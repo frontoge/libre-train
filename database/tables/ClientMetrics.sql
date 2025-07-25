@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS ClientMetrics (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    client_id INT UNSIGNED NOT NULL REFERENCES Client(id) ON DELETE CASCADE,
+    current_weight DECIMAL(5, 2),
+    body_fat_percentage DECIMAL(5, 2),
+    muscle_mass DECIMAL(5, 2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
