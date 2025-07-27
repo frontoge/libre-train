@@ -1,5 +1,4 @@
 import { Layout } from "antd";
-import { Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import { Outlet } from "react-router-dom";
 import { NavMenu } from "../components/NavMenu";
@@ -13,9 +12,7 @@ export function RouterLayout() {
             <Sider>
                 <NavMenu />
             </Sider>
-            <Content>
-                <Outlet />
-            </Content>
+            <Outlet />
         </Layout>
     )
 }

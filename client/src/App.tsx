@@ -13,6 +13,11 @@ function App() {
 			token: {
 				colorPrimary: "#49aa19",
 			},
+			components: {
+				Layout: {
+					headerBg: '#141414ff'
+				}
+			}
 		}}
 	>
 		<div style={{
