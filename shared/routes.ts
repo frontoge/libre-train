@@ -1,3 +1,4 @@
 export const Routes = {
-    Test: "/test"
+    Health: "/health",
+    Clients: "/clients",
 }

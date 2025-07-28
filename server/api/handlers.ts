@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 
-export const handleTestRoute = (req: Request, res: Response) => {
-    res.json({
-        message: "This is a test route!"
+export const handleHealthCheck = (req: Request, res: Response) => {
+    res.status(200).json({
+        message: "Status: OK",
     });
 };
+
 
