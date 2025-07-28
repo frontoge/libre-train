@@ -18,7 +18,6 @@ function getNavigationUrlFromNavKey(navKey: string): string {
 export function getNavigationUrl(keyPath: string[]): string {
     const reversedKeyPath = keyPath.toReversed();
     return reversedKeyPath.reduce((acc: string, current: string) => {
-        console.log('Current:', current, 'Acc:', acc);
         return acc + "/" + getNavigationUrlFromNavKey(current)
     }, '')
 }

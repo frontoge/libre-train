@@ -7,6 +7,7 @@ export function ClientRouter() {
     return (
         <Routes>
             <Route index element={<ClientDashboard />} />
+            <Route path=":id" element={<ClientDashboard />} />
             <Route path="create" element={<AddClient />} />
             <Route path="*" element={<NoPage />} />
         </Routes>
