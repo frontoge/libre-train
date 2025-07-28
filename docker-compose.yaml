@@ -3,7 +3,21 @@ services:
     build:
       context: .
       dockerfile: server/Dockerfile
+    develop:
+      watch:
+        - action: sync
+          path: server
+          target: /app/server
+          ignore:
+            - "**/node_modules/**"
+            - "**/dist/**"
+        - action: rebuild
+          path: server/package.json
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
+    env_file:
+      - .env
+    volumes:
+      - ./server:/app/server
+      - ./shared:/app/shared
+    

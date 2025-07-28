@@ -8,4 +8,4 @@ WORKDIR /app/server
 COPY server/package.json server/bun.lockb* ./
 COPY server/ .
 EXPOSE 3000
-CMD ["bun", "run", "index.ts"]
+CMD ["bun", "run", "dev"]

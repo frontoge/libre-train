@@ -9,9 +9,16 @@
     "express": "^5.1.0"
   },
   "scripts": {
-    "start": "bun run index.ts"
+    "start": "bun run index.ts",
+    "dev": "bun --watch index.ts"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/node": "^24.1.0",
+    "cors": "^2.8.5",
+    "mysql2": "^3.14.2"
   }
 }
