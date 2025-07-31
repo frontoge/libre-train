@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS ClientDailyLog (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    client_id INT UNSIGNED NOT NULL,
+    logged_weight DECIMAL(5,1),
+    target_weight DECIMAL(5,1),
+    body_fat DECIMAL(5,1),
+    target_body_fat DECIMAL(5,1),
+    logged_calories INT,
+    target_calories INT,
+    logged_protein INT,
+    target_protein INT,
+    logged_carbs INT,
+    target_carbs INT,
+    logged_fat INT,
+    target_fat INT,
+)
