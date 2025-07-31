@@ -13,7 +13,9 @@ app.use(cors({
     origin: '*', // Adjust as necessary for CORS
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
-}))
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", apiRouter);
 
