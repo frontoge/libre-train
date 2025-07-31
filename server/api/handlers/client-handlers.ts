@@ -48,7 +48,7 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
     try {
         // Insert client into database
         const [result] = await connection.query<RowDataPacket[][]>({
-            sql: "CALL spCreateContact(?, ?, ?, ?, ?, ?, ?, ?)",
+            sql: "CALL spCreateClient(?, ?, ?, ?, ?, ?, ?, ?)",
             values: [
                 information.firstName ?? null,
                 information.lastName ?? null,
@@ -64,6 +64,7 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
         const insertResult = result[0];
 
         if (!insertResult || insertResult.length === 0 || !insertResult[0]?.id) {
+            console.error("Failed to create client:", "Failed to create contact.");
             res.status(500).json({ message: "Failed to create client." });
             return;
         }
@@ -107,6 +108,7 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
         });
 
         if (dailyLogResult.affectedRows === 0 || measurementResult.affectedRows === 0) {
+            console.error("Failed to create daily log or measurements:", "Failed to create daily log or measurements.");
             res.status(500).json({ message: "Failed to create daily log or measurements." });
             return;
         }
@@ -116,9 +118,11 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
 
     } catch (error) {
         if (error instanceof Error) {
+            console.error("Error creating client:", error.message);
             res.status(500).json({ message: error.message });
             return;
         }
+        console.error("Unexpected error creating client:", error);
         res.status(500).json({ message: "An unexpected error occurred." });
     }
 }
