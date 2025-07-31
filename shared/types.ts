@@ -8,3 +8,8 @@ export type Client = {
     created_at: Date;
     updated_at: Date;
 }
+
+export type Goal = {
+    id: number;
+    goal: string;
+}

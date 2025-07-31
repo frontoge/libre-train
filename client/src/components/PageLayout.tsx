@@ -3,7 +3,7 @@ import { Content, Header } from "antd/es/layout/layout";
 
 type PageLayoutProps = {
     title?: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
     style?: React.CSSProperties;
 }
 
