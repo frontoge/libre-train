@@ -1,6 +1,7 @@
 import { Input, InputNumber } from "antd"
 import React from "react";
-import { AddClientFormContext, type AddClientFormValues } from "../../contexts/AddClientFormContext";
+import { AddClientFormContext} from "../../contexts/AddClientFormContext";
+import { type AddClientFormValues } from "../../../../shared/types";
 
 export default function ClientFormInformation() {
 

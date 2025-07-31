@@ -20,10 +20,35 @@ export default function ClientMeasurements() {
                 height: '50%',
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
-                gridTemplateRows: 'repeat(5, 1fr)',
+                gridTemplateRows: 'repeat(6, 1fr)',
                 alignItems: 'center',
                 gap: '1rem',
             }}>
+                <InputNumber 
+                    placeholder="Weight" 
+                    style={{ width: '100%' }}
+                    min={0} 
+                    suffix={"lbs"}
+                    value={formValues.measurements.weight} 
+                    onChange={(val) => 
+                        setFormValues(prev => 
+                            ({...prev, measurements: {...prev.measurements, weight: val === null ? undefined : val}})
+                        )
+                    }
+                />
+                <InputNumber
+                    placeholder="Body Fat"
+                    style={{ width: '100%' }}
+                    min={0}
+                    max={100}
+                    suffix={"%"}
+                    value={formValues.measurements.body_fat}
+                    onChange={(val) => 
+                        setFormValues(prev => 
+                            ({...prev, measurements: {...prev.measurements, body_fat: val === null ? undefined : val}})
+                        )
+                    }
+                />
                 <InputNumber 
                     placeholder="Wrist" 
                     style={{ width: '100%' }} 

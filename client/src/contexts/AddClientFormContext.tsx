@@ -1,36 +1,6 @@
 import React from "react";
 
-export type AddClientFormValues = {
-    information: {
-        firstName?: string;
-        lastName?: string;
-        phone?: string;
-        email?: string;
-        height?: number;
-        age?: number;
-        img64?: string;
-        notes?: string;
-    },
-    goals: {
-        goal?: number;
-        targetWeight?: number;
-        targetBodyFat?: number;
-        targetLeanMass?: number;
-        targetDate?: Date;
-    },
-    measurements: {
-        wrist?: number;
-        calves?: number;
-        biceps?: number;
-        chest?: number;
-        thighs?: number;
-        waist?: number;
-        shoulders?: number;
-        hips?: number;
-        forearm?: number;
-        neck?: number;
-    },
-}
+import { type AddClientFormValues } from "../../../shared/types";
 
 export const defaultFormValues: AddClientFormValues = {
     information: {
@@ -50,6 +20,8 @@ export const defaultFormValues: AddClientFormValues = {
         targetDate: undefined
     },
     measurements: {
+        weight: undefined,
+        body_fat: undefined,
         wrist: undefined,
         calves: undefined,
         biceps: undefined,

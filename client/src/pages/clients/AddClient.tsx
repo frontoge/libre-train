@@ -1,82 +1,42 @@
 import Divider from "antd/es/divider";
 import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";
-import { Button } from "antd";
+import { Button, message } from "antd";
 import { useState } from "react";
 import TextArea from "antd/es/input/TextArea";
-import { AddClientFormContext, type AddClientFormValues } from "../../contexts/AddClientFormContext";
+import { AddClientFormContext, defaultFormValues } from "../../contexts/AddClientFormContext";
 import ClientFormInformation from "../../components/clients/ClientFormInformation";
 import ClientFormGoals from "../../components/clients/ClientFormGoals";
 import ClientMeasurements from "../../components/clients/ClientMeasurements";
+import { type AddClientFormValues } from "../../../../shared/types";
+import { Routes } from "../../../../shared/routes";
+import { getAppConfiguration } from "../../config/app.config";
 
 export function AddClient() {
 
-    const [formValues, setFormValues] = useState<AddClientFormValues>({
-        information: {
-            firstName: undefined,
-            lastName: undefined,
-            phone: undefined,
-            email: undefined,
-            height: undefined,
-            age: undefined,
-            img64: undefined
-        },
-        goals: {
-            goal: undefined,
-            targetWeight: undefined,
-            targetBodyFat: undefined,
-            targetLeanMass: undefined,
-            targetDate: undefined
-        },
-        measurements: {
-            wrist: undefined,
-            calves: undefined,
-            biceps: undefined,
-            chest: undefined,
-            thighs: undefined,
-            waist: undefined,
-            shoulders: undefined,
-            hips: undefined,
-            forearm: undefined,
-            neck: undefined
-        }
-    })
+    const [messageApi, contextHolder] = message.useMessage();
+    const [formValues, setFormValues] = useState<AddClientFormValues>(defaultFormValues);
 
     const resetFormValues = () => {
-        setFormValues({
-            information: {
-                firstName: undefined,
-                lastName: undefined,
-                phone: undefined,
-                email: undefined,
-                height: undefined,
-                age: undefined,
-                img64: undefined
-            },
-            goals: {
-                goal: undefined,
-                targetWeight: undefined,
-                targetBodyFat: undefined,
-                targetLeanMass: undefined,
-                targetDate: undefined
-            },
-            measurements: {
-                wrist: undefined,
-                calves: undefined,
-                biceps: undefined,
-                chest: undefined,
-                thighs: undefined,
-                waist: undefined,
-                shoulders: undefined,
-                hips: undefined,
-                forearm: undefined,
-                neck: undefined
-            }
-        })
+        setFormValues(defaultFormValues)
     }
 
-    const submitAddClientForm = () => {
-
+    const submitAddClientForm = async () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formValues)
+        }
+        const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}`, requestOptions);
+        if (!response.ok) {
+            messageApi.error('Failed to add client.');
+            return;
+        }
+        const data = await response.json();
+        messageApi.success('Client added successfully.');
+        resetFormValues();
     }
 
     return (
@@ -129,18 +89,18 @@ export function AddClient() {
 
                             </div>
                             <div style={{
-                                    justifySelf: 'end',
-                                    alignSelf: 'end',
-                                    display: 'flex',
-                                    gap: '1rem',
-                                }}>
-                                    <Button type="primary" onClick={submitAddClientForm}>
-                                        Save
-                                    </Button>
-                                    <Button type="default" onClick={resetFormValues}>
-                                        Clear
-                                    </Button>
-                                </div>
+                                justifySelf: 'end',
+                                alignSelf: 'end',
+                                display: 'flex',
+                                gap: '1rem',
+                            }}>
+                                <Button type="primary" onClick={submitAddClientForm}>
+                                    Save
+                                </Button>
+                                <Button type="default" onClick={resetFormValues}>
+                                    Clear
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </Panel>
