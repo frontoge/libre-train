@@ -151,14 +151,12 @@ export const handleDailyUpdate = async (req: Request<{}, {}, DailyUpdateRequest>
     try {
 
         const [result] = await connection.execute<ResultSetHeader>({
-            sql: "CALL spCreateClientDailyLog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            sql: "CALL spCreateClientDailyLog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             values: [
                 req.body.clientId, // Assuming clientId is part of the request body
                 new Date(date),
                 data.weight ?? null,
-                null,
                 data.body_fat ?? null,
-                null,
                 data.calories ?? null,
                 data.target_calories ?? null,
                 data.protein ?? null,
