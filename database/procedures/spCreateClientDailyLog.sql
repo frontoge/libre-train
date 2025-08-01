@@ -1,5 +1,6 @@
 CREATE PROCEDURE `spCreateClientDailyLog` (
   IN p_client_id INT UNSIGNED,
+  IN p_date DATE,
   IN p_logged_weight DECIMAL(5, 1),
   IN p_target_weight DECIMAL(5, 1),
   IN p_body_fat DECIMAL(5, 1),
@@ -27,7 +28,8 @@ INSERT INTO
     logged_carbs,
     target_carbs,
     logged_fat,
-    target_fat
+    target_fat,
+    created_at
   )
 VALUES
   (
@@ -43,7 +45,8 @@ VALUES
     p_logged_carbs,
     p_target_carbs,
     p_logged_fat,
-    p_target_fat
+    p_target_fat,
+    p_date
   );
 
 SELECT
