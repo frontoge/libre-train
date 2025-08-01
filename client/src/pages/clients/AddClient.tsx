@@ -41,8 +41,10 @@ export function AddClient() {
 
     return (
         <AddClientFormContext value={{formValues, setFormValues}}>
+            <>
+            {contextHolder}
             <PageLayout title="Add Client" style={{
-                    padding: "2rem 3rem",
+                padding: "2rem 3rem",
                 display: "flex",
                 justifyContent: "center",
             }}>
@@ -105,6 +107,7 @@ export function AddClient() {
                     </div>
                 </Panel>
             </PageLayout>
+            </>
         </AddClientFormContext>
     );
 }

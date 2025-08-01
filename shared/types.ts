@@ -50,3 +50,22 @@ export type AddClientFormValues = {
         neck?: number;
     },
 }
+
+export type DailyUpdateData = {
+    weight?: number;
+    body_fat?: number;
+    calories?: number;
+    target_calories?: number;
+    protein?: number;
+    target_protein?: number;
+    carbs?: number;
+    target_carbs?: number;
+    fats?: number;
+    target_fats?: number;
+}
+
+export type DailyUpdateRequest = {
+    clientId: number;
+    date: string; // ISO string
+    data: DailyUpdateData;
+}

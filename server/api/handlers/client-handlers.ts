@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { AddClientFormValues, Client } from "../../../shared/types";
+import { AddClientFormValues, Client, DailyUpdateData, DailyUpdateRequest } from "../../../shared/types";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 export const handleGetClients = async (req: Request, res: Response<Client[] | {message: string}>) => {
@@ -72,9 +72,10 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
         const insertId = insertResult[0].id;
 
         const [dailyLogResult] = await connection.execute<ResultSetHeader>({
-            sql: "Call spCreateClientDailyLog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            sql: "Call spCreateClientDailyLog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             values: [
                 insertId,
+                new Date(),
                 measurements.weight ?? null,
                 goals.targetWeight ?? null,
                 measurements.body_fat ?? null,
@@ -107,7 +108,18 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
             ]
         });
 
-        if (dailyLogResult.affectedRows === 0 || measurementResult.affectedRows === 0) {
+        const [goalResult] = await connection.execute<ResultSetHeader>({
+            sql: "CALL spCreateClientGoal(?, ?, ?, ?, ?)",
+            values: [
+                insertId,
+                goals.goal ?? null,
+                goals.targetWeight ?? null,
+                goals.targetBodyFat ?? null,
+                new Date()
+            ]
+        });
+
+        if (dailyLogResult.affectedRows === 0 || measurementResult.affectedRows === 0 || goalResult.affectedRows === 0) {
             console.error("Failed to create daily log or measurements:", "Failed to create daily log or measurements.");
             res.status(500).json({ message: "Failed to create daily log or measurements." });
             return;
@@ -125,4 +137,48 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
         console.error("Unexpected error creating client:", error);
         res.status(500).json({ message: "An unexpected error occurred." });
     }
+}
+
+export const handleDailyUpdate = async (req: Request<{}, {}, DailyUpdateRequest>, res: Response) => {
+    const connection = await getDatabaseConnection();
+
+    if (!req.body) {
+        res.status(400).json({ message: "Request body is required" });
+        return;
+    }
+
+    const { date, data } = req.body;
+    try {
+
+        const [result] = await connection.execute<ResultSetHeader>({
+            sql: "CALL spCreateClientDailyLog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            values: [
+                req.body.clientId, // Assuming clientId is part of the request body
+                new Date(date),
+                data.weight ?? null,
+                null,
+                data.body_fat ?? null,
+                null,
+                data.calories ?? null,
+                data.target_calories ?? null,
+                data.protein ?? null,
+                data.target_protein ?? null,
+                data.carbs ?? null,
+                data.target_carbs ?? null,
+                data.fats ?? null,
+                data.target_fats ?? null
+            ]
+        });
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("Error submitting daily update:", error.message);
+            res.status(500).json({ message: error.message });
+            return;
+        }
+        console.error("Unexpected error submitting daily update:", error);
+        res.status(500).json({ message: "An unexpected error occurred." });
+    }
+
+    res.status(200).json({ message: "Daily update submitted successfully." });
+
 }

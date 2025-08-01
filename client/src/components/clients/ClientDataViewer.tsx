@@ -1,14 +1,82 @@
-import { Button, Calendar, Card, Divider, InputNumber, Spin, Statistic} from "antd";
+import { Button, Calendar, Card, Divider, InputNumber, message, Spin, Statistic} from "antd";
 import { Panel } from "../Panel";
 import React from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { NutritionSummary } from "../Nutrition/NutritionSummary";
+import { type DailyUpdateData } from "../../../../shared/types";
+import { undefinedIfNull } from "../../helpers/boolean-helpers";
+import { Routes } from "../../../../shared/routes";
+import { useParams } from "react-router-dom";
+import { getAppConfiguration } from "../../config/app.config";
 
 export function ClientDataViewer() {
-
+    const { id } = useParams();
+    const [messageApi, contextHolder] = message.useMessage();
     const [isLoading, setIsLoading] = React.useState(false);
     const [selectedDate, setSelectedDate] = React.useState<Dayjs | null>(null);
+    const [dailyData, setDailyData] = React.useState<DailyUpdateData>({
+        weight: undefined,
+        body_fat: undefined,
+        calories: undefined,
+        target_calories: undefined,
+        protein: undefined,
+        target_protein: undefined,
+        carbs: undefined,
+        target_carbs: undefined,
+        fats: undefined,
+        target_fats: undefined,   
+    })
+
+    const clearDailyValues = () => {
+        setDailyData({
+            weight: undefined,
+            body_fat: undefined,
+            calories: undefined,
+            target_calories: undefined,
+            protein: undefined,
+            target_protein: undefined,
+            carbs: undefined,
+            target_carbs: undefined,
+            fats: undefined,
+            target_fats: undefined,   
+        });
+    }
+
+    const submitDailyUpdate = async () => {
+        if (!selectedDate) {
+            return;
+        }
+        if (!id) {
+            messageApi.error("Must select a client");
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    clientId: parseInt(id ?? "0"), // Ensure id is a number
+                    date: selectedDate.toISOString(),
+                    data: dailyData
+                })
+            };
+            const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}/daily-update`, requestOptions);
+            if (!response.ok) {
+                messageApi.error('Failed to submit daily update.');
+                throw new Error('Failed to submit daily update');
+            }
+            clearDailyValues();
+        } catch (error) {
+            messageApi.error('An error occurred while submitting daily update.');
+            console.error("Error submitting daily update:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     if (isLoading) {
         return (
@@ -24,6 +92,8 @@ export function ClientDataViewer() {
     }
 
     return (
+        <>
+            {contextHolder}
         <Panel id="client-dash-data-viewer" style={{
             height: '80%',
             display: 'flex',
@@ -50,35 +120,39 @@ export function ClientDataViewer() {
                     flexDirection: 'column',
                 }}>
                     <div className='update-inputs' style={{
-                        height: "75%",
+                        height: "65%",
                         width: '100%',
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
-                        gridTemplateRows: 'repeat(3, 1fr)',
+                        gridTemplateRows: 'repeat(7, 1fr)',
                         alignItems: 'center',
                         gap: '1rem',
+                        paddingTop: '1rem'
                     }}>
-                        <InputNumber placeholder="Weight" style={{ width: '100%' }} min={0} suffix={"lbs"} />
-                        <InputNumber placeholder="Body Fat" style={{ width: '100%' }} min={0} max={100} suffix={"%"} />
-                        <InputNumber placeholder="Calories" style={{ width: '100%' }} min={0} suffix={"kcal"} />
-                        <InputNumber placeholder="Protein" style={{ width: '100%' }} min={0} suffix={"g"} />
-                        <InputNumber placeholder="Carbs" style={{ width: '100%' }} min={0} suffix={"g"} />
-                        <InputNumber placeholder="Fats" style={{ width: '100%' }} min={0} suffix={"g"} />
+                        <InputNumber placeholder="Weight" style={{ width: '100%' }} min={0} suffix={"lbs"} value={dailyData.weight} onChange={(val) => setDailyData({ ...dailyData, weight: undefinedIfNull(val) })} />
+                        <InputNumber placeholder="Body Fat" style={{ width: '100%' }} min={0} max={100} suffix={"%"} value={dailyData.body_fat} onChange={(val) => setDailyData({ ...dailyData, body_fat: undefinedIfNull(val) })} />
+                        <InputNumber placeholder="Calories" style={{ width: '100%' }} min={0} suffix={"kcal"} value={dailyData.calories} onChange={(val) => setDailyData({ ...dailyData, calories: undefinedIfNull(val) })} />
+                        <InputNumber placeholder="Target Calories" style={{ width: '100%' }} min={0} suffix={"kcal"} value={dailyData.target_calories} onChange={(val) => setDailyData({ ...dailyData, target_calories: undefinedIfNull(val) })} />
+                        <InputNumber placeholder="Protein" style={{ width: '100%' }} min={0} suffix={"g"} value={dailyData.protein} onChange={(val) => setDailyData({ ...dailyData, protein: undefinedIfNull(val) })} />
+                        <InputNumber placeholder="Target Protein" style={{ width: '100%' }} min={0} suffix={"g"} value={dailyData.target_protein} onChange={(val) => setDailyData({ ...dailyData, target_protein: undefinedIfNull(val) })} />
+                        <InputNumber placeholder="Carbs" style={{ width: '100%' }} min={0} suffix={"g"} value={dailyData.carbs} onChange={(val) => setDailyData({ ...dailyData, carbs: undefinedIfNull(val) })} />
+                        <InputNumber placeholder="Target Carbs" style={{ width: '100%' }} min={0} suffix={"g"} value={dailyData.target_carbs} onChange={(val) => setDailyData({ ...dailyData, target_carbs: undefinedIfNull(val) })} />
+                        <InputNumber placeholder="Fats" style={{ width: '100%' }} min={0} suffix={"g"} value={dailyData.fats} onChange={(val) => setDailyData({ ...dailyData, fats: undefinedIfNull(val) })} />
+                        <InputNumber placeholder="Target Fats" style={{ width: '100%' }} min={0} suffix={"g"} value={dailyData.target_fats} onChange={(val) => setDailyData({ ...dailyData, target_fats: undefinedIfNull(val) })} />
                     </div>
                     <div className='update-actions' style={{
-                        height: "25%",
+                        height: "15%",
                         display: 'flex',
                         flexDirection: 'row',
                         justifyContent: "end",
                         alignItems: 'end',
                         gap: '1rem',
                         width: '100%',
-                        paddingBottom: '1rem'
                     }}>
-                        <Button type="primary">
+                        <Button type="primary" onClick={submitDailyUpdate}>
                             Save
                         </Button>
-                        <Button type="default">
+                        <Button type="default" onClick={clearDailyValues}>
                             Clear
                         </Button>
                     </div>
@@ -147,5 +221,6 @@ export function ClientDataViewer() {
             </div>
             
         </Panel>
+        </>
     );
 }
