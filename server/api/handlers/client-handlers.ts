@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { AddClientFormValues, Client, DailyUpdateData, DailyUpdateRequest, DashboardData, DashboardResponse } from "../../../shared/types";
+import { AddClientFormValues, Client, DailyUpdateRequest, DashboardData, DashboardResponse } from "../../../shared/types";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 export const handleGetClients = async (req: Request, res: Response<Client[] | {message: string}>) => {
@@ -14,6 +14,10 @@ export const handleGetClients = async (req: Request, res: Response<Client[] | {m
             last_name: row.last_name,
             email: row.email,
             phone: row.phone,
+            height: row.height,
+            img: row.img,
+            age: row.age,
+            notes: row.notes,
             created_at: row.created_at,
             updated_at: row.updated_at,
         }));
@@ -71,15 +75,15 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
 
         const insertId = insertResult[0].id;
 
+        let d = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"})); 
+
         const [dailyLogResult] = await connection.execute<ResultSetHeader>({
-            sql: "Call spCreateClientDailyLog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            sql: "Call spCreateClientDailyLog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             values: [
                 insertId,
-                new Date(),
+                d,
                 measurements.weight ?? null,
-                goals.targetWeight ?? null,
                 measurements.body_fat ?? null,
-                goals.targetBodyFat ?? null,
                 null,
                 null,
                 null,
@@ -201,7 +205,7 @@ export const handleGetDashboard = async (req: Request<{}, {}, {}, { clientId: st
         });
 
         if (results.length === 0 || !results[0] || results[0].length === 0) {
-            res.status(500).json({ message: "No dashboard data found for the specified client and date." });
+            res.status(200).json({ message: "no data found" });
             return;
         }
 
@@ -218,11 +222,11 @@ export const handleGetDashboard = async (req: Request<{}, {}, {}, { clientId: st
             logged_body_fat: results[0][0].logged_body_fat,
             logged_protein: results[0][0].logged_protein,
             logged_carbs: results[0][0].logged_carbs,
-            logged_fats: results[0][0].logged_fats,
+            logged_fats: results[0][0].logged_fat,
             target_calories: results[0][0].target_calories,
             target_protein: results[0][0].target_protein,
             target_carbs: results[0][0].target_carbs,
-            target_fats: results[0][0].target_fats,
+            target_fats: results[0][0].target_fat,
             goal: results[0][0].goal,
             goal_weight: results[0][0].goal_weight,
             goal_bodyFat: results[0][0].goal_bodyFat

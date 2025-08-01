@@ -5,13 +5,21 @@ import { AppContext } from "../../app-context";
 import { useContext } from "react";
 import { Panel } from "../Panel";
 import type { Client } from "../../../../shared/types";
+import { ClientDashboardContext } from "../../contexts/ClientDashboardContext";
 
 export function ClientOverview() {
 
     const { id } = useParams();
     const {state} = useContext(AppContext);
+    const { dashboardState } = useContext(ClientDashboardContext);
 
     const selectedClient: Client | undefined = state.clients.find(c => c.id === Number(id));
+
+    console.log("Selected Client:", selectedClient);
+
+    const loggedWeight = dashboardState.data.logged_weight ?? 0;
+    const targetWeight = dashboardState.data.goal_weight ?? 200;
+
 
     return (
         <Panel id='client-dash-information'
@@ -32,7 +40,7 @@ export function ClientOverview() {
             <>
                 <Avatar
                     size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
-                    icon={<AntDesignOutlined />}
+                    icon={dashboardState.data.img ?? <AntDesignOutlined />}
                 />
                 <div style={{
                     display: 'flex',
@@ -43,9 +51,9 @@ export function ClientOverview() {
                     gap: '0.1rem',
                     flexGrow: 1,
                 }}>
-                    <h2>{`${selectedClient?.first_name} ${selectedClient.last_name}`}</h2>
-                    <div>{selectedClient?.email}</div>
-                    <div>{selectedClient?.phone}</div>
+                    <h2>{`${selectedClient?.first_name} ${selectedClient?.last_name}`}</h2>
+                    <div>Email: {selectedClient?.email ?? ""}</div>
+                    <div>Phone: {selectedClient?.phone ?? ""}</div>
                     <div>{`Height: ${selectedClient?.height ?? "N/A"}`}</div>
                 </div>
                 <div style={{
@@ -56,13 +64,13 @@ export function ClientOverview() {
                     gap: '0.4rem',
                 }}>
                     <div>
-                        <span>Body Fat:</span><span>17.4%</span>
+                        <span>Body Fat:</span><span>{"Coming Soon"}</span>
                     </div>
                     <div>
-                        <span>Lean Mass:</span><span>150.6lbs</span>
+                        <span>Lean Mass:</span><span>{"Coming Soon"}</span>
                     </div>
                     <div>
-                        <span>Phase:</span><span>2 - Bulking</span>
+                        <span>Phase:</span><span>{"Coming Soon"}</span>
                     </div>
                 </div>
                 <div id='client-progress' style={{
@@ -72,10 +80,10 @@ export function ClientOverview() {
                     width: '15%',
                     height: '100%',
                 }}>
-                    <Progress type='dashboard' percent={Math.floor((180-170)/(200-170)*100)} gapDegree={90} format={() => `180lbs`} style={{
+                    <Progress type='dashboard' percent={Math.floor((loggedWeight - 170) / (targetWeight - 170) * 100)} gapDegree={90} format={() => `${loggedWeight}lbs`} style={{
                         height: "80%"
                     }}/>
-                    <div style={{ marginTop: '0.5rem' }}>TW: 200lbs</div>
+                    <div style={{ marginTop: '0.5rem' }}>TW: {targetWeight}lbs</div>
                 </div>
             </>}
         </Panel>

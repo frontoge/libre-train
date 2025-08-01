@@ -9,24 +9,29 @@ import { undefinedIfNull } from "../../helpers/boolean-helpers";
 import { Routes } from "../../../../shared/routes";
 import { useParams } from "react-router-dom";
 import { getAppConfiguration } from "../../config/app.config";
+import { ClientDashboardContext } from "../../contexts/ClientDashboardContext";
 
 export function ClientDataViewer() {
+
+    const { dashboardState, setDashboardState } = React.useContext(ClientDashboardContext);
     const { id } = useParams();
+
     const [messageApi, contextHolder] = message.useMessage();
+
     const [isLoading, setIsLoading] = React.useState(false);
-    const [selectedDate, setSelectedDate] = React.useState<Dayjs | null>(null);
     const [dailyData, setDailyData] = React.useState<DailyUpdateData>({
-        weight: undefined,
-        body_fat: undefined,
-        calories: undefined,
-        target_calories: undefined,
-        protein: undefined,
-        target_protein: undefined,
-        carbs: undefined,
-        target_carbs: undefined,
-        fats: undefined,
-        target_fats: undefined,   
+        weight: dashboardState.data.logged_weight,
+        body_fat: dashboardState.data.logged_body_fat,
+        calories: dashboardState.data.logged_calories,
+        target_calories: dashboardState.data.target_calories,
+        protein: dashboardState.data.logged_protein,
+        target_protein: dashboardState.data.target_protein,
+        carbs: dashboardState.data.logged_carbs,
+        target_carbs: dashboardState.data.target_carbs,
+        fats: dashboardState.data.logged_fats,
+        target_fats: dashboardState.data.target_fats,
     })
+
 
     const clearDailyValues = () => {
         setDailyData({
@@ -44,7 +49,7 @@ export function ClientDataViewer() {
     }
 
     const submitDailyUpdate = async () => {
-        if (!selectedDate) {
+        if (!dashboardState.selectedDate) {
             return;
         }
         if (!id) {
@@ -60,7 +65,7 @@ export function ClientDataViewer() {
                 },
                 body: JSON.stringify({
                     clientId: parseInt(id ?? "0"), // Ensure id is a number
-                    date: selectedDate.toISOString(),
+                    date: dashboardState.selectedDate.toISOString(),
                     data: dailyData
                 })
             };
@@ -109,7 +114,7 @@ export function ClientDataViewer() {
                 <div style={{
                     display: 'flex',
                 }}>
-                    <Calendar fullscreen={false} onSelect={setSelectedDate} />
+                    <Calendar fullscreen={false} onSelect={date => setDashboardState(prev => ({ ...prev, selectedDate: date }))} />
                 </div>
                 <Divider style={{ margin: '0' }}>
                     Input Daily Data
@@ -169,7 +174,7 @@ export function ClientDataViewer() {
                 <h1 style={{
                     marginBottom: '0',
                 }}>
-                    {selectedDate?.format('MM/DD/YYYY') ?? dayjs().format('MM/DD/YYYY')}
+                    {dashboardState.selectedDate?.format('MM/DD/YYYY') ?? dayjs().format('MM/DD/YYYY')}
                 </h1>
                 <div style={{
                     display: 'flex',
@@ -196,11 +201,11 @@ export function ClientDataViewer() {
                     }}>
                         <Statistic
                             title="Weight"
-                            value={180}
+                            value={dashboardState.data.logged_weight ?? 0}
                             precision={1}
-                            suffix="(+2.3)"
-                            valueStyle={{ color: '#3f8600' }}
-                            prefix={<ArrowUpOutlined />}
+                            // suffix="(+2.3)"
+                            // valueStyle={{ color: '#3f8600' }}
+                            // prefix={<ArrowUpOutlined />}
                         />
                     </Card>
                     <Card variant="outlined" style={{
@@ -208,11 +213,11 @@ export function ClientDataViewer() {
                     }}>
                         <Statistic
                             title="Calories"
-                            value={2876}
+                            value={dashboardState.data.logged_calories ?? 0}
                             precision={0}
-                            suffix="(-144)"
-                            valueStyle={{ color: '#cf1322' }}
-                            prefix={<ArrowDownOutlined />}
+                            // suffix="(-144)"
+                            // valueStyle={{ color: '#cf1322' }}
+                            // prefix={<ArrowDownOutlined />}
                         />
                     </Card>
                 </div>

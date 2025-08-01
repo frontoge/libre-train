@@ -5,13 +5,21 @@ import { useNavigate } from "react-router-dom";
 
 export function ClientList() {
 
-    const { state } = useContext(AppContext);
+    const { state, setState } = useContext(AppContext);
     const navigate = useNavigate();
+
+    const selectClient = (clientId: number) => {
+        setState(prev => ({
+            ...prev,
+            selectedClient: clientId
+        }));
+        navigate(`/clients/${clientId}`);
+    }
 
     const list = state.clients.map(client => ({
         id: client.id,
         name: client.first_name + ' ' + client.last_name,
-        avatar: client?.img ?? 'https://joeschmoe.io/api/v1/random',
+        avatar: client?.img,
         email: client.email,
         loading: false // You can set this based on your loading state
     }));
@@ -23,7 +31,7 @@ export function ClientList() {
             dataSource={list}
             renderItem={(item) => (
                 <List.Item
-                    onClick={() => navigate(`/clients/${item.id}`)}
+                    onClick={() => selectClient(item.id)}
                     key={item.id}
                     actions={[
                         <a key="list-loadmore-edit">edit</a>,

@@ -10,7 +10,7 @@ INSERT INTO
 VALUES
   (
     p_client_id,
-    p_goal_id,
+    p_goal_type,
     p_target_weight,
     p_target_bodyfat,
     IFNULL(
