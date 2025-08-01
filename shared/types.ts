@@ -69,3 +69,32 @@ export type DailyUpdateRequest = {
     date: string; // ISO string
     data: DailyUpdateData;
 }
+
+export type DashboardData = {
+    clientId: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+    height?: number;
+    img?: string;
+    logged_weight: number;
+    logged_calories?: number;
+    logged_body_fat?: number;
+    logged_protein?: number;
+    logged_carbs?: number;
+    logged_fats?: number;
+    target_calories?: number;
+    target_protein?: number;
+    target_carbs?: number;
+    target_fats?: number;
+    goal?: string;
+    goal_weight?: number;
+    goal_bodyFat?: number;
+}
+
+export type ErrorResponse = {
+    message: string;
+}
+
+export type DashboardResponse = DashboardData | ErrorResponse;

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { AddClientFormValues, Client, DailyUpdateData, DailyUpdateRequest } from "../../../shared/types";
+import { AddClientFormValues, Client, DailyUpdateData, DailyUpdateRequest, DashboardData, DashboardResponse } from "../../../shared/types";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 export const handleGetClients = async (req: Request, res: Response<Client[] | {message: string}>) => {
@@ -179,4 +179,64 @@ export const handleDailyUpdate = async (req: Request<{}, {}, DailyUpdateRequest>
 
     res.status(200).json({ message: "Daily update submitted successfully." });
 
+}
+
+export const handleGetDashboard = async (req: Request<{}, {}, {}, { clientId: string, date: string }>, res: Response<DashboardResponse>) => {
+    const connection = await getDatabaseConnection();
+
+    const { clientId, date } = req.query;
+
+    if (!clientId || !date) {
+        res.status(400).json({ message: "Client ID and date are required." });
+        return;
+    }
+
+    try {
+        const [results] = await connection.query<RowDataPacket[]>({
+            sql: "CALL spGetClientDashboard(?, ?)",
+            values: [
+                parseInt(clientId, 10),
+                new Date(date)
+            ]
+        });
+
+        if (results.length === 0 || !results[0] || results[0].length === 0) {
+            res.status(500).json({ message: "No dashboard data found for the specified client and date." });
+            return;
+        }
+
+        const dashboardData: DashboardData = {
+            clientId: results[0][0].client_id,
+            first_name: results[0][0].first_name,
+            last_name: results[0][0].last_name,
+            email: results[0][0].email,
+            phone: results[0][0].phone,
+            height: results[0][0].height,
+            img: results[0][0].img,
+            logged_weight: results[0][0].logged_weight,
+            logged_calories: results[0][0].logged_calories,
+            logged_body_fat: results[0][0].logged_body_fat,
+            logged_protein: results[0][0].logged_protein,
+            logged_carbs: results[0][0].logged_carbs,
+            logged_fats: results[0][0].logged_fats,
+            target_calories: results[0][0].target_calories,
+            target_protein: results[0][0].target_protein,
+            target_carbs: results[0][0].target_carbs,
+            target_fats: results[0][0].target_fats,
+            goal: results[0][0].goal,
+            goal_weight: results[0][0].goal_weight,
+            goal_bodyFat: results[0][0].goal_bodyFat
+        };
+
+        res.status(200).json(dashboardData);
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("Error fetching dashboard data:", error.message);
+            res.status(500).json({ message: error.message });
+            return;
+        }
+        console.error("Unexpected error fetching dashboard data:", error);
+        res.status(500).json({ message: "An unexpected error occurred." });
+    }
 }
