@@ -76,6 +76,7 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
         const insertId = insertResult[0].id;
 
         let d = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"})); 
+        console.log("Current date in New York timezone:", d);
 
         const [dailyLogResult] = await connection.execute<ResultSetHeader>({
             sql: "Call spCreateClientDailyLog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",

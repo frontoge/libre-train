@@ -65,7 +65,7 @@ export function ClientDataViewer() {
                 },
                 body: JSON.stringify({
                     clientId: parseInt(id ?? "0"), // Ensure id is a number
-                    date: dashboardState.selectedDate.toISOString(),
+                    date: dashboardState.selectedDate.format('YYYY-MM-DD'),
                     data: dailyData
                 })
             };

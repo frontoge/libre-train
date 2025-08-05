@@ -12,9 +12,9 @@ CREATE TABLE
     `target_carbs` int(11) DEFAULT NULL,
     `logged_fat` int(11) DEFAULT NULL,
     `target_fat` int(11) DEFAULT NULL,
-    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    `created_at` date DEFAULT NULL,
     `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
     PRIMARY KEY (`id`),
-    KEY `FK_CLIENTLOG_CLIENT` (`client_id`),
+    UNIQUE KEY `idx_client_date` (`client_id`, `created_at`),
     CONSTRAINT `FK_CLIENTLOG_CLIENT` FOREIGN KEY (`client_id`) REFERENCES `Client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-  ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci

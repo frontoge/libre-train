@@ -12,8 +12,7 @@ CREATE PROCEDURE `spCreateClientDailyLog` (
   IN p_logged_fat INT,
   IN p_target_fat INT
 ) BEGIN
-INSERT INTO
-  ClientDailyLog (
+INSERT INTO ClientDailyLog (
     client_id,
     logged_weight,
     body_fat,
@@ -26,9 +25,8 @@ INSERT INTO
     logged_fat,
     target_fat,
     created_at
-  )
-VALUES
-  (
+)
+VALUES (
     p_client_id,
     p_logged_weight,
     p_body_fat,
@@ -41,9 +39,24 @@ VALUES
     p_logged_fat,
     p_target_fat,
     p_date
-  );
+)
+ON DUPLICATE KEY UPDATE
+    logged_weight = p_logged_weight,
+    body_fat = p_body_fat,
+    logged_calories = p_logged_calories,
+    target_calories = p_target_calories,
+    logged_protein = p_logged_protein,
+    target_protein = p_target_protein,
+    logged_carbs = p_logged_carbs,
+    target_carbs = p_target_carbs,
+    logged_fat = p_logged_fat,
+    target_fat = p_target_fat,
+    created_at = p_date;
 
-SELECT
-  LAST_INSERT_ID() AS id;
+SELECT id
+FROM ClientDailyLog
+WHERE client_id = p_client_id
+AND DATE(created_at) = p_date
+LIMIT 1;
 
 END

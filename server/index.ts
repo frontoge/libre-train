@@ -14,8 +14,11 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Increase the limit for JSON payloads
+app.use(express.json({ limit: '5mb' })); 
+
+// Increase the limit for URL-encoded payloads (if applicable)
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
 
 app.use("/api", apiRouter);
 

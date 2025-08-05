@@ -10,6 +10,12 @@ export default function ClientFormInformation() {
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
+
+            if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                alert("File size exceeds 2MB limit.");
+                return;
+            }
+
             const reader = new FileReader();
             reader.onloadend = () => {
                 setFormValues((prev: AddClientFormValues) => ({
