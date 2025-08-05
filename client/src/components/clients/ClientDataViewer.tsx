@@ -74,6 +74,22 @@ export function ClientDataViewer() {
                 messageApi.error('Failed to submit daily update.');
                 throw new Error('Failed to submit daily update');
             }
+            setDashboardState(prev => ({
+                ...prev,
+                data: {
+                    ...prev.data,
+                    logged_weight: dailyData.weight ?? prev.data.logged_weight,
+                    logged_body_fat: dailyData.body_fat ?? prev.data.logged_body_fat,
+                    logged_calories: dailyData.calories ?? prev.data.logged_calories,
+                    target_calories: dailyData.target_calories ?? prev.data.target_calories,
+                    logged_protein: dailyData.protein ?? prev.data.logged_protein,
+                    target_protein: dailyData.target_protein ?? prev.data.target_protein,
+                    logged_carbs: dailyData.carbs ?? prev.data.logged_carbs,
+                    target_carbs: dailyData.target_carbs ?? prev.data.target_carbs,
+                    logged_fats: dailyData.fats ?? prev.data.logged_fats,
+                    target_fats: dailyData.target_fats ?? prev.data.target_fats,
+                }
+            }))
             clearDailyValues();
         } catch (error) {
             messageApi.error('An error occurred while submitting daily update.');
@@ -114,7 +130,7 @@ export function ClientDataViewer() {
                 <div style={{
                     display: 'flex',
                 }}>
-                    <Calendar fullscreen={false} onSelect={date => setDashboardState(prev => ({ ...prev, selectedDate: date }))} />
+                    <Calendar fullscreen={false} value={dashboardState.selectedDate} onSelect={date => setDashboardState(prev => ({ ...prev, selectedDate: date }))} />
                 </div>
                 <Divider style={{ margin: '0' }}>
                     Input Daily Data
