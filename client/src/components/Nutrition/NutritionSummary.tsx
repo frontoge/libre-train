@@ -14,11 +14,6 @@ export function NutritionSummary() {
             alignItems: 'start',
             width: '100%',
         }}>
-            <h3 style={{
-                alignSelf: 'center',
-                fontSize: '1.5rem',
-                marginTop: '0',
-            }}>Nutrition</h3>
             <NutritionBar label="Calories" value={dashboardState.data.logged_calories ?? 0} maxValue={dashboardState.data.target_calories ?? 0} />
             <NutritionBar label="Protein" value={dashboardState.data.logged_protein ?? 0} maxValue={dashboardState.data.target_protein ?? 0} color='orange'/>
             <NutritionBar label="Carbs" value={dashboardState.data.logged_carbs ?? 0} maxValue={dashboardState.data.target_carbs ?? 0} color='green'/>

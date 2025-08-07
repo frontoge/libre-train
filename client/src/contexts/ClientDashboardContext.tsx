@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type SetStateAction } from "react";
 
 import { type DashboardData } from "../../../shared/types";
 import type { Dayjs } from "dayjs";
@@ -27,12 +27,16 @@ export const defaultDashboardState: DashboardState = {
         goal: undefined,
         goal_weight: undefined,
         goal_bodyFat: undefined,
-    }
+    },
+    isLoading: false,
+    setIsLoading: () => {}
 };
 
 export type DashboardState = {
     selectedDate: Dayjs,
-    data: DashboardData
+    data: DashboardData,
+    isLoading: boolean,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
 export const ClientDashboardContext = React.createContext<{

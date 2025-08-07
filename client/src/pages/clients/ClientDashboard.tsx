@@ -66,7 +66,7 @@ export function ClientDashboard() {
 
     return (
         <ClientDashboardContext value={{dashboardState, setDashboardState}}>
-            <PageLayout title="Client Dashboard" style={{ display: 'flex', flexDirection: 'row'}}>
+            <PageLayout title="Client Dashboard" style={{ display: 'flex', flexDirection: 'row', overflow: 'hidden'}}>
 
                 <div id='client-dash-left' style={{
                     display: 'flex',
