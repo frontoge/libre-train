@@ -1,14 +1,15 @@
 import { Menu} from "antd";
 import { Panel } from "../Panel";
-import { MailOutlined} from '@ant-design/icons';
 import { type ClientListMenuItem } from "../../types/types";
 import { ClientList } from "./ClientList";
+import { IoMdPerson } from "react-icons/io";
 
+  
 const items: ClientListMenuItem[] = [
   {
     label: 'Clients',
     key: 'clients',
-    icon: <MailOutlined />,
+    icon: <IoMdPerson/>,
   }
 ];
 

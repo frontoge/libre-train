@@ -1,6 +1,8 @@
 import { HomeFilled } from "@ant-design/icons";
 import { type NavMenuItem } from "../types/types";
 import { IoMdPerson } from "react-icons/io";
+import { MdSpaceDashboard } from "react-icons/md";
+import { IoMdPersonAdd } from "react-icons/io";
 
 export const items: NavMenuItem[] = [
     {
@@ -18,13 +20,13 @@ export const items: NavMenuItem[] = [
         children: [
             {
                 key: 'client_overview',
-                label: 'Overview',
-                icon: <HomeFilled />,
+                label: 'Dashboard',
+                icon: <MdSpaceDashboard />,
             },
             {
                 key: 'client_new',
                 label: 'New Client',
-                icon: <IoMdPerson />,
+                icon: <IoMdPersonAdd />,
             },
         ]
     },

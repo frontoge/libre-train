@@ -1,4 +1,4 @@
-import { Calendar, InputNumber, Divider, Card, Statistic, Button, message } from "antd";
+import { Calendar, InputNumber, Divider, Card, Statistic, Button, message, Alert } from "antd";
 import { NutritionSummary } from "../../Nutrition/NutritionSummary";
 import { ClientDashboardContext } from "../../../contexts/ClientDashboardContext";
 import React from "react";
@@ -92,6 +92,18 @@ export function DailyUpdate() {
         } finally {
             dashboardState.setIsLoading(false);
         }
+    }
+
+    if (!id) {
+        return (
+            <div style={{
+                width: '100%',
+                height: '100%',
+                paddingTop: '1rem'
+            }}>
+                <Alert message="Please Select a client" type="info"/>
+            </div>
+        )
     }
 
     return (
