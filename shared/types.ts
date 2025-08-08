@@ -98,3 +98,9 @@ export type ErrorResponse = {
 }
 
 export type DashboardResponse = DashboardData | ErrorResponse;
+
+export type DashboardSummaryQuery = {
+    clientId: string;
+    startDate: string; 
+    endDate: string; 
+}

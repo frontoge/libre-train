@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { AddClientFormValues, Client, DailyUpdateRequest, DashboardData, DashboardResponse } from "../../../shared/types";
+import { AddClientFormValues, Client, DailyUpdateRequest, DashboardData, DashboardResponse, DashboardSummaryQuery } from "../../../shared/types";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 export const handleGetClients = async (req: Request, res: Response<Client[] | {message: string}>) => {
@@ -242,6 +242,45 @@ export const handleGetDashboard = async (req: Request<{}, {}, {}, { clientId: st
             return;
         }
         console.error("Unexpected error fetching dashboard data:", error);
+        res.status(500).json({ message: "An unexpected error occurred." });
+    }
+}
+
+export const handleGetDashboardSummary = async (req: Request<{}, {}, {}, DashboardSummaryQuery>, res: Response) => {
+    const connection = await getDatabaseConnection();
+
+    const { clientId, startDate, endDate } = req.query;
+
+    if (!clientId || !startDate || !endDate) {
+        res.status(400).json({ message: "Client ID, start date, and end date are required." });
+        return;
+    }
+
+    try {
+
+        const [results] = await connection.query<RowDataPacket[]>({
+            sql: "CALL spGetClientWeeklySummary(?, ?, ?)",
+            values: [
+                new Date(startDate),
+                new Date(endDate),
+                parseInt(clientId, 10),
+            ]
+        });
+
+        if (results.length === 0 || !results[0] || results[0].length === 0) {
+            res.status(200).json({ message: "No data found for the specified date range." });
+            return;
+        }
+
+        res.status(200).json(results[0]);
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("Error fetching dashboard weekly summary:", error.message);
+            res.status(500).json({ message: error.message });
+            return;
+        }
+        console.error("Unexpected error fetching dashboard weekly summary:", error);
         res.status(500).json({ message: "An unexpected error occurred." });
     }
 }
