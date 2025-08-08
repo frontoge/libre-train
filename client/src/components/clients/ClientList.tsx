@@ -1,12 +1,14 @@
 import { List, Skeleton, Avatar } from "antd";
 import { AppContext } from "../../app-context";
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import "../../styles/ClientDashboard/client-list.css"
 
 export function ClientList() {
 
     const { state, setState } = useContext(AppContext);
     const navigate = useNavigate();
+    const {id} = useParams();
 
     const selectClient = (clientId: number) => {
         setState(prev => ({
@@ -31,6 +33,7 @@ export function ClientList() {
             dataSource={list}
             renderItem={(item) => (
                 <List.Item
+                    className={`client-list-item ${id !== undefined && item.id == parseInt(id, 10) ? 'client-list-item-selected' : ''}`}
                     onClick={() => selectClient(item.id)}
                     key={item.id}
                     actions={[

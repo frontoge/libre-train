@@ -8,7 +8,7 @@ import { WeeklySummary } from "./Dashboard/WeeklySummary";
 export function ClientDataViewer() {
 
     const { dashboardState } = React.useContext(ClientDashboardContext);
-    const [selectedView, setSelectedView] = React.useState<string>('summaries');
+    const [selectedView, setSelectedView] = React.useState<string>('dailyUpdate');
     
 
     const viewComponents = {

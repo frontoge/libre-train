@@ -1,0 +1,13 @@
+
+.client-list-item {
+    transition: background-color 0.3s ease;
+    border-radius: 0.5rem;
+}
+
+.client-list-item-selected {
+    background-color: #2e2e2ea1;
+}
+
+.client-list-item:hover {
+    background-color: #1d1d1d5e;
+}
