@@ -104,3 +104,13 @@ export type DashboardSummaryQuery = {
     startDate: string; 
     endDate: string; 
 }
+
+export type DashboardWeeklySummary = {
+    avg_weight: number;
+    avg_bodyfat: number;
+    avg_calories: number;
+    total_macros: number;
+    target_macros: number;
+}
+
+export type DashboardWeeklySummaryResponse = DashboardWeeklySummary[] | ErrorResponse;

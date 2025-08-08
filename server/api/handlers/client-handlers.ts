@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { AddClientFormValues, Client, DailyUpdateRequest, DashboardData, DashboardResponse, DashboardSummaryQuery } from "../../../shared/types";
+import { AddClientFormValues, Client, DailyUpdateRequest, DashboardData, DashboardResponse, DashboardSummaryQuery, DashboardWeeklySummaryResponse } from "../../../shared/types";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 export const handleGetClients = async (req: Request, res: Response<Client[] | {message: string}>) => {
@@ -246,7 +246,7 @@ export const handleGetDashboard = async (req: Request<{}, {}, {}, { clientId: st
     }
 }
 
-export const handleGetDashboardSummary = async (req: Request<{}, {}, {}, DashboardSummaryQuery>, res: Response) => {
+export const handleGetDashboardSummary = async (req: Request<{}, {}, {}, DashboardSummaryQuery>, res: Response<DashboardWeeklySummaryResponse>) => {
     const connection = await getDatabaseConnection();
 
     const { clientId, startDate, endDate } = req.query;
@@ -272,7 +272,7 @@ export const handleGetDashboardSummary = async (req: Request<{}, {}, {}, Dashboa
             return;
         }
 
-        res.status(200).json(results[0]);
+        res.status(200).json(results[0] as DashboardWeeklySummaryResponse);
 
     } catch (error) {
         if (error instanceof Error) {
