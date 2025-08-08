@@ -27,6 +27,21 @@ export function DailyUpdate() {
     });
     const [messageApi, contextHolder] = message.useMessage();
 
+    React.useEffect(() => {
+        setDailyData({
+            weight: dashboardState.data.logged_weight,
+            body_fat: dashboardState.data.logged_body_fat,
+            calories: dashboardState.data.logged_calories,
+            target_calories: dashboardState.data.target_calories,
+            protein: dashboardState.data.logged_protein,
+            target_protein: dashboardState.data.target_protein,
+            carbs: dashboardState.data.logged_carbs,
+            target_carbs: dashboardState.data.target_carbs,
+            fats: dashboardState.data.logged_fats,
+            target_fats: dashboardState.data.target_fats,
+        });
+    }, [dashboardState])
+
 
     const clearDailyValues = () => {
         setDailyData({
