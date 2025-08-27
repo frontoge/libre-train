@@ -1,9 +1,11 @@
 import { type Client } from "../../shared/types";
 import React, { createContext } from "react";
+import type { ModalType } from "./types/types";
 
 export type AppState = {
     clients: Client[];
-    selectedClient?: number;
+    selectedClient?: Client;
+    selectedModal?: ModalType;
 }
 
 export type AppContext = {
@@ -14,7 +16,8 @@ export type AppContext = {
 const initialContext: AppContext = {
     state: {
         selectedClient: undefined,
-        clients: []
+        clients: [],
+        selectedModal: undefined
     },
     setState: () => {}
 };

@@ -284,3 +284,27 @@ export const handleGetDashboardSummary = async (req: Request<{}, {}, {}, Dashboa
         res.status(500).json({ message: "An unexpected error occurred." });
     }
 }
+
+export const handleDeleteClient = async (req: Request<{ id: string }>, res: Response) => {
+    const connection = await getDatabaseConnection();
+
+    const { id } = req.params;
+
+    try {
+        await connection.query({
+            sql: "DELETE FROM Client WHERE id = ?",
+            values: [parseInt(id, 10)]
+        });
+
+        res.status(204).send();
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("Error deleting client:", error.message);
+            res.status(500).json({ message: error.message });
+            return;
+        }
+        console.error("Unexpected error deleting client:", error);
+        res.status(500).json({ message: "An unexpected error occurred." });
+    }
+}

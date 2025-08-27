@@ -3,6 +3,7 @@ import { AppContext } from "../../app-context";
 import { useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/ClientDashboard/client-list.css"
+import { ModalType } from "../../types/types";
 
 export function ClientList() {
 
@@ -13,9 +14,17 @@ export function ClientList() {
     const selectClient = (clientId: number) => {
         setState(prev => ({
             ...prev,
-            selectedClient: clientId
+            selectedClient: prev.clients.find(c => c.id === clientId)
         }));
         navigate(`/clients/${clientId}`);
+    }
+
+    const openDeleteModal = (clientId: number) => {
+        setState(prev => ({
+            ...prev,
+            selectedModal: ModalType.DeleteClient,
+            selectedClient: prev.clients.find(c => c.id === clientId)
+        }))
     }
 
     const list = state.clients.map(client => ({
@@ -38,7 +47,7 @@ export function ClientList() {
                     key={item.id}
                     actions={[
                         <a key="list-loadmore-edit">edit</a>,
-                        <a key="list-loadmore-more">remove</a>
+                        <a key="list-loadmore-more" onClick={() => {openDeleteModal(item.id)}}>remove</a>
                 ]}>
                 <Skeleton avatar title={false} loading={item.loading} active>
                     <List.Item.Meta

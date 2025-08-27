@@ -1,21 +1,16 @@
 import { Avatar, Progress } from "antd"
 import AntDesignOutlined from "@ant-design/icons/AntDesignOutlined"
-import { useParams } from "react-router-dom"
 import { AppContext } from "../../app-context";
 import { useContext } from "react";
 import { Panel } from "../Panel";
-import type { Client } from "../../../../shared/types";
 import { ClientDashboardContext } from "../../contexts/ClientDashboardContext";
 
 export function ClientOverview() {
 
-    const { id } = useParams();
     const {state} = useContext(AppContext);
     const { dashboardState } = useContext(ClientDashboardContext);
 
-    const selectedClient: Client | undefined = state.clients.find(c => c.id === Number(id));
-
-    console.log("Selected Client:", selectedClient);
+    const selectedClient = state.selectedClient;
 
     const loggedWeight = dashboardState.data.logged_weight ?? 0;
     const targetWeight = dashboardState.data.goal_weight ?? 200;

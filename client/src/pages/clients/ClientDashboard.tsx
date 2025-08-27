@@ -33,7 +33,6 @@ export function ClientDashboard() {
 
         const fetchDashboardData = async () => {
             try {
-                console.log("Fetching dashboard data for client:", state.selectedClient);
                 if (state.selectedClient == undefined) {
                     return;
                 }
@@ -44,7 +43,7 @@ export function ClientDashboard() {
                         'Content-Type': 'application/json',
                     },
                 }
-                const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard?clientId=${state.selectedClient}&date=${dashboardState.selectedDate.format("YYYY-MM-DD")}`, requestOptions);
+                const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard?clientId=${state.selectedClient.id}&date=${dashboardState.selectedDate.format("YYYY-MM-DD")}`, requestOptions);
                 const data = await response.json();
                 setDashboardState(prev => ({
                     ...prev,

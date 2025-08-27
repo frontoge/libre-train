@@ -19,3 +19,7 @@ export type DashboardSummaryState = {
     bmr?: number | string;
     macroAdherence?: number | string;
 }
+
+export enum ModalType {
+    DeleteClient
+};
