@@ -56,6 +56,53 @@ export const passwordValidators = [
         .withMessage('Username is required'),
   ]
 
+export const handleAuthLogin = async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { username, password } = req.body;
+    const connection = await getDatabaseConnection();
+    try {
+        const [results, fields] = await connection.query<RowDataPacket[]>({
+            sql: 'SELECT * FROM User WHERE username = ?',
+            values: [username]
+        });
+
+        if (
+            results.length === 0 ||
+            !results[0] ||
+            results[0].length === 0
+        ) {
+            return res.status(401).json({ message: 'Invalid username' });
+        }
+
+        const user = results[0];
+        
+        const passwordMatch = await verifyPassword(user.pass, password);
+
+        if (!passwordMatch) {
+            return res.status(401).json({ message: 'Invalid username or password' });
+        }
+
+        const accessToken = jwt.sign(
+            { sub: user.id },
+            process.env.JWT_SECRET,
+            { expiresIn: '3h' }
+        );
+
+        return res.status(200).json({
+            accessToken,
+            user: user.id
+        });
+
+    } catch (error) {
+        console.error('Error during login:', error);
+        return res.status(500).json({ message: 'Internal server error during login' });
+    }
+}
+
 export const handleAuthSignup = async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -109,6 +156,4 @@ export const handleAuthSignup = async (req: Request, res: Response) => {
         console.error('Error creating user:', error);
         return res.status(500).json({ message: 'Internal server error while creating user' });
     }
-
-    
 }

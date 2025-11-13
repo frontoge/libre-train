@@ -10,9 +10,10 @@ const port = 3000;
 
 app.use(cors({
     // TODO change this to fill with frontend Deployment URL
-    origin: '*', // Adjust as necessary for CORS
+    origin: 'http://localhost:5173', // Adjust as necessary for CORS
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
 }));
 // Increase the limit for JSON payloads
 app.use(express.json({ limit: '5mb' })); 

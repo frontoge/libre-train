@@ -8,7 +8,6 @@ export function NavMenu() {
 
     const onClick = (item: { key: string; keyPath: string[] }) => {
         // Navigate to the selected menu item
-        console.log('Click', item);
         navigate(getNavigationUrl(item.keyPath));
     }
 
