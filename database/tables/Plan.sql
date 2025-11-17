@@ -1,18 +1,25 @@
-CREATE TABLE 
-    `Plan` (
-        `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-        `client_id` int(10) unsigned NOT NULL,
-        `user_id` int(10) unsigned NOT NULL,
-        `plan_label` varchar(128) NOT NULL,
-        `parent_plan_id` int(10) unsigned DEFAULT NULL,
-        `plan_phase` int(10) NOT NULL,
-        `start_date` date DEFAULT NOW(),
-        `end_date` date DEFAULT NULL,
-        `is_active` boolean NOT NULL DEFAULT true,
-        `workout_program_id` int(10) unsigned DEFAULT NULL,
-        `target_metric_id` int(10) unsigned NOT NULL,
-        `target_value` float NOT NULL,
-        `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-        `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
-        PRIMARY KEY (`id`)
-    ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci
+CREATE TABLE
+  `Plan` (
+    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `client_id` int(10) unsigned NOT NULL,
+    `user_id` int(10) unsigned NOT NULL,
+    `plan_label` varchar(128) NOT NULL,
+    `parent_plan_id` int(10) unsigned DEFAULT NULL,
+    `plan_phase` int(10) NOT NULL,
+    `start_date` date DEFAULT current_timestamp(),
+    `end_date` date DEFAULT NULL,
+    `is_active` tinyint(1) NOT NULL DEFAULT 1,
+    `target_metric_id` int(10) unsigned NOT NULL,
+    `target_value` float NOT NULL,
+    `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+    `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    PRIMARY KEY (`id`),
+    KEY `Plan_relation_1` (`client_id`),
+    KEY `Plan_relation_2` (`user_id`),
+    KEY `Plan_relation_3` (`parent_plan_id`),
+    KEY `Plan_relation_5` (`target_metric_id`),
+    CONSTRAINT `Plan_relation_1` FOREIGN KEY (`client_id`) REFERENCES `Client` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT `Plan_relation_2` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT `Plan_relation_3` FOREIGN KEY (`parent_plan_id`) REFERENCES `Plan` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT `Plan_relation_5` FOREIGN KEY (`target_metric_id`) REFERENCES `TargetMetric` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+  ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci
