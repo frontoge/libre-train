@@ -35,7 +35,6 @@ function App() {
 		}
 
 		const decodedToken = jwtDecode(appState.auth.authToken);
-		console.log('Decoded Token:', decodedToken);
 		const currentDate = new Date();
 
 		if (decodedToken === undefined || (decodedToken?.exp ?? 0) * 1000 < currentDate.getTime()) {

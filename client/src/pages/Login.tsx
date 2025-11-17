@@ -52,7 +52,6 @@ export function Login() {
             const { accessToken, user } = await res.json();
 
             setAuth({authToken: accessToken, user});
-            console.log("Login successful, token set.");
 
         } catch (e: any) {
             setError(e.message);
