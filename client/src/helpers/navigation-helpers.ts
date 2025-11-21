@@ -10,6 +10,10 @@ function getNavigationUrlFromNavKey(navKey: string): string {
             return '';
         case 'client_new':
             return 'create';
+        case 'exercisesMenu':
+            return 'exercises';
+        case 'exercise_new':
+            return 'create';
         default:
             return '/not-found';
     }

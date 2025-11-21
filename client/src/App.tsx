@@ -11,6 +11,7 @@ import { jwtDecode } from "jwt-decode"
 import type { Auth } from "./auth/authorization"
 import { RequireAuth } from "./auth/RequireAuth"
 import { Login } from "./pages/Login"
+import { ExerciseRouter } from "./pages/exercises/ExerciseRouter"
 
 function App() {
 
@@ -70,6 +71,7 @@ function App() {
 						<Route path="/" element={<RouterLayout />} >
 							<Route index element={<RequireAuth><Dashboard /></RequireAuth>} />
 							<Route path="clients/*" element={<RequireAuth><ClientRouter /></RequireAuth>} />
+							<Route path="exercises/*" element={<RequireAuth><ExerciseRouter /></RequireAuth>} />
 						</Route>
 						<Route path="/signup" element={<Signup />} />
 						<Route path="/login" element={<Login />} />

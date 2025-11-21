@@ -2,7 +2,9 @@ import { HomeFilled } from "@ant-design/icons";
 import { type NavMenuItem } from "../types/types";
 import { IoMdPerson } from "react-icons/io";
 import { MdSpaceDashboard } from "react-icons/md";
-import { IoMdPersonAdd } from "react-icons/io";
+import { IoMdPersonAdd, IoMdAddCircle } from "react-icons/io";
+import { GiWeightLiftingUp } from "react-icons/gi";
+
 
 export const items: NavMenuItem[] = [
     {
@@ -30,4 +32,16 @@ export const items: NavMenuItem[] = [
             },
         ]
     },
+    {
+        key: 'exercisesMenu',
+        label: 'Exercises',
+        icon: <GiWeightLiftingUp />,
+        children: [
+            {
+                key: 'exercise_new',
+                label: 'Add New Exercise',
+                icon: <IoMdAddCircle />,
+            }
+        ]
+    }
 ];
