@@ -44,7 +44,6 @@ export function AddExercise() {
     const [form] = Form.useForm();
 
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
-        console.log('Success:', values);
         const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.ExerciseCreate}`, {
             method: 'POST',
             headers: {
@@ -57,6 +56,7 @@ export function AddExercise() {
             form.resetFields();
             refreshExercises();
         } else {
+            // TODO add error handling/UI feedback
             console.error('Failed to add exercise');
         }
     }

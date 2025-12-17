@@ -11,15 +11,14 @@ export function ExerciseTable(props: any) {
     const { exerciseData, refreshExercises } = useContext(ExerciseContext);
 
     const handleDelete = async (key: string) => {
-        console.log("Delete exercise with key:", key);
         const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Exercise}/${key}`, {
             method: 'DELETE',
         });
 
         if (response.ok) {
-            console.log("Exercise deleted successfully");
             refreshExercises();
         } else {
+            // TODO add error handling/UI feedback
             console.error("Failed to delete exercise");
         }
     }
