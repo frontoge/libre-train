@@ -39,7 +39,7 @@ export const items: NavMenuItem[] = [
         children: [
             {
                 key: 'exercise_new',
-                label: 'Add New Exercise',
+                label: 'Manager Exercises',
                 icon: <IoMdAddCircle />,
             }
         ]
