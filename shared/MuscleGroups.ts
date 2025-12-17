@@ -1,10 +1,17 @@
-
 export type MuscleGroupOption = {
     label: string;
     value: string;
 };
 
-export const MuscleGroupColors = {
+export type ExerciseData = {
+    key: string;
+    name: string;
+    muscleGroups: MuscleGroupOption[];
+    description?: string;
+    videoLink?: string;
+}
+
+export const MuscleGroupColors: {[key: string]: string} = {
     chest: 'green',
     back: 'blue',
     shoulders: 'orange',
@@ -17,7 +24,7 @@ export const MuscleGroupColors = {
 
 export const muscleValueToColor: Record<string, string> = {
     "pectoralis major": MuscleGroupColors.chest,
-    "pectoralis minor": MuscleGroupColors.chest,
+    "pectoralis minor": MuscleGroupColors.chest, 
     "serratus anterior": MuscleGroupColors.chest,
     "subclavius": MuscleGroupColors.shoulders,
     "deltoid-anterior": MuscleGroupColors.shoulders,
@@ -218,3 +225,11 @@ export const muscleGroupOptions: MuscleGroupOption[] = [
     { label: "Glutes", value: "glutes" },
     { label: "Quadriceps", value: "quadriceps" },
 ]
+
+export function getMuscleGroupFromLabel(label: string): MuscleGroupOption | undefined {
+    return muscleGroupOptions.find(mg => mg.label.toLowerCase() === label.toLowerCase());
+}
+
+export function getMuscleGroupFromValue(value: string): MuscleGroupOption | undefined {
+    return muscleGroupOptions.find(mg => mg.value.toLowerCase() === value.toLowerCase());
+}

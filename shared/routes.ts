@@ -1,6 +1,8 @@
 export const Routes = {
     Health: "/health",
     Clients: "/clients",
-    AuthSingup: "/auth/signup",
+    AuthSignup: "/auth/signup",
     AuthLogin: "/auth/login",
+    ExerciseCreate: "/exercises/create",
+    Exercise: "/exercises",
 }

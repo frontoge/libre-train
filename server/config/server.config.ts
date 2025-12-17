@@ -3,7 +3,8 @@ export type ServerConfig = {
         host: string;
         port: number;
         database: string;
-    }
+    },
+    disableAuth: boolean;
 }
 
 const config: { [key: string]: ServerConfig } = {
@@ -12,21 +13,24 @@ const config: { [key: string]: ServerConfig } = {
             host: "edenrp.net",
             port: 3306,
             database: "libre_train"
-        }
+        },
+        disableAuth: true,
     },
     dev: {
         database: {
             host: "dev-db-host",
             port: 3306,
             database: "dev-db"
-        }
+        },
+        disableAuth: false,
     },
     prod: {
         database: {
             host: "prod-db-host",
             port: 3306,
             database: "prod-db"
-        }
+        },
+        disableAuth: false,
     }
 }
 

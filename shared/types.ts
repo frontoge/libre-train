@@ -114,3 +114,10 @@ export type DashboardWeeklySummary = {
 }
 
 export type DashboardWeeklySummaryResponse = DashboardWeeklySummary[] | ErrorResponse;
+
+export type AddExerciseFormData = {
+    name: string;
+    muscleGroups: string[];
+    description?: string;
+    videoLink?: string;
+}
