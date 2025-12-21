@@ -8,12 +8,14 @@ function getNavigationUrlFromNavKey(navKey: string): string {
             return 'clients';
         case 'client_overview':
             return '';
+        case 'plan_new':
         case 'client_new':
+        case 'exercise_new':
             return 'create';
         case 'exercisesMenu':
             return 'exercises';
-        case 'exercise_new':
-            return 'create';
+        case 'plansMenu':
+            return 'plans';
         default:
             return '/not-found';
     }

@@ -4,6 +4,8 @@ import { IoMdPerson } from "react-icons/io";
 import { MdSpaceDashboard } from "react-icons/md";
 import { IoMdPersonAdd, IoMdAddCircle } from "react-icons/io";
 import { GiWeightLiftingUp } from "react-icons/gi";
+import { ImMap } from "react-icons/im";
+import { FaRegSquarePlus } from "react-icons/fa6";
 
 
 export const items: NavMenuItem[] = [
@@ -33,13 +35,25 @@ export const items: NavMenuItem[] = [
         ]
     },
     {
+        key: 'plansMenu',
+        label: 'Plans',
+        icon: <ImMap />,
+        children: [
+            {
+                key: 'plan_new',
+                label: 'New Plan',
+                icon: <FaRegSquarePlus />,
+            }
+        ]
+    },
+    {
         key: 'exercisesMenu',
         label: 'Exercises',
         icon: <GiWeightLiftingUp />,
         children: [
             {
                 key: 'exercise_new',
-                label: 'Manager Exercises',
+                label: 'Manage Exercises',
                 icon: <IoMdAddCircle />,
             }
         ]

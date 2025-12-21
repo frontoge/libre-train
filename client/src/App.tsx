@@ -12,6 +12,7 @@ import type { Auth } from "./auth/authorization"
 import { RequireAuth } from "./auth/RequireAuth"
 import { Login } from "./pages/Login"
 import { ExerciseRouter } from "./pages/exercises/ExerciseRouter"
+import { PlanRouter } from "./pages/plans/PlanRouter"
 
 function App() {
 
@@ -72,6 +73,7 @@ function App() {
 							<Route index element={<RequireAuth><Dashboard /></RequireAuth>} />
 							<Route path="clients/*" element={<RequireAuth><ClientRouter /></RequireAuth>} />
 							<Route path="exercises/*" element={<RequireAuth><ExerciseRouter /></RequireAuth>} />
+							<Route path="plans/*" element={<RequireAuth><PlanRouter /></RequireAuth>} />
 						</Route>
 						<Route path="/signup" element={<Signup />} />
 						<Route path="/login" element={<Login />} />
