@@ -2,11 +2,13 @@ import { Button, Input, Select, Steps, Timeline } from "antd";
 import React from "react";
 import PlanExercise from "./PlanExercise";
 import "../../styles/index.css";
+import { AppContext } from "../../app-context";
 
 
 export default function AddPlanDays() {
     const [days, setDays] = React.useState([])
     const [selectedDay, setSelectedDay] = React.useState(0);
+    const { state: {workoutRoutineStages} } = React.useContext(AppContext);
 
     const [dayRoutineItems, setDayRoutineItems] = React.useState([
         {
@@ -66,6 +68,11 @@ export default function AddPlanDays() {
         setSelectedDay(index);
     }
 
+    const workoutStageOptions = workoutRoutineStages.map(stage => ({
+        label: stage.stage_name,
+        value: stage.id
+    }));
+
     return (
         <>   
             <h1 style={{
@@ -120,7 +127,7 @@ export default function AddPlanDays() {
                         minWidth: 0,
                     }}
                 >
-                    <Select placeholder="Select Routine Stage" style={{ width: 325 }} />
+                    <Select placeholder="Select Routine Stage" options={workoutStageOptions} style={{ width: 325 }} />
                     <Select placeholder="Select Exercise" style={{ width: 325 }} />
                     <div
                         className="inputGrid"

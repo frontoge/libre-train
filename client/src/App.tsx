@@ -5,7 +5,7 @@ import { NoPage } from "./pages/NoPage"
 import { ConfigProvider, theme } from "antd"
 import { ClientRouter } from "./pages/clients/ClientRouter"
 import { AppContext, type AppState } from "./app-context"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Signup } from "./pages/Signup"
 import { jwtDecode } from "jwt-decode"
 import type { Auth } from "./auth/authorization"
@@ -13,11 +13,14 @@ import { RequireAuth } from "./auth/RequireAuth"
 import { Login } from "./pages/Login"
 import { ExerciseRouter } from "./pages/exercises/ExerciseRouter"
 import { PlanRouter } from "./pages/plans/PlanRouter"
+import { getAppConfiguration } from "./config/app.config"
+import { Routes as ApiRoutes } from "../../shared/routes";
 
 function App() {
 
 	const [appState, setAppState] = useState<AppState>({
 		clients: [],
+		workoutRoutineStages: [],
 		auth: {
 			authToken: '',
 			user: 0
@@ -45,6 +48,31 @@ function App() {
 
 		return true;
 	}
+
+	useEffect(() => {
+		const fetchWorkoutRoutineStages = async () => {
+			try {
+				const requestOptions = {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				}
+				const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.WorkoutRoutineStages}`, requestOptions);
+				const data = await response.json();
+				setAppState(prevState => ({
+					...prevState,
+					workoutRoutineStages: data
+				}));
+			} catch (error) {
+				console.error("Error fetching workout routine stages:", error);
+			}
+		};
+
+		if (isAuthenticated() || getAppConfiguration().disableAuth) {
+			fetchWorkoutRoutineStages();
+		}
+	}, [])
 
   return (
 	<AppContext value={{ state: appState, setState: setAppState, setAuth, isAuthenticated }}>
