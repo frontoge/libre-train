@@ -5,6 +5,7 @@ import { handleGetClients, handleCreateClient, handleDailyUpdate, handleGetDashb
 import { handleAuthSignup, handleAuthLogin } from "./handlers/auth-handlers";
 import { handleDeleteExercise, handleExerciseCreate, handleGetAllExercises } from "./handlers/exercise-handlers";
 import { handleGetTargetMetricModels } from "./handlers/models/target-metric-handler";
+import { handleGetWorkoutRoutineStage } from "./handlers/models/workout-routine-stage-handler";
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.delete(`${Routes.Exercise}/:id`, handleDeleteExercise);
 // Models
 // Target Metric Types
 router.get(Routes.TargetMetricTypes, handleGetTargetMetricModels);
+router.get(Routes.WorkoutRoutineStages, handleGetWorkoutRoutineStage);
 
 //Auth routes
 router.post(Routes.AuthSignup, handleAuthSignup);
