@@ -4,6 +4,7 @@ import { Routes } from "../../shared/routes";
 import { handleGetClients, handleCreateClient, handleDailyUpdate, handleGetDashboard, handleGetDashboardSummary, handleDeleteClient } from "./handlers/client-handlers";
 import { handleAuthSignup, handleAuthLogin } from "./handlers/auth-handlers";
 import { handleDeleteExercise, handleExerciseCreate, handleGetAllExercises } from "./handlers/exercise-handlers";
+import { handleGetTargetMetricModels } from "./handlers/models/target-metric-handler";
 
 const router = Router();
 
@@ -20,6 +21,10 @@ router.delete(`${Routes.Clients}/:id`, handleDeleteClient);
 router.post(Routes.ExerciseCreate, handleExerciseCreate);
 router.get(Routes.Exercise, handleGetAllExercises);
 router.delete(`${Routes.Exercise}/:id`, handleDeleteExercise);
+
+// Models
+// Target Metric Types
+router.get(Routes.TargetMetricTypes, handleGetTargetMetricModels);
 
 //Auth routes
 router.post(Routes.AuthSignup, handleAuthSignup);
