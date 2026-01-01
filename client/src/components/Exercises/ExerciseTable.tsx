@@ -37,7 +37,7 @@ export function ExerciseTable(props: any) {
             dataIndex: 'muscleGroups',
             key: 'muscleGroups',
             render: (_, { muscleGroups }) => (
-                <Flex gap="small" wrap>
+                <Flex gap="small" style={{ overflow: 'hidden' }}>
                     {muscleGroups.map((tag: MuscleGroupOption) => {
                         return (
                             <Tag color={muscleValueToColor[tag.value]} key={tag.value}>
@@ -88,7 +88,7 @@ export function ExerciseTable(props: any) {
                     flex: 1
                 }}
                 pagination={{ 
-                    pageSize: 9,
+                    pageSize: 10,
                     showSizeChanger: false
                 }}
                 size="middle"
