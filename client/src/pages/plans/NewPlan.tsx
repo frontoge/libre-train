@@ -41,6 +41,20 @@ export function NewPlan() {
             workoutRoutines: planState.workoutRoutines
         }
         console.log("Submitting new plan:", planSubmissionBody);
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(planSubmissionBody)
+        }
+        const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Plan}/create`, requestOptions);
+
+        if (response.ok) {
+            console.log("Plan created successfully");
+        } else {
+            console.error("Failed to create plan");
+        }
     }
 
     const handleNext = () => {

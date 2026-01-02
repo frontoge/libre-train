@@ -6,5 +6,6 @@ export const Routes = {
     ExerciseCreate: "/exercises/create",
     Exercise: "/exercises",
     TargetMetricTypes: "/models/target-metrics",
-    WorkoutRoutineStages: "/models/workout-routine-stages"
+    WorkoutRoutineStages: "/models/workout-routine-stages",
+    Plan: "/plan",
 }
