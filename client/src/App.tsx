@@ -21,6 +21,7 @@ function App() {
 	const [appState, setAppState] = useState<AppState>({
 		clients: [],
 		workoutRoutineStages: [],
+		exerciseData: [],
 		auth: {
 			authToken: '',
 			user: 0
@@ -69,8 +70,28 @@ function App() {
 			}
 		};
 
+		const fetchExercises = async () => {
+			try {
+				const requestOptions = {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				}
+				const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.Exercise}`, requestOptions);
+				const data = await response.json();
+				setAppState(prevState => ({
+					...prevState,
+					exerciseData: data
+				}));
+			} catch (error) {
+				console.error("Error fetching exercise data:", error);
+			}
+		}
+
 		if (isAuthenticated() || getAppConfiguration().disableAuth) {
 			fetchWorkoutRoutineStages();
+			fetchExercises();
 		}
 	}, [])
 

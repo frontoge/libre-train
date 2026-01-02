@@ -6,11 +6,12 @@ import AddPlanDays from "../../components/Plans/AddPlanDays";
 import React, { useEffect } from "react";
 import { getAppConfiguration } from "../../config/app.config";
 import { Routes } from "../../../../shared/routes";
-import { NewPlanContext, type NewPlanState } from "../../contexts/NewPlanContext";
+import { defaultPlanState, NewPlanContext, type NewPlanState } from "../../contexts/NewPlanContext";
+import type { SubmitPlanRequest } from "../../../../shared/types";
 
 export function NewPlan() {
     const [page, setPage] = React.useState(0);
-    const [planState, setPlanState] = React.useState<NewPlanState>({} as NewPlanState);
+    const [planState, setPlanState] = React.useState<NewPlanState>(defaultPlanState as NewPlanState);
 
     const updatePlanState = (newState: Partial<NewPlanState>) => {
         setPlanState( prev => ({
@@ -20,7 +21,26 @@ export function NewPlan() {
     }
 
     const handleSubmit = async () => {
+
+        if (!planState.selectedClient ||
+            !planState.selectedDates ||
+            !planState.selectedTargetMetricType ||
+            !planState.targetMetricValue
+        )
+            return;
+
         // Submit new plan
+        const planSubmissionBody: SubmitPlanRequest = {
+            clientId: planState.selectedClient,
+            planLabel: planState.planName,
+            parentPlanId: planState.parentPlanId,
+            plan_phase: planState.planStage ?? 1,
+            dates: planState.selectedDates,
+            targetMetricId: planState.selectedTargetMetricType?.id,
+            targetMetricValue: planState.targetMetricValue,
+            workoutRoutines: planState.workoutRoutines
+        }
+        console.log("Submitting new plan:", planSubmissionBody);
     }
 
     const handleNext = () => {
@@ -88,7 +108,7 @@ export function NewPlan() {
                     flexDirection: 'column',
                     alignItems: 'center',
                     height: "100%",
-                    width: '50%',
+                    width: '60%',
                     gap: '1rem'
                 }}>
                     {page === 0 ? <AddPlanDetails /> : <AddPlanDays />}

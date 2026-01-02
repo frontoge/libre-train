@@ -1,10 +1,10 @@
 import React from "react";
-import type { Client } from "../../../shared/types";
+import type { Client, RoutineExercise, WorkoutRoutine } from "../../../shared/types";
 import type { TargetMetric } from "../../../shared/models";
 
 export type NewPlanState = {
     clientOptions?: Client[];
-    selectedClient?: Client;
+    selectedClient?: number;
 
     exerciseData: any[];
     refreshExercises: () => void;
@@ -17,6 +17,13 @@ export type NewPlanState = {
     }[];
     targetMetricTypes?: TargetMetric[];
     selectedTargetMetricType?: TargetMetric;
+
+    planName?: string;
+    parentPlanId?: number;
+    planStage?: number;
+    planStagesCount?: number;
+    targetMetricValue?: number;
+    workoutRoutines: WorkoutRoutine[]
 }
 
 export type NewPlanContextType = {
@@ -24,12 +31,15 @@ export type NewPlanContextType = {
     updateState: (newState: Partial<NewPlanState>) => void;
 }
 
+export const defaultPlanState: NewPlanState = {
+    refreshExercises: () => {},
+    exerciseData: [],
+    existingPlans: [],
+    workoutRoutines: []
+}
+
 export const defaultNewPlanContextValue: NewPlanContextType = {
-    state: {
-        refreshExercises: () => {},
-        exerciseData: [],
-        existingPlans: []
-    },
+    state: defaultPlanState,
     updateState: (newState: Partial<NewPlanState>) => {}
 };
     

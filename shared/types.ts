@@ -121,3 +121,34 @@ export type AddExerciseFormData = {
     description?: string;
     videoLink?: string;
 }
+
+export type RoutineExercise = {
+    routineStage: number;
+    stage_index: number;
+    exerciseId: number;
+    sets?: number;
+    reps?: number;
+    weight?: number;
+    duration?: number;
+    distance?: number;
+    restTime?: number;
+    pace?: number;
+    targetRPE?: number;
+}
+
+export type WorkoutRoutine = {
+    dayName: string;
+    exercises: RoutineExercise[];
+}
+
+export type SubmitPlanRequest = {
+    clientId: number;
+    planLabel?: string;
+    parentPlanId?: number;
+    plan_phase: number;
+    dates: [string, string];
+    targetMetricId: number;
+    targetMetricValue: number;
+    workoutRoutines: WorkoutRoutine[]
+
+}
