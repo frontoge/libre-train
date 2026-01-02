@@ -50,45 +50,68 @@ function App() {
 		return true;
 	}
 
-	useEffect(() => {
-		const fetchWorkoutRoutineStages = async () => {
-			try {
-				const requestOptions = {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				}
-				const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.WorkoutRoutineStages}`, requestOptions);
-				const data = await response.json();
-				setAppState(prevState => ({
-					...prevState,
-					workoutRoutineStages: data
-				}));
-			} catch (error) {
-				console.error("Error fetching workout routine stages:", error);
+	const fetchWorkoutRoutineStages = async () => {
+		try {
+			const requestOptions = {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
 			}
-		};
-
-		const fetchExercises = async () => {
-			try {
-				const requestOptions = {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				}
-				const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.Exercise}`, requestOptions);
-				const data = await response.json();
-				setAppState(prevState => ({
-					...prevState,
-					exerciseData: data
-				}));
-			} catch (error) {
-				console.error("Error fetching exercise data:", error);
-			}
+			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.WorkoutRoutineStages}`, requestOptions);
+			const data = await response.json();
+			setAppState(prevState => ({
+				...prevState,
+				workoutRoutineStages: data
+			}));
+		} catch (error) {
+			console.error("Error fetching workout routine stages:", error);
 		}
+	};
 
+	const fetchExercises = async () => {
+		try {
+			const requestOptions = {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}
+			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.Exercise}`, requestOptions);
+			const data = await response.json();
+			setAppState(prevState => ({
+				...prevState,
+				exerciseData: data
+			}));
+		} catch (error) {
+			console.error("Error fetching exercise data:", error);
+		}
+	}
+
+	const fetchClients = async () => {
+		try {
+			const requestOptions = {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}
+			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.Clients}`, requestOptions);
+			console.log(`${getAppConfiguration().apiUrl}${ApiRoutes.Clients}`);
+			const data = await response.json();
+			setAppState( prev => ({...prev, clients: data}))
+		} catch (error) {
+			console.error("Error fetching client data:", error);
+		}
+	};
+
+	const stateRefreshers = {
+		refreshExerciseData: fetchExercises,
+		refreshWorkoutRoutineStages: fetchWorkoutRoutineStages,
+		refreshClients: fetchClients,
+	}
+
+	useEffect(() => {
 		if (isAuthenticated() || getAppConfiguration().disableAuth) {
 			fetchWorkoutRoutineStages();
 			fetchExercises();
@@ -96,7 +119,7 @@ function App() {
 	}, [])
 
   return (
-	<AppContext value={{ state: appState, setState: setAppState, setAuth, isAuthenticated }}>
+	<AppContext value={{ state: appState, setState: setAppState, setAuth, isAuthenticated, stateRefreshers }}>
 
 		<ConfigProvider
 			theme={{

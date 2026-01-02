@@ -14,11 +14,18 @@ export type AppState = {
     auth: Auth;
 }
 
+export type StateRefreshers = {
+    refreshExerciseData: () => void;
+    refreshClients: () => void;
+    refreshWorkoutRoutineStages: () => void;
+}
+
 export type AppContext = {
     state: AppState;
     setState: React.Dispatch<React.SetStateAction<AppState>>;
     setAuth: (auth: Auth) => void;
     isAuthenticated: () => boolean;
+    stateRefreshers?: StateRefreshers;
 }
 
 const initialContext: AppContext = {
