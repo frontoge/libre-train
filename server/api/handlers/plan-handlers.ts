@@ -114,6 +114,19 @@ export async function handleGetClientPlans(req: Request, res: Response) {
     }
 }
 
+export async function handleDeletePlan(req: Request, res: Response) {
+    const planId = req.params.id;
+    const connection = await getDatabaseConnection();
+
+    try {
+        await connection.query(`CALL spDeletePlan(?)`, [planId]);
+        res.status(200).json({ message: "Plan deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting plan:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 function validatePlanCreateRequest(body: SubmitPlanRequest): boolean {
     return !(!body.clientId ||
         !body.plan_phase ||
