@@ -7,6 +7,7 @@ import { AppContext } from "../../app-context";
 import { getAppConfiguration } from "../../config/app.config";
 import type { Plan } from "../../../../shared/types";
 import { Routes } from "../../../../shared/routes";
+import { DeletePlanModal } from "../../components/Plans/DeletePlanModal";
 
 export function ManagePlans() {
 
@@ -15,6 +16,7 @@ export function ManagePlans() {
     const [plans, setPlans] = useState<Plan[]>([]);
     const [selectedPlanId, setSelectedPlanId] = useState<number | undefined>(undefined);
     const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
     const selectedPlan = plans.find(plan => plan.id === selectedPlanId);
 
@@ -48,7 +50,7 @@ export function ManagePlans() {
 
     const title = selectedClientId && selectedPlan ? selectedPlan?.planName : "Select a client and plan";
 
-    const dayOptions = selectedPlan?.workoutRoutines.map((routine, index) => ({
+    const dayOptions = selectedPlan?.workoutRoutines.map((routine) => ({
         title: routine.dayName,
     })) ?? [];
 
@@ -105,8 +107,11 @@ export function ManagePlans() {
                     height: "7.5%",
                     alignSelf: 'end',
                 }}>
-                    <Button variant="solid" color="danger">Delete</Button>
+                    <Button variant="solid" color="danger" disabled={!selectedPlanId} onClick={() => setIsDeleteModalOpen(true)}>Delete</Button>
                 </div>
+                {isDeleteModalOpen && (
+                    <DeletePlanModal planId={selectedPlanId} onCancel={() => setIsDeleteModalOpen(false)} />
+                )}
             </Panel>
         </PageLayout>
     )
