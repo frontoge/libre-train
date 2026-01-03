@@ -21,6 +21,10 @@ export function ManagePlans() {
     const selectedPlan = plans.find(plan => plan.id === selectedPlanId);
 
     useEffect(() => {
+        if (selectedClientId === undefined) {
+            setPlans([]);
+            return;
+        }
         const fetchClientPlans = async (clientId: number) => {
             const requestOptions = {
                 method: 'GET',
@@ -54,6 +58,13 @@ export function ManagePlans() {
         title: routine.dayName,
     })) ?? [];
 
+    const onSuccessfulDelete = () => {
+        setSelectedPlanId(undefined);
+        setSelectedClientId(undefined);
+        setPlans([]);
+        setSelectedDayIndex(0);
+    }
+
     return (
         <PageLayout title="Manage Plans" style={{
             display: 'flex',
@@ -86,6 +97,7 @@ export function ManagePlans() {
                         style={{
                             width: "20%"
                         }}
+                        value={selectedClientId}
                         onChange={(value) => setSelectedClientId(value)}
                     />
                     <Select
@@ -95,22 +107,25 @@ export function ManagePlans() {
                         style={{
                             width: "20%"
                         }}
+                        value={selectedPlanId}
                         onChange={(value) => setSelectedPlanId(value)}
                         
                     />
                 </div>
-                <Steps size="small" current={selectedDayIndex} items={dayOptions || []} onChange={(current) => setSelectedDayIndex(current)}/>
-                <div style={{ display: 'flex', justifyContent: 'center', width: '100%', height: '100%' }}>
-                    <WorkoutRoutine selectedRoutine={selectedPlan?.workoutRoutines[selectedDayIndex]} style={{ width: '100%', height: '100%' }} />
-                </div>
-                <div style={{
-                    height: "7.5%",
-                    alignSelf: 'end',
-                }}>
-                    <Button variant="solid" color="danger" disabled={!selectedPlanId} onClick={() => setIsDeleteModalOpen(true)}>Delete</Button>
-                </div>
+                {selectedPlanId !== undefined && <>
+                    <Steps size="small" current={selectedDayIndex} items={dayOptions || []} onChange={(current) => setSelectedDayIndex(current)}/>
+                    <div style={{ display: 'flex', justifyContent: 'center', width: '100%', height: '100%' }}>
+                        <WorkoutRoutine selectedRoutine={selectedPlan?.workoutRoutines[selectedDayIndex]} style={{ width: '100%', height: '100%' }} />
+                    </div>
+                    <div style={{
+                        height: "7.5%",
+                        alignSelf: 'end',
+                    }}>
+                        <Button variant="solid" color="danger" disabled={!selectedPlanId} onClick={() => setIsDeleteModalOpen(true)}>Delete</Button>
+                    </div>
+                </>}
                 {isDeleteModalOpen && (
-                    <DeletePlanModal planId={selectedPlanId} onCancel={() => setIsDeleteModalOpen(false)} />
+                    <DeletePlanModal planId={selectedPlanId!} onCancel={() => setIsDeleteModalOpen(false)} onComplete={onSuccessfulDelete}/>
                 )}
             </Panel>
         </PageLayout>

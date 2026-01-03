@@ -5,6 +5,7 @@ import { Routes } from "../../../../shared/routes";
 
 export type DeletePlanModalProps = {
     onCancel: () => void;
+    onComplete?: () => void;
     planId: number | string;
 };
 
@@ -28,6 +29,7 @@ export function DeletePlanModal(props: DeletePlanModalProps) {
                 if (response.ok) {
                     console.log("Plan deleted successfully");
                 }
+                props.onComplete && props.onComplete();
             } catch (error) {
                 console.error("Error deleting plan:", error);
             } finally {
