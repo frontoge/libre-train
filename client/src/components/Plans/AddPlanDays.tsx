@@ -8,7 +8,7 @@ import { WorkoutRoutine } from "./WorkoutRoutine";
 
 
 export default function AddPlanDays() {
-    const [selectedDay, setSelectedDay] = React.useState(-1);
+    const [selectedDay, setSelectedDay] = React.useState(0);
     const [selectedExercise, setSelectedExercise] = React.useState<string | undefined>(undefined);
     const [selectedStage, setSelectedStage] = React.useState<string | undefined>(undefined);
     const [exerciseInput, setExerciseInput] = React.useState({
@@ -26,7 +26,6 @@ export default function AddPlanDays() {
     const { state: {workoutRoutines}, updateState } = useContext(NewPlanContext);
 
     const selectedRoutine = workoutRoutines[selectedDay];
-    console.log(workoutRoutines);
 
     const exerciseKeys: { [key: string]: string } = {};
     exerciseData?.map(exercise => {
@@ -45,8 +44,9 @@ export default function AddPlanDays() {
             ...workoutRoutines.slice(selectedDay + 1)
         ];
         updateState({ workoutRoutines: newWorkoutRoutines });
-        console.log(selectedDay);
-        setSelectedDay(selectedDay + 1);
+        if (newWorkoutRoutines.length !== 1) {
+            setSelectedDay(selectedDay + 1);
+        }
     }
 
     const handleDeleteDay = () => {
@@ -56,7 +56,7 @@ export default function AddPlanDays() {
             ...workoutRoutines.slice(selectedDay + 1)
         ];
         updateState({ workoutRoutines: newWorkoutRoutines });
-        setSelectedDay(prev => prev - 1);
+        setSelectedDay(prev => prev === 0 ? 0 : prev - 1);
     }
 
     const onSelectDay = (index: number) => {

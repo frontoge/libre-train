@@ -22,7 +22,7 @@ export function NewPlan() {
 
     const handleSubmit = async () => {
 
-        if (!planState.selectedClient ||
+        if (!planState.selectedClientId ||
             !planState.selectedDates ||
             !planState.selectedTargetMetricType ||
             !planState.targetMetricValue
@@ -31,7 +31,7 @@ export function NewPlan() {
 
         // Submit new plan
         const planSubmissionBody: SubmitPlanRequest = {
-            clientId: planState.selectedClient,
+            clientId: planState.selectedClientId,
             planLabel: planState.planName,
             parentPlanId: planState.parentPlanId,
             plan_phase: planState.planStage ?? 1,
@@ -52,6 +52,8 @@ export function NewPlan() {
 
         if (response.ok) {
             console.log("Plan created successfully");
+            setPlanState(defaultPlanState as NewPlanState);
+            setPage(0);
         } else {
             console.error("Failed to create plan");
         }

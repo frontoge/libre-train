@@ -1,13 +1,27 @@
 import { Input, Select, DatePicker, Slider } from "antd";
 import { useContext } from "react";
-import { NewPlanContext } from "../../contexts/NewPlanContext";
+import { NewPlanContext, type RangeValueType } from "../../contexts/NewPlanContext";
+import type { Client } from "../../../../shared/types";
+import type dayjs from "dayjs";
 
 const { RangePicker } = DatePicker;
 
 export default function AddPlanDetails() {
 
-    const { state: {targetMetricTypes, selectedTargetMetricType, clientOptions}, updateState } = useContext(NewPlanContext);
+    // State
+    const { state: {
+        targetMetricTypes,
+        selectedTargetMetricType,
+        clientOptions,
+        selectedDateRange,
+        targetMetricValue,
+        planName,
+        selectedClientId
+    }, updateState } = useContext(NewPlanContext);
 
+    const selectedClient: Client | undefined = clientOptions?.find(client => client.id === selectedClientId!);
+
+    // Input options
     const goalMetricOptions = targetMetricTypes?.map(metric => ({
         value: metric.id,
         label: metric.metric_name
@@ -27,14 +41,13 @@ export default function AddPlanDetails() {
         50: '1',
     }
 
+    // input handlers
     const handleClientSelect = (value: string) => {
-        console.log("Selected client ID:", (clientKeyToIdMap ?? {})[value]);
-        updateState({ selectedClient: (clientKeyToIdMap ?? {})[value] ?? 0 });
+        updateState({ selectedClientId: (clientKeyToIdMap ?? {})[value] ?? 0 });
     }
 
-    const handleDateSelect = (dates: any, dateStrings: [string, string]) => {
-        console.log(dates, dateStrings);
-        updateState({ selectedDates: dateStrings });
+    const handleDateSelect = (dates: RangeValueType<dayjs.Dayjs>, dateStrings: [string, string]) => {
+        updateState({ selectedDates: dateStrings, selectedDateRange: dates });
     };
 
     const handleMetricSelect = (value: string) => {
@@ -51,7 +64,6 @@ export default function AddPlanDetails() {
     }
 
     const handleStageChange = (value: number) => {
-        console.log("Selected stage:", stageMarks[value]);
         updateState({ planStage: parseInt(stageMarks[value], 10)});
         // updateState({ planStage: (value / 50) });
     }
@@ -70,11 +82,12 @@ export default function AddPlanDetails() {
                 style={{ width: 400 }}
                 options={clientSelectOptions}
                 onChange={handleClientSelect}
+                value={selectedClient ? selectedClient.first_name + selectedClient.last_name : undefined}
             >
 
             </Select>
-            <RangePicker style={{width: 400}} onChange={handleDateSelect}/>
-            <Input placeholder="Plan Name" style={{ width: 400 }} onChange={handlePlanNameChange} />
+            <RangePicker style={{width: 400}} onChange={handleDateSelect} value={selectedDateRange} />
+            <Input placeholder="Plan Name" style={{ width: 400 }} onChange={handlePlanNameChange} value={planName} />
             <Select 
                 placeholder="Select Parent Plan (optional)"
                 style={{ width: 400 }}
@@ -89,8 +102,15 @@ export default function AddPlanDetails() {
                 style={{ width: 400 }}
                 options={goalMetricOptions}
                 onChange={handleMetricSelect}
+                value={selectedTargetMetricType?.metric_name}
             />
-            <Input placeholder="Goal Value" suffix={selectedTargetMetricType?.target_unit} onChange={handleGoalValueChange} style={{ width: 400 }} />
+            <Input 
+                placeholder="Goal Value"
+                suffix={selectedTargetMetricType?.target_unit}
+                onChange={handleGoalValueChange}
+                style={{ width: 400 }}
+                value={targetMetricValue}
+            />
         </>
     )
 }
