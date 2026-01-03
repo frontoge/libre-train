@@ -1,10 +1,10 @@
-import { Button, Input, Select, Steps, Timeline } from "antd";
+import { Button, Input, Select, Steps } from "antd";
 import React, { useContext } from "react";
-import PlanExercise from "./PlanExercise";
 import "../../styles/index.css";
 import { AppContext } from "../../app-context";
 import { NewPlanContext } from "../../contexts/NewPlanContext";
 import type { RoutineExercise } from "../../../../shared/types";
+import { WorkoutRoutine } from "./WorkoutRoutine";
 
 
 export default function AddPlanDays() {
@@ -26,72 +26,12 @@ export default function AddPlanDays() {
     const { state: {workoutRoutines}, updateState } = useContext(NewPlanContext);
 
     const selectedRoutine = workoutRoutines[selectedDay];
-    const nextStageIndex = workoutRoutines[selectedDay]?.exercises.filter(ex => ex.routineStage - 1 === parseInt(selectedStage ?? "-1")).length ?? 0;
-
     console.log(workoutRoutines);
 
-    const dayRoutineItems = [
-        {
-            color: 'purple',
-            children: (
-            <div>
-                <span style={{fontWeight: 'bold'}}>Warmup</span>
-                {selectedRoutine?.exercises?.filter(ex => ex.routineStage - 1 === 0).map((exercise) => {
-                    return <PlanExercise key={exercise.exerciseId} exercise={exercise} />
-                })}
-            </div>)
-        },
-        {
-            color: 'orange',
-            children: (
-                <div>
-                    <span style={{fontWeight: 'bold'}}>Activation</span>
-                    {selectedRoutine?.exercises?.filter(ex => ex.routineStage - 1 === 1).map((exercise) => {
-                        return <PlanExercise key={exercise.exerciseId} exercise={exercise} />
-                    })}
-                </div>
-            )
-        },
-        {
-            color: 'green',
-            children: (
-            <div>
-                <span style={{fontWeight: 'bold'}}>Skill Development</span>
-                {selectedRoutine?.exercises?.filter(ex => ex.routineStage - 1 === 2).map((exercise) => {
-                    return <PlanExercise key={exercise.exerciseId} exercise={exercise} />
-                })}
-            </div>)
-        },
-        {
-            color: 'cyan',
-            children: (
-            <div>
-                <span style={{fontWeight: 'bold'}}>Resistance Training</span>
-                {selectedRoutine?.exercises?.filter(ex => ex.routineStage - 1 === 3).map((exercise) => {
-                    return <PlanExercise key={exercise.exerciseId} exercise={exercise} />
-                })}
-            </div>),
-        },
-        {
-            color: 'yellow',
-            children: (
-                <div>
-                    <span style={{fontWeight: 'bold'}}>Free Choice</span>
-                </div>
-            )
-        },
-        {
-            color: 'red',
-            children: (
-                <div>
-                    <span style={{fontWeight: 'bold'}}>Cooldown</span>
-                    {selectedRoutine?.exercises.filter(ex => ex.routineStage - 1 === 4).map((exercise) => {
-                        return <PlanExercise key={exercise.exerciseId} exercise={exercise} />
-                    })}
-                </div>
-            )
-        }
-    ];
+    const exerciseKeys: { [key: string]: string } = {};
+    exerciseData?.map(exercise => {
+        exerciseKeys[exercise.name.replace(/\s+/g, '')] = exercise.key;
+    })
 
     const handleNewDay = () => {
         const newDay = {
@@ -147,9 +87,9 @@ export default function AddPlanDays() {
 
         const newExercise: RoutineExercise = {
             ...exerciseInput,
-            stage_index: nextStageIndex,
+            stage_index: selectedRoutine.exercises.filter(exercise => exercise.routineStage == parseInt(selectedStage)).length,
             routineStage: parseInt(selectedStage), // Use selected stage
-            exerciseId: parseInt(selectedExercise) // Use selected exercise
+            exerciseId: parseInt(exerciseKeys[selectedExercise]) // Use selected exercise
         };
         const updatedWorkoutRoutines = workoutRoutines;
 
@@ -172,14 +112,18 @@ export default function AddPlanDays() {
         value: stage.id
     }));
 
+    
+    
+
     const exerciseOptions = exerciseData?.map(exercise => ({
         label: exercise.name,
-        value: exercise.key
+        value: exercise.name.replace(/\s+/g, ''),
     }))
 
     const dayOptions = workoutRoutines.map((dayRoutine) => ({
         title: dayRoutine.dayName,
     }))
+
 
     return (
         <>   
@@ -211,21 +155,7 @@ export default function AddPlanDays() {
                     overflow: 'hidden',
                 }}
             >
-                <div
-                    style={{
-                        width: '60%',
-                        height: '100%',
-                        overflowY: 'auto',
-                        background: 'transparent',
-                        borderRadius: 8,
-                        scrollbarWidth: 'thin', // Firefox
-                        flex: 1,
-                        minWidth: 0,
-                    }}
-                    className="timeline-scroll"
-                >
-                    <Timeline style={{ width: '100%' }} items={dayRoutineItems} />
-                </div>
+                <WorkoutRoutine selectedRoutine={selectedRoutine} />
                 <div
                     style={{
                         display: 'flex',
@@ -236,7 +166,7 @@ export default function AddPlanDays() {
                     }}
                 >
                     <Select placeholder="Select Routine Stage" options={workoutStageOptions} onChange={handleStageSelect} style={{ width: 325 }} />
-                    <Select placeholder="Select Exercise" style={{ width: 325 }} options={exerciseOptions} onChange={handleExerciseSelect} />
+                    <Select placeholder="Select Exercise" showSearch style={{ width: 325 }} options={exerciseOptions} onChange={handleExerciseSelect} />
                     <div
                         className="inputGrid"
                         style={{

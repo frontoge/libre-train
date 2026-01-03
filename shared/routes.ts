@@ -8,4 +8,5 @@ export const Routes = {
     TargetMetricTypes: "/models/target-metrics",
     WorkoutRoutineStages: "/models/workout-routine-stages",
     Plan: "/plan",
+    ClientPlan: "/plan/client",
 }

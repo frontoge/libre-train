@@ -152,3 +152,17 @@ export type SubmitPlanRequest = {
     workoutRoutines: WorkoutRoutine[]
 
 }
+
+export type Plan = {
+    id: number;
+    planName: string;
+    parentPlanId?: number;
+    planPhase: number;
+    startDate: string;
+    endDate: string;
+    isActive: boolean;
+    targetMetricId: number; 
+    targetMetricValue: number;
+    planCreatedAt: string;
+    workoutRoutines: WorkoutRoutine[];
+}

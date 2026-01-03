@@ -15,10 +15,10 @@ CREATE TABLE `WorkoutRoutineExercise` (
   `routine_stage` int(10) unsigned DEFAULT NULL,
   `stage_index` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `WorkoutRoutineExercise_relation_2` (`routine_id`),
   KEY `WorkoutRoutineExercise_relation_1` (`exercise_id`),
+  KEY `WorkoutRoutineExercise_relation_2` (`routine_id`),
   KEY `WorkoutRoutineExercise_relation_3` (`routine_stage`),
   CONSTRAINT `WorkoutRoutineExercise_relation_1` FOREIGN KEY (`exercise_id`) REFERENCES `Exercise` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
-  CONSTRAINT `WorkoutRoutineExercise_relation_2` FOREIGN KEY (`routine_id`) REFERENCES `WorkoutRoutine` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `WorkoutRoutineExercise_relation_2` FOREIGN KEY (`routine_id`) REFERENCES `WorkoutRoutine` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `WorkoutRoutineExercise_relation_3` FOREIGN KEY (`routine_stage`) REFERENCES `WorkoutRoutineStage` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci

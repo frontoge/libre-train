@@ -1,10 +1,11 @@
 import { Button } from "antd";
-import type { RoutineExercise } from "../../contexts/NewPlanContext";
+import type { RoutineExercise } from "../../../../shared/types";
 import { AppContext } from "../../app-context";
 import React from "react";
 
 export type PlanExerciseProps = {
     exercise: RoutineExercise
+    editable?: boolean;
 }
 
 export default function PlanExercise(props: PlanExerciseProps) {
@@ -15,7 +16,7 @@ export default function PlanExercise(props: PlanExerciseProps) {
     displayString += (props.exercise.reps ? props.exercise.reps + "x" : "");
     displayString += (props.exercise.sets ? props.exercise.sets : "");
     displayString += (props.exercise.weight ? ", " + props.exercise.weight + "kg" : "");
-    displayString += (props.exercise.duration ? ", " + props.exercise.duration + "min" : "");
+    displayString += (props.exercise.duration ? ", " + props.exercise.duration + "s" : "");
     displayString += (props.exercise.distance ? ", " + props.exercise.distance + "m" : "");
     displayString += (props.exercise.targetRPE ? ", RPE " + props.exercise.targetRPE : "");
     displayString += (props.exercise.pace ? ", " + props.exercise.pace + " pace" : "");
@@ -24,8 +25,12 @@ export default function PlanExercise(props: PlanExerciseProps) {
     return (
         <div>
             <span>{displayString}</span>
-            <Button type="link">Edit</Button>
-            <Button type="link" danger>Remove</Button>
+            { props.editable &&
+            <>
+                <Button type="link">Edit</Button>
+                <Button type="link" danger>Remove</Button>
+            </>
+            }
         </div>
     )
 }

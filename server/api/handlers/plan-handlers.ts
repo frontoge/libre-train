@@ -1,6 +1,9 @@
 import { Request, Response } from "express"; 
 import { SubmitPlanRequest } from "../../../shared/types";
 import { getDatabaseConnection } from "../../infrastructure/mysql-database";
+import { get } from "http";
+import { ClientPlanDTO, ClientPlanExerciseDTO, ClientPlanWithExercisesDTO } from "../../types/dto";
+import { mapPlanDTOToPlans, mapPlanExerciseDTOToWorkoutRoutines } from "../../mappers/plan-mappers";
 
 export async function handleCreatePlan(req: Request<{}, {}, SubmitPlanRequest>, res: Response) {
     const body = req.body;
@@ -82,6 +85,32 @@ export async function handleCreatePlan(req: Request<{}, {}, SubmitPlanRequest>, 
     catch (error) {
         console.error("Error creating plan:", error);
         res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function handleGetClientPlans(req: Request, res: Response) {
+    const clientId = req.params.id;
+    const connection = await getDatabaseConnection();
+    
+    try {
+        const [results] = await connection.query(`CALL spGetClientPlans(?)`, [clientId]);
+        const [exerciseResults] = await connection.query(`CALL spGetClientExercises(?)`, [clientId]);
+        const plans = (results as any)[0];
+        const exercises = (exerciseResults as any)[0];
+
+        const populatedPlans: ClientPlanWithExercisesDTO[] = plans.map((plan: ClientPlanDTO) => {
+            const planExercises = exercises.filter((ex: ClientPlanExerciseDTO) => ex.planId === plan.id);
+            return {
+                ...plan,
+                exercises: planExercises
+            }
+        })
+
+        const mappedPlans = populatedPlans.map((planDTO: ClientPlanWithExercisesDTO) => mapPlanDTOToPlans(planDTO));
+        res.status(200).json(mappedPlans);
+    } catch (error) {
+        console.error("Error fetching client plans:", error);
+        res.status(500).json({ message: "Internal server error" });   
     }
 }
 

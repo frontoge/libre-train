@@ -19,6 +19,7 @@ export const MuscleGroupColors: {[key: string]: string} = {
     legs: 'brown',
     core: 'yellow',
     cardio: 'red',
+    stretch: 'pink',
     other: 'gray',
 };
 
@@ -122,6 +123,7 @@ export const muscleValueToColor: Record<string, string> = {
     "lats": MuscleGroupColors.back,
     "glutes": MuscleGroupColors.legs,
     "quadriceps": MuscleGroupColors.legs,
+    "stretch": MuscleGroupColors.stretch,
 };
 
 export const muscleGroupOptions: MuscleGroupOption[] = [
@@ -224,6 +226,7 @@ export const muscleGroupOptions: MuscleGroupOption[] = [
     { label: "Lats", value: "lats" },
     { label: "Glutes", value: "glutes" },
     { label: "Quadriceps", value: "quadriceps" },
+    { label: "Stretch", value: "stretch" },
 ]
 
 export function getMuscleGroupFromLabel(label: string): MuscleGroupOption | undefined {

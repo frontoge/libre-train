@@ -40,6 +40,11 @@ export const items: NavMenuItem[] = [
         icon: <ImMap />,
         children: [
             {
+                key: 'plan_manage',
+                label: 'Manage Plans',
+                icon: <ImMap />
+            },
+            {
                 key: 'plan_new',
                 label: 'New Plan',
                 icon: <FaRegSquarePlus />,

@@ -2,12 +2,13 @@
 function getNavigationUrlFromNavKey(navKey: string): string {
 
     switch (navKey) {
+        // Index pages
         case 'dashboard':
+        case 'client_overview':
+        case 'plan_manage':
             return '';
         case 'clientsMenu':
             return 'clients';
-        case 'client_overview':
-            return '';
         case 'plan_new':
         case 'client_new':
         case 'exercise_new':
