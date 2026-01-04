@@ -1,12 +1,11 @@
 import React from "react";
-import type { Client, WorkoutRoutine } from "../../../shared/types";
+import type { Plan, WorkoutRoutine } from "../../../shared/types";
 import type { TargetMetric } from "../../../shared/models";
 import type { Dayjs } from "dayjs";
 
 export type RangeValueType<T> = [T | null, T | null] | null;
 
 export type NewPlanState = {
-    clientOptions?: Client[];
     selectedClientId?: number;
 
     exerciseData: any[];
@@ -14,11 +13,7 @@ export type NewPlanState = {
 
     selectedDates?: [string, string];
     selectedDateRange?: RangeValueType<Dayjs>;
-    existingPlans?: {
-        planName: string;
-        planId: number;
-        stages: number;
-    }[];
+    existingPlans?: Plan[];
     targetMetricTypes?: TargetMetric[];
     selectedTargetMetricType?: TargetMetric;
 
@@ -39,7 +34,7 @@ export const defaultPlanState: NewPlanState = {
     refreshExercises: () => {},
     exerciseData: [],
     existingPlans: [],
-    workoutRoutines: []
+    workoutRoutines: [],
 }
 
 export const defaultNewPlanContextValue: NewPlanContextType = {

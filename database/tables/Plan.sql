@@ -19,6 +19,6 @@ CREATE TABLE `Plan` (
   KEY `Plan_relation_3` (`parent_plan_id`),
   CONSTRAINT `Plan_relation_1` FOREIGN KEY (`client_id`) REFERENCES `Client` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `Plan_relation_2` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `Plan_relation_3` FOREIGN KEY (`parent_plan_id`) REFERENCES `Plan` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  CONSTRAINT `Plan_relation_3` FOREIGN KEY (`parent_plan_id`) REFERENCES `Plan` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `Plan_relation_5` FOREIGN KEY (`target_metric_id`) REFERENCES `TargetMetric` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci

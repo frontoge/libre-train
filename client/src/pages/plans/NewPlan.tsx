@@ -74,22 +74,6 @@ export function NewPlan() {
     }
 
     useEffect(() => {
-        const fetchClients = async () => {
-            try {
-                const requestOptions = {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-                const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}`, requestOptions);
-                const data = await response.json();
-                updatePlanState({ clientOptions: data });
-            } catch (error) {
-                console.error("Error fetching client data:", error);
-            }
-        };
-
         const fetchTargetMetricTypes = async () => {
             try {
                 const requestOptions = {
@@ -105,10 +89,16 @@ export function NewPlan() {
                 console.error("Error fetching target metric types:", error);
             }
         }
-
-        fetchClients();
         fetchTargetMetricTypes();
     }, [])
+
+    const disableNextButton = (
+        !planState.selectedClientId 
+        || !planState.selectedDates
+        || !planState.selectedTargetMetricType
+        || !planState.targetMetricValue
+        || !planState.planName
+    )
 
     return (
         <NewPlanContext.Provider value={{ state: planState, updateState: updatePlanState }}>
@@ -134,7 +124,7 @@ export function NewPlan() {
                         alignSelf: 'end',
                     }}>
                         <Button type="default" disabled={page === 0} onClick={handleBack}>Prev</Button>
-                        <Button type="primary" style={{marginLeft: '1rem'}} onClick={handleNext}>{page === 0 ? "Next" : "Finish"}</Button>
+                        <Button type="primary" style={{marginLeft: '1rem'}} disabled={disableNextButton} onClick={handleNext}>{page === 0 ? "Next" : "Finish"}</Button>
                     </div>
                 </Panel>
             </PageLayout>

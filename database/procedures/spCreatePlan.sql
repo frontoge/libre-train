@@ -10,6 +10,7 @@ CREATE PROCEDURE spCreatePlan(
 	IN p_target_value FLOAT
 )
 BEGIN
+	-- Insert the new plan
 	INSERT INTO Plan (
 		client_id,
 		plan_label,
@@ -31,5 +32,19 @@ BEGIN
 		p_target_metric_id,
 		p_target_value
 	);
-	SELECT LAST_INSERT_ID() AS plan_id;
+
+	-- Get the new plan's ID
+	SET @new_plan_id = LAST_INSERT_ID();
+
+	-- If a parent_plan_id was provided, update sibling plan phases
+	IF p_parent_plan_id IS NOT NULL THEN
+		UPDATE Plan
+		SET plan_phase = plan_phase + 1
+		WHERE parent_plan_id = p_parent_plan_id
+		  AND id <> @new_plan_id
+		  AND plan_phase >= p_plan_phase;
+	END IF;
+
+	-- Return the new plan's ID
+	SELECT @new_plan_id AS plan_id;
 END

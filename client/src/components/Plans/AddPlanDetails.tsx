@@ -1,8 +1,11 @@
 import { Input, Select, DatePicker, Slider } from "antd";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { NewPlanContext, type RangeValueType } from "../../contexts/NewPlanContext";
 import type { Client } from "../../../../shared/types";
 import type dayjs from "dayjs";
+import { Routes } from "../../../../shared/routes";
+import { getAppConfiguration } from "../../config/app.config";
+import { AppContext } from "../../app-context";
 
 const { RangePicker } = DatePicker;
 
@@ -12,14 +15,18 @@ export default function AddPlanDetails() {
     const { state: {
         targetMetricTypes,
         selectedTargetMetricType,
-        clientOptions,
         selectedDateRange,
         targetMetricValue,
         planName,
-        selectedClientId
+        selectedClientId,
+        existingPlans,
+        parentPlanId,
+        planStage
     }, updateState } = useContext(NewPlanContext);
 
-    const selectedClient: Client | undefined = clientOptions?.find(client => client.id === selectedClientId!);
+    const {state: {clients}} = useContext(AppContext)
+
+    const selectedClient: Client | undefined = clients?.find(client => client.id === selectedClientId!);
 
     // Input options
     const goalMetricOptions = targetMetricTypes?.map(metric => ({
@@ -27,19 +34,27 @@ export default function AddPlanDetails() {
         label: metric.metric_name
     }))
 
-    const clientKeyToIdMap = clientOptions?.reduce((map, client) => {
+    const clientKeyToIdMap = clients?.reduce((map, client) => {
         map[client.first_name + client.last_name] = client.id;
         return map;
     }, {} as Record<string, number>);
 
-    const clientSelectOptions = clientOptions?.map(client => ({
+    const clientSelectOptions = clients?.map(client => ({
         value: client.first_name + client.last_name,
         label: client.first_name + " " + client.last_name
     }))
-    
-    const stageMarks: Record<number, string> = {
-        50: '1',
-    }
+
+    const parentPlanOptions = existingPlans?.map(plan => ({
+        value: plan.id.toString(),
+        label: plan.planName
+    }))
+
+    const planStageCount = existingPlans?.filter((plan) => plan.parentPlanId === parentPlanId).length ?? 0;
+
+    const planStageOptions = parentPlanId ? Array.from({ length: planStageCount + 1}, (val, index) => ({
+        value: (index + 1).toString(),
+        label: `Stage ${index + 1}`
+    })) : [];
 
     // input handlers
     const handleClientSelect = (value: string) => {
@@ -64,14 +79,32 @@ export default function AddPlanDetails() {
     }
 
     const handleStageChange = (value: number) => {
-        updateState({ planStage: parseInt(stageMarks[value], 10)});
-        // updateState({ planStage: (value / 50) });
+        updateState({ planStage: value });
     }
 
     const handleGoalValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("Goal value changed:", e.target.value);
-        updateState({ targetMetricValue: parseFloat(e.target.value) });
+        const value = parseFloat(e.target.value);
+        updateState({ targetMetricValue: isNaN(value) ? undefined : value });
     }
+
+    useEffect(() => {
+        if (!selectedClientId) return;
+        const fetchClientPlans = async (clientId: number) => {
+            const requestOptions = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+            const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.ClientPlan}/${clientId}`, requestOptions);
+            if (response.ok) {
+                const data = await response.json();
+                updateState({ existingPlans: data });
+            }
+        }
+
+        fetchClientPlans(selectedClientId as number);
+    }, [selectedClientId]);
 
     return (
         <>
@@ -91,12 +124,22 @@ export default function AddPlanDetails() {
             <Select 
                 placeholder="Select Parent Plan (optional)"
                 style={{ width: 400 }}
+                options={parentPlanOptions}
+                disabled={existingPlans === undefined || existingPlans.length === 0}
                 onChange={handleParentPlanSelect}
             >
                 
             </Select>
-            <h3 style={{margin: 0, padding: 0}}>Stage</h3>
-            <Slider marks={stageMarks} disabled defaultValue={50} step={null} style={{ width: 400 }} onChange={handleStageChange}></Slider>
+            <Select
+                placeholder="Select Plan Stage"
+                style={{ width: 400 }}
+                onChange={(value) => handleStageChange(parseInt(value))}
+                disabled={parentPlanId === undefined}
+                options={planStageOptions}
+                value={planStage?.toString()}
+            >
+
+            </Select>
             <Select 
                 placeholder="Select Goal Metric"
                 style={{ width: 400 }}
