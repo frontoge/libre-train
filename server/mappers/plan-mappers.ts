@@ -25,7 +25,7 @@ export function mapPlanExerciseDTOToWorkoutRoutines(planDTO: ClientPlanExerciseD
     planDTO.sort((a, b) => a.routine_day - b.routine_day).map(routine => {
         if (!routines[routine.routine_day]) {
             routines[routine.routine_day] = {
-                dayName: routine.routine_name || `Day ${routine.routine_day + 1}`,
+                dayName: routine.routine_name ?? `Day ${routine.routine_day + 1}`,
                 exercises: []
             }
         }

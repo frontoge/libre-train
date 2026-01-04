@@ -40,9 +40,10 @@ export async function handleCreatePlan(req: Request<{}, {}, SubmitPlanRequest>, 
         // Step 3: Create WorkoutRoutine entries
         console.log("Creating workout routines for workout program:", workoutProgramId);
         body.workoutRoutines.map(async (routine, index) => {
-            const [WorkoutRoutineResults] = await connection.query(`CALL spCreateWorkoutRoutine(?, ?)`, [
+            const [WorkoutRoutineResults] = await connection.query(`CALL spCreateWorkoutRoutine(?, ?, ?)`, [
                 workoutProgramId,
-                index
+                index,
+                routine.dayName
             ])
 
             // Step 4: Create WorkoutRoutineExercise entrie

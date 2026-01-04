@@ -1,5 +1,5 @@
 import { Button, Input, Select, Steps } from "antd";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import "../../styles/index.css";
 import { AppContext } from "../../app-context";
 import { NewPlanContext } from "../../contexts/NewPlanContext";
@@ -32,7 +32,7 @@ export default function AddPlanDays() {
         targetRPE: undefined
     });
 
-    const { state: {workoutRoutineStages, exerciseData} } = React.useContext(AppContext);
+    const { state: {workoutRoutineStages, exerciseData}, stateRefreshers } = React.useContext(AppContext);
     const { state: {workoutRoutines}, updateState } = useContext(NewPlanContext);
 
     const selectedRoutine = workoutRoutines[selectedDay];
@@ -162,6 +162,9 @@ export default function AddPlanDays() {
         title: dayRoutine.dayName,
     }))
 
+    useEffect(() => {
+        stateRefreshers && stateRefreshers.refreshExerciseData();
+    }, [])
 
     return (
         <>   

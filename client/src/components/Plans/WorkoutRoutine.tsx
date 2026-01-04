@@ -89,7 +89,12 @@ export function WorkoutRoutine(props: WorkoutRoutineProps) {
                 <div>
                     <span style={{fontWeight: 'bold'}}>Cooldown</span>
                     {selectedRoutine?.exercises.filter(ex => ex.routineStage - 1 === 5).map((exercise) => {
-                        return <PlanExercise key={exercise.exerciseId} exercise={exercise} editable={editable} />
+                        return <PlanExercise 
+                                key={exercise.exerciseId}
+                                exercise={exercise}
+                                editable={editable}
+                                onDelete={() => props.onDelete && props.onDelete(exercise.routineStage, exercise.stage_index)}
+                            />
                     })}
                 </div>
             )

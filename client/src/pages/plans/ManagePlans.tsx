@@ -25,6 +25,7 @@ export function ManagePlans() {
             setPlans([]);
             return;
         }
+        setSelectedPlanId(undefined);
         const fetchClientPlans = async (clientId: number) => {
             const requestOptions = {
                 method: 'GET',
@@ -70,7 +71,7 @@ export function ManagePlans() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            margin: '2rem',
+            margin: '1rem',
 
         }}>
             <Panel style={{
@@ -114,7 +115,7 @@ export function ManagePlans() {
                 </div>
                 {selectedPlanId !== undefined && <>
                     <Steps size="small" current={selectedDayIndex} items={dayOptions || []} onChange={(current) => setSelectedDayIndex(current)}/>
-                    <div style={{ display: 'flex', justifyContent: 'center', width: '100%', height: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', width: '100%', height: '100%', overflow: 'hidden' }}>
                         <WorkoutRoutine selectedRoutine={selectedPlan?.workoutRoutines[selectedDayIndex]} style={{ width: '100%', height: '100%' }} />
                     </div>
                     <div style={{
