@@ -132,7 +132,7 @@ export type RoutineExercise = {
     duration?: number;
     distance?: number;
     restTime?: number;
-    pace?: number;
+    pace?: string;
     targetRPE?: number;
 }
 

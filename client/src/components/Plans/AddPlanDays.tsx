@@ -6,12 +6,22 @@ import { NewPlanContext } from "../../contexts/NewPlanContext";
 import type { RoutineExercise } from "../../../../shared/types";
 import { WorkoutRoutine } from "./WorkoutRoutine";
 
+type ExerciseInput = {
+    sets?: number;
+    reps?: number;
+    weight?: number;
+    duration?: number;
+    distance?: number;
+    restTime?: number;
+    pace?: string;
+    targetRPE?: number;
+}
 
 export default function AddPlanDays() {
     const [selectedDay, setSelectedDay] = React.useState(0);
     const [selectedExercise, setSelectedExercise] = React.useState<string | undefined>(undefined);
     const [selectedStage, setSelectedStage] = React.useState<string | undefined>(undefined);
-    const [exerciseInput, setExerciseInput] = React.useState({
+    const [exerciseInput, setExerciseInput] = React.useState<ExerciseInput>({
         sets: undefined,
         reps: undefined,
         weight: undefined,
@@ -72,6 +82,16 @@ export default function AddPlanDays() {
     }
 
     const handleExerciseInput = (field: string, value: string) => {
+
+        if (field === 'pace') {
+            console.log('setting pace', value);
+            setExerciseInput(prev => ({
+                ...prev,
+                [field]: value ? value : undefined
+            }))
+            return;
+        }
+
         setExerciseInput(prev => ({
             ...prev,
             [field]: value ? parseFloat(value) : undefined

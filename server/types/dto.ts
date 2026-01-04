@@ -23,7 +23,7 @@ export type ClientPlanExerciseDTO = {
     duration?: number;
     distance?: number;
     rest_time?: number;
-    pace?: number;
+    pace?: string;
     rpe?: number;
     routine_stage: number;
     stage_index: number;

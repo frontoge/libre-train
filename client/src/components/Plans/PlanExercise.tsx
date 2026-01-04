@@ -12,15 +12,34 @@ export default function PlanExercise(props: PlanExerciseProps) {
     const { state: {exerciseData} } = React.useContext(AppContext);
     const exercise = exerciseData?.find(ex => parseInt(ex.key) === props.exercise.exerciseId);
 
-    let displayString = (exercise ? exercise.name : "Unknown Exercise") + " - ";
-    displayString += (props.exercise.reps ? props.exercise.reps + "x" : "");
-    displayString += (props.exercise.sets ? props.exercise.sets : "");
-    displayString += (props.exercise.weight ? ", " + props.exercise.weight + "kg" : "");
-    displayString += (props.exercise.duration ? ", " + props.exercise.duration + "s" : "");
-    displayString += (props.exercise.distance ? ", " + props.exercise.distance + "m" : "");
-    displayString += (props.exercise.targetRPE ? ", RPE " + props.exercise.targetRPE : "");
-    displayString += (props.exercise.pace ? ", " + props.exercise.pace + " pace" : "");
-    displayString += (props.exercise.restTime ? ", Rest " + props.exercise.restTime + "s" : "");
+    const variableStrings: string[] = [];
+
+    let volumeVariables = props.exercise.sets ? props.exercise.sets + "x" : "";
+    volumeVariables += props.exercise.reps ? props.exercise.reps : "";
+    volumeVariables += props.exercise.duration ? props.exercise.duration + "s" : "";
+
+    if (volumeVariables.length > 0) {
+        variableStrings.push(volumeVariables);
+    }
+
+    let intensityVariables = props.exercise.weight ? props.exercise.weight + "lbs" : "";
+    intensityVariables += props.exercise.distance ? props.exercise.distance + "m" : "";
+    intensityVariables += props.exercise.targetRPE ? "RPE " + props.exercise.targetRPE : "";
+
+    if (intensityVariables.length > 0) {
+        variableStrings.push(intensityVariables);
+    }
+
+    if (props.exercise.pace) {
+        variableStrings.push(props.exercise.pace + " pace");
+    }
+
+    if (props.exercise.restTime) {
+        variableStrings.push("Rest " + props.exercise.restTime + "s");
+    }
+
+    let displayString = (exercise ? exercise.name : "Unknown Exercise") + (variableStrings.length === 0 ? "" : " - ");
+    displayString += variableStrings.join(", ");
 
     return (
         <div>
