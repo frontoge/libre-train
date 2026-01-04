@@ -1,4 +1,4 @@
-import { getDatabaseConnection } from "../../infrastructure/mysql-database"
+import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database"
 import { Request, Response } from "express";
 import { AddExerciseFormData } from "../../../shared/types";
 import { RowDataPacket } from "mysql2";
@@ -20,6 +20,8 @@ export const handleExerciseCreate = async (req: Request<{}, {}, AddExerciseFormD
     } catch (error) {
         console.error("Error creating exercise:", error);
         res.status(500).json({ message: "Internal server error" });
+    } finally {
+        await closeDatabaseConnection(connection);
     }
 }
 
@@ -39,11 +41,12 @@ export const handleGetAllExercises = async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Error fetching exercises:", error);
         res.status(500).json({ message: "Internal server error" });
+    } finally {
+        await closeDatabaseConnection(connection);
     }
 }
 
 export const handleDeleteExercise = async (req: Request<{ id: string }>, res: Response) => {
-    const connection = await getDatabaseConnection();
 
     const { id } = req.params;
 
@@ -51,6 +54,7 @@ export const handleDeleteExercise = async (req: Request<{ id: string }>, res: Re
         return res.status(400).json({ message: "Exercise ID is required" });
     }
 
+    const connection = await getDatabaseConnection();
     try {
         await connection.query({
             sql: "DELETE FROM Exercise WHERE id = ?",
@@ -67,5 +71,7 @@ export const handleDeleteExercise = async (req: Request<{ id: string }>, res: Re
         }
         console.error("Unexpected error deleting exercise:", error);
         res.status(500).json({ message: "An unexpected error occurred." });
+    } finally {
+        await closeDatabaseConnection(connection);
     }
 }

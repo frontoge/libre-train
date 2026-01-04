@@ -1,9 +1,8 @@
 import { Request, Response } from "express"; 
 import { SubmitPlanRequest } from "../../../shared/types";
-import { getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { get } from "http";
+import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
 import { ClientPlanDTO, ClientPlanExerciseDTO, ClientPlanWithExercisesDTO } from "../../types/dto";
-import { mapPlanDTOToPlans, mapPlanExerciseDTOToWorkoutRoutines } from "../../mappers/plan-mappers";
+import { mapPlanDTOToPlans} from "../../mappers/plan-mappers";
 
 export async function handleCreatePlan(req: Request<{}, {}, SubmitPlanRequest>, res: Response) {
     const body = req.body;
@@ -111,6 +110,8 @@ export async function handleGetClientPlans(req: Request, res: Response) {
     } catch (error) {
         console.error("Error fetching client plans:", error);
         res.status(500).json({ message: "Internal server error" });   
+    } finally {
+        await closeDatabaseConnection(connection);
     }
 }
 
@@ -124,6 +125,8 @@ export async function handleDeletePlan(req: Request, res: Response) {
     } catch (error) {
         console.error("Error deleting plan:", error);
         res.status(500).json({ message: "Internal server error" });
+    } finally {
+        await closeDatabaseConnection(connection);
     }
 }
 
