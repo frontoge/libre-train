@@ -6,6 +6,8 @@ export type WorkoutRoutineProps = {
     selectedRoutine: WorkoutRoutine | undefined;
     editable?: boolean;
     style?: React.CSSProperties | undefined;
+    onDelete?: (routineStage: number, stageIndex: number) => void;
+    onEdit?: (routineStage: number, stageIndex: number) => void;
 };
 
 export function WorkoutRoutine(props: WorkoutRoutineProps) {
@@ -18,7 +20,12 @@ export function WorkoutRoutine(props: WorkoutRoutineProps) {
             <div>
                 <span style={{fontWeight: 'bold'}}>Warmup</span>
                 {selectedRoutine?.exercises?.filter(ex => ex.routineStage - 1 === 0).map((exercise) => {
-                    return <PlanExercise key={exercise.exerciseId} exercise={exercise} editable={editable} />
+                    return <PlanExercise 
+                                key={exercise.exerciseId}
+                                exercise={exercise}
+                                editable={editable}
+                                onDelete={() => props.onDelete && props.onDelete(exercise.routineStage, exercise.stage_index)}
+                            />
                 })}
             </div>)
         },
@@ -28,7 +35,12 @@ export function WorkoutRoutine(props: WorkoutRoutineProps) {
                 <div>
                     <span style={{fontWeight: 'bold'}}>Activation</span>
                     {selectedRoutine?.exercises?.filter(ex => ex.routineStage - 1 === 1).map((exercise) => {
-                        return <PlanExercise key={exercise.exerciseId} exercise={exercise} editable={editable} />
+                        return <PlanExercise 
+                                key={exercise.exerciseId}
+                                exercise={exercise}
+                                editable={editable}
+                                onDelete={() => props.onDelete && props.onDelete(exercise.routineStage, exercise.stage_index)}
+                            />
                     })}
                 </div>
             )
@@ -39,7 +51,12 @@ export function WorkoutRoutine(props: WorkoutRoutineProps) {
             <div>
                 <span style={{fontWeight: 'bold'}}>Skill Development</span>
                 {selectedRoutine?.exercises?.filter(ex => ex.routineStage - 1 === 2).map((exercise) => {
-                    return <PlanExercise key={exercise.exerciseId} exercise={exercise} editable={editable} />
+                    return <PlanExercise 
+                                key={exercise.exerciseId}
+                                exercise={exercise}
+                                editable={editable}
+                                onDelete={() => props.onDelete && props.onDelete(exercise.routineStage, exercise.stage_index)}
+                            />
                 })}
             </div>)
         },
@@ -49,7 +66,12 @@ export function WorkoutRoutine(props: WorkoutRoutineProps) {
             <div>
                 <span style={{fontWeight: 'bold'}}>Resistance Training</span>
                 {selectedRoutine?.exercises?.filter(ex => ex.routineStage - 1 === 3).map((exercise) => {
-                    return <PlanExercise key={exercise.exerciseId} exercise={exercise} editable={editable} />
+                    return <PlanExercise 
+                                key={exercise.exerciseId}
+                                exercise={exercise}
+                                editable={editable}
+                                onDelete={() => props.onDelete && props.onDelete(exercise.routineStage, exercise.stage_index)}
+                            />
                 })}
             </div>),
         },

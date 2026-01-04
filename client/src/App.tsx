@@ -115,6 +115,7 @@ function App() {
 		if (isAuthenticated() || getAppConfiguration().disableAuth) {
 			fetchWorkoutRoutineStages();
 			fetchExercises();
+			fetchClients();
 		}
 	}, [])
 

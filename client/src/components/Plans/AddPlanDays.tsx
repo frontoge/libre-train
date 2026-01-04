@@ -119,6 +119,24 @@ export default function AddPlanDays() {
         })
     }
 
+    const handleDeleteExercise = (routineStage: number, stageIndex: number) => {
+        const updatedWorkoutRoutines = workoutRoutines;
+        const exercises = updatedWorkoutRoutines[selectedDay].exercises;
+        const exerciseIndex = exercises.findIndex(ex => ex.routineStage === routineStage && ex.stage_index === stageIndex);
+        if (exerciseIndex !== -1) {
+            exercises.splice(exerciseIndex, 1);
+            // Recalculate stage_index for remaining exercises in the same routineStage
+            updatedWorkoutRoutines[selectedDay].exercises
+                .filter(ex => ex.routineStage === routineStage)
+                .forEach((ex, idx) => {
+                    ex.stage_index = idx;
+                });
+            updateState({
+                workoutRoutines: updatedWorkoutRoutines
+            });
+        }
+    }
+
     const handleNameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const updatedWorkoutRoutines = workoutRoutines;
         updatedWorkoutRoutines[selectedDay].dayName = e.target.value;
@@ -175,7 +193,7 @@ export default function AddPlanDays() {
                     overflow: 'hidden',
                 }}
             >
-                <WorkoutRoutine selectedRoutine={selectedRoutine} />
+                <WorkoutRoutine selectedRoutine={selectedRoutine} editable={true} onDelete={handleDeleteExercise} />
                 <div
                     style={{
                         display: 'flex',

@@ -6,6 +6,8 @@ import React from "react";
 export type PlanExerciseProps = {
     exercise: RoutineExercise
     editable?: boolean;
+    onDelete?: () => void;
+    onEdit?: () => void;
 }
 
 export default function PlanExercise(props: PlanExerciseProps) {
@@ -14,40 +16,34 @@ export default function PlanExercise(props: PlanExerciseProps) {
 
     const variableStrings: string[] = [];
 
-    let volumeVariables = props.exercise.sets ? props.exercise.sets + "x" : "";
-    volumeVariables += props.exercise.reps ? props.exercise.reps : "";
-    volumeVariables += props.exercise.duration ? props.exercise.duration + "s" : "";
+    const volumeParts = [
+        props.exercise.sets ? `${props.exercise.sets}x` : "",
+        props.exercise.reps ?? "",
+        props.exercise.duration ? `${props.exercise.duration}s` : ""
+    ].filter(Boolean).join("");
 
-    if (volumeVariables.length > 0) {
-        variableStrings.push(volumeVariables);
-    }
+    if (volumeParts) variableStrings.push(volumeParts);
 
-    let intensityVariables = props.exercise.weight ? props.exercise.weight + "lbs" : "";
-    intensityVariables += props.exercise.distance ? props.exercise.distance + "m" : "";
-    intensityVariables += props.exercise.targetRPE ? "RPE " + props.exercise.targetRPE : "";
+    const intensityParts = [
+        props.exercise.weight ? `${props.exercise.weight}lbs` : "",
+        props.exercise.distance ? `${props.exercise.distance}m` : "",
+        props.exercise.targetRPE ? `RPE ${props.exercise.targetRPE}` : ""
+    ].filter(Boolean).join("");
 
-    if (intensityVariables.length > 0) {
-        variableStrings.push(intensityVariables);
-    }
+    if (intensityParts) variableStrings.push(intensityParts);
 
-    if (props.exercise.pace) {
-        variableStrings.push(props.exercise.pace + " pace");
-    }
+    if (props.exercise.pace) variableStrings.push(`${props.exercise.pace} pace`);
+    if (props.exercise.restTime) variableStrings.push(`Rest ${props.exercise.restTime}s`);
 
-    if (props.exercise.restTime) {
-        variableStrings.push("Rest " + props.exercise.restTime + "s");
-    }
-
-    let displayString = (exercise ? exercise.name : "Unknown Exercise") + (variableStrings.length === 0 ? "" : " - ");
-    displayString += variableStrings.join(", ");
+    const displayString = `${exercise ? exercise.name : "Unknown Exercise"}${variableStrings.length ? " - " : ""}${variableStrings.join(", ")}`;
 
     return (
         <div>
             <span>{displayString}</span>
             { props.editable &&
             <>
-                <Button type="link">Edit</Button>
-                <Button type="link" danger>Remove</Button>
+                <Button type="link" onClick={props.onEdit}>Edit</Button>
+                <Button color="danger" variant="filled" onClick={props.onDelete}>Remove</Button>
             </>
             }
         </div>
