@@ -5,6 +5,7 @@ CREATE TABLE `WorkoutRoutine` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `routine_name` varchar(255) DEFAULT NULL,
+  `routine_exercises` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT 'NULL' COMMENT 'JSON data object containing the workout routine programming',
   PRIMARY KEY (`id`),
   KEY `WorkoutRoutine_relation_1` (`workout_program_id`),
   CONSTRAINT `WorkoutRoutine_relation_1` FOREIGN KEY (`workout_program_id`) REFERENCES `WorkoutProgram` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
