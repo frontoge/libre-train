@@ -2,6 +2,7 @@ export const Routes = {
     Health: "/health",
     Clients: "/clients",
     AuthSignup: "/auth/signup",
+    Contacts: "/contact",
     AuthLogin: "/auth/login",
     ExerciseCreate: "/exercises/create",
     Exercise: "/exercises",

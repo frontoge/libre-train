@@ -17,6 +17,8 @@ export type Goal = {
     goal: string;
 }
 
+export type ResponseWithError<T> = T | {hasError: true; errorMessage: string};
+
 export type AddClientFormValues = {
     information: {
         firstName?: string;
