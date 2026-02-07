@@ -17,3 +17,7 @@ export const getDatabaseConnection = async () => {
         throw error;
     }
 };
+
+export async function closeDatabaseConnection(connection: mysql.Connection) {
+    if (connection) await connection.end();
+}

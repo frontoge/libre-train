@@ -1,8 +1,8 @@
 import Divider from "antd/es/divider";
 import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";
-import { Button, message } from "antd";
-import { useState } from "react";
+import { App, Button, message } from "antd";
+import { useContext, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 import { AddClientFormContext, defaultFormValues } from "../../contexts/AddClientFormContext";
 import ClientFormInformation from "../../components/clients/ClientFormInformation";
@@ -11,11 +11,13 @@ import ClientMeasurements from "../../components/clients/ClientMeasurements";
 import { type AddClientFormValues } from "../../../../shared/types";
 import { Routes } from "../../../../shared/routes";
 import { getAppConfiguration } from "../../config/app.config";
+import { AppContext } from "../../app-context";
 
 export function AddClient() {
 
     const [messageApi, contextHolder] = message.useMessage();
     const [formValues, setFormValues] = useState<AddClientFormValues>(defaultFormValues);
+    const { stateRefreshers } = useContext(AppContext);
 
     const resetFormValues = () => {
         setFormValues(defaultFormValues)
@@ -37,6 +39,7 @@ export function AddClient() {
         const data = await response.json();
         messageApi.success('Client added successfully.');
         resetFormValues();
+        stateRefreshers?.refreshClients();
     }
 
     return (

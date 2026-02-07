@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getDatabaseConnection } from "../../infrastructure/mysql-database";
+import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
 import { AddClientFormValues, Client, DailyUpdateRequest, DashboardData, DashboardResponse, DashboardSummaryQuery, DashboardWeeklySummaryResponse } from "../../../shared/types";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
@@ -29,13 +29,16 @@ export const handleGetClients = async (req: Request, res: Response<Client[] | {m
             return;
         }
         res.status(500).json({ message: "An unexpected error occurred." });
-    } 
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
 };
 
 export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValues>, res: Response) => {
     const connection = await getDatabaseConnection();
 
     if (!req.body) {
+        await closeDatabaseConnection(connection);
         res.status(400).json({ message: "Request body is required" });
         return;
     }
@@ -44,6 +47,7 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
     
     if (!body.information || !body.goals || !body.measurements) {
         res.status(400).json({ message: "Missing required fields: information, goals, measurements" });
+        await closeDatabaseConnection(connection);
         return;
     }
 
@@ -140,18 +144,19 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
         }
         console.error("Unexpected error creating client:", error);
         res.status(500).json({ message: "An unexpected error occurred." });
+    } finally {
+        await closeDatabaseConnection(connection);
     }
 }
 
 export const handleDailyUpdate = async (req: Request<{}, {}, DailyUpdateRequest>, res: Response) => {
-    const connection = await getDatabaseConnection();
-
     if (!req.body) {
         res.status(400).json({ message: "Request body is required" });
         return;
     }
 
     const { date, data } = req.body;
+    const connection = await getDatabaseConnection();
     try {
 
         const [result] = await connection.execute<ResultSetHeader>({
@@ -179,6 +184,8 @@ export const handleDailyUpdate = async (req: Request<{}, {}, DailyUpdateRequest>
         }
         console.error("Unexpected error submitting daily update:", error);
         res.status(500).json({ message: "An unexpected error occurred." });
+    } finally {
+        await closeDatabaseConnection(connection);
     }
 
     res.status(200).json({ message: "Daily update submitted successfully." });
@@ -186,7 +193,6 @@ export const handleDailyUpdate = async (req: Request<{}, {}, DailyUpdateRequest>
 }
 
 export const handleGetDashboard = async (req: Request<{}, {}, {}, { clientId: string, date: string }>, res: Response<DashboardResponse>) => {
-    const connection = await getDatabaseConnection();
 
     const { clientId, date } = req.query;
 
@@ -194,7 +200,7 @@ export const handleGetDashboard = async (req: Request<{}, {}, {}, { clientId: st
         res.status(400).json({ message: "Client ID and date are required." });
         return;
     }
-
+    const connection = await getDatabaseConnection();
     try {
         const [results] = await connection.query<RowDataPacket[]>({
             sql: "CALL spGetClientDashboard(?, ?)",
@@ -242,12 +248,12 @@ export const handleGetDashboard = async (req: Request<{}, {}, {}, { clientId: st
         }
         console.error("Unexpected error fetching dashboard data:", error);
         res.status(500).json({ message: "An unexpected error occurred." });
+    } finally {
+        await closeDatabaseConnection(connection);
     }
 }
 
 export const handleGetDashboardSummary = async (req: Request<{}, {}, {}, DashboardSummaryQuery>, res: Response<DashboardWeeklySummaryResponse>) => {
-    const connection = await getDatabaseConnection();
-
     const { clientId, startDate, endDate } = req.query;
 
     if (!clientId || !startDate || !endDate) {
@@ -255,6 +261,7 @@ export const handleGetDashboardSummary = async (req: Request<{}, {}, {}, Dashboa
         return;
     }
 
+    const connection = await getDatabaseConnection();
     try {
 
         const [results] = await connection.query<RowDataPacket[]>({
@@ -281,6 +288,8 @@ export const handleGetDashboardSummary = async (req: Request<{}, {}, {}, Dashboa
         }
         console.error("Unexpected error fetching dashboard weekly summary:", error);
         res.status(500).json({ message: "An unexpected error occurred." });
+    } finally {
+        await closeDatabaseConnection(connection);
     }
 }
 
@@ -305,5 +314,7 @@ export const handleDeleteClient = async (req: Request<{ id: string }>, res: Resp
         }
         console.error("Unexpected error deleting client:", error);
         res.status(500).json({ message: "An unexpected error occurred." });
+    } finally {
+        await closeDatabaseConnection(connection);
     }
 }

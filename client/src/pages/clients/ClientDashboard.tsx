@@ -10,26 +10,11 @@ import { ClientDashboardContext, type DashboardState, defaultDashboardState } fr
 
 export function ClientDashboard() {
 
-    const { state, setState } = useContext(AppContext);
+    const { state, stateRefreshers } = useContext(AppContext);
     const [dashboardState, setDashboardState] = useState<DashboardState>(defaultDashboardState);
 
     useEffect(() => {
-        const fetchClients = async () => {
-            try {
-                const requestOptions = {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-                const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}`, requestOptions);
-                console.log(`${getAppConfiguration().apiUrl}${Routes.Clients}`);
-                const data = await response.json();
-                setState( prev => ({...prev, clients: data}))
-            } catch (error) {
-                console.error("Error fetching client data:", error);
-            }
-        };
+        
 
         const fetchDashboardData = async () => {
             try {
@@ -55,7 +40,7 @@ export function ClientDashboard() {
             }
         }
         if (state.clients.length === 0 || state.selectedClient === undefined) {
-            fetchClients();
+            stateRefreshers?.refreshClients();
             return;
         }
 

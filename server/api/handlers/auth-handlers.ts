@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { getDatabaseConnection } from '../../infrastructure/mysql-database';
+import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastructure/mysql-database';
 import { RowDataPacket } from 'mysql2';
 import argon2 from 'argon2';
 import crypto from 'crypto';
@@ -96,10 +96,11 @@ export const handleAuthLogin = async (req: Request, res: Response) => {
             accessToken,
             user: user.id
         });
-
     } catch (error) {
         console.error('Error during login:', error);
         return res.status(500).json({ message: 'Internal server error during login' });
+    } finally {
+        if (connection) await connection.end();
     }
 }
 
@@ -118,12 +119,14 @@ export const handleAuthSignup = async (req: Request, res: Response) => {
         });
 
         if (results.length > 0) {
+            await closeDatabaseConnection(connection);
             return res.status(409).json({ message: 'Username already exists' });
         }
     } catch (error) {
         console.error('Error checking existing username:', error);
+        await closeDatabaseConnection(connection);
         return res.status(500).json({ message: 'Internal server error while checking for duplicate usernames' });
-    }
+    } 
 
     const passwordHash = await hashPassword(password);
 
@@ -155,5 +158,7 @@ export const handleAuthSignup = async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Error creating user:', error);
         return res.status(500).json({ message: 'Internal server error while creating user' });
+    } finally {
+        await closeDatabaseConnection(connection);
     }
 }

@@ -26,7 +26,7 @@ export function Signup() {
         setLoading(true);
 
         try {
-            const res = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthSingup}`, {
+            const res = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthSignup}`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

@@ -1,7 +1,13 @@
 export const Routes = {
     Health: "/health",
     Clients: "/clients",
+    AuthSignup: "/auth/signup",
     Contacts: "/contact",
-    AuthSingup: "/auth/signup",
     AuthLogin: "/auth/login",
+    ExerciseCreate: "/exercises/create",
+    Exercise: "/exercises",
+    TargetMetricTypes: "/models/target-metrics",
+    WorkoutRoutineStages: "/models/workout-routine-stages",
+    Plan: "/plan",
+    ClientPlan: "/plan/client",
 }

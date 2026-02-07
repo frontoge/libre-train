@@ -1,3 +1,14 @@
+export type TargetMetric = {
+    id: number;
+    metric_name: string;
+    target_unit: string;
+}
+
+export type WorkoutRoutineStage = {
+    id: number;
+    stage_name: string;
+}
+
 export type Contact = {
     id: number;
     first_name: string;

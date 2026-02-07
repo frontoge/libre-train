@@ -1,17 +1,21 @@
 
 export type AppConfig = {
     apiUrl: string;
+    disableAuth: boolean;
 }
 
 const config: { [key: string]: AppConfig } = {
     local: {
-        apiUrl: "http://localhost:3000/api"
+        apiUrl: "http://localhost:3000/api",
+        disableAuth: true,
     },
     dev: {
-        apiUrl: "https://dev-api.example.com/api"
+        apiUrl: "https://dev-api.example.com/api",
+        disableAuth: false,
     },
     prod: {
-        apiUrl: "https://api.example.com/api"
+        apiUrl: "https://api.example.com/api",
+        disableAuth: false,
     }
 };
 
