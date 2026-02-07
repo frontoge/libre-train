@@ -96,8 +96,8 @@ function App() {
 					'Content-Type': 'application/json',
 				},
 			}
-			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.Clients}`, requestOptions);
-			console.log(`${getAppConfiguration().apiUrl}${ApiRoutes.Clients}`);
+			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.ClientContact}`, requestOptions);
+			console.log(`${getAppConfiguration().apiUrl}${ApiRoutes.ClientContact}`);
 			const data = await response.json();
 			setAppState( prev => ({...prev, clients: data}))
 		} catch (error) {

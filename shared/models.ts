@@ -19,3 +19,12 @@ export type Contact = {
     img?: string;
     notes?: string;
 }
+
+export type Client = {
+    id: number;
+    height?: number;
+    created_at: Date;
+    updated_at: Date;
+}
+
+export type ClientContact = Client & Omit<Contact, "id">;

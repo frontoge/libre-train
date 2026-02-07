@@ -1,17 +1,3 @@
-export type Client = {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone: string;
-    img?: string;
-    height?: number;
-    age?: number;
-    notes?: string;
-    created_at: Date;
-    updated_at: Date;
-}
-
 export type Goal = {
     id: number;
     goal: string;

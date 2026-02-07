@@ -1,8 +1,40 @@
 import { Request, Response } from "express";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { AddClientFormValues, Client, DailyUpdateRequest, DashboardData, DashboardResponse, DashboardSummaryQuery, DashboardWeeklySummaryResponse } from "../../../shared/types";
+import { AddClientFormValues, DailyUpdateRequest, DashboardData, DashboardResponse, DashboardSummaryQuery, DashboardWeeklySummaryResponse } from "../../../shared/types";
+import { Client, ClientContact } from "../../../shared/models";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
+export const handleGetClientContacts = async (req: Request<{ id?: string }>, res: Response) => {
+    const { id } = req.params;
+
+    const connection = await getDatabaseConnection();
+    try {
+        const [results] = await connection.query<RowDataPacket[]>({
+            sql: "CALL spGetClientContacts(?)",
+            values: [id ? parseInt(id, 10) : null]
+        });
+
+        res.status(200).json(results[0] as ClientContact[]);
+        
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("Error fetching client contacts:", error.message);
+            res.status(500).json({ message: error.message });
+            return;
+        }
+        console.error("Unexpected error fetching client contacts:", error);
+        res.status(500).json({ message: "An unexpected error occurred." });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
+}
+
+/**
+ * @deprecated - This endpoint is no longer used in the client application, but is left here for potential future use if needed.
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 export const handleGetClients = async (req: Request, res: Response<Client[] | {message: string}>) => {
     const connection = await getDatabaseConnection();
     try {
