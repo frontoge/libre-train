@@ -2,7 +2,7 @@ CREATE TABLE `Contact` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `first_name` varchar(100) NOT NULL,
   `last_name` varchar(100) NOT NULL,
-  `email` varchar(100) DEFAULT NULL,
+  `email` varchar(100) NOT NULL,
   `phone` varchar(15) DEFAULT NULL,
   `date_of_birth` date DEFAULT NULL,
   `img` varchar(255) DEFAULT NULL,

@@ -8,7 +8,7 @@ export type ResponseWithError<T> = T | {hasError: true; errorMessage: string};
 export type AddClientFormValues = {
     firstName?: string;
     lastName?: string;
-    phone?: string;
+    phoneNumber?: string;
     email?: string;
     height?: number;
     dob?: string;
