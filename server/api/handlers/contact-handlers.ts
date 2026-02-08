@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ResponseWithError } from '../../../shared/types';
 import { Contact } from '../../../shared/models';
-import { getDatabaseConnection } from '../../infrastructure/mysql-database';
+import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastructure/mysql-database';
 import { RowDataPacket } from 'mysql2';
 
 export const handleGetContacts = async (req: Request, res: Response<ResponseWithError<Contact[]>>) => {
@@ -14,7 +14,7 @@ export const handleGetContacts = async (req: Request, res: Response<ResponseWith
             first_name: row.first_name,
             last_name: row.last_name,
             email: row.email,
-            phone_number: row.phone_number,
+            phone: row.phone,
             img: row.img,
             date_of_birth: row.date_of_birth,
             notes: row.notes
@@ -26,7 +26,7 @@ export const handleGetContacts = async (req: Request, res: Response<ResponseWith
         res.status(500).json({hasError: true, errorMessage: 'An error occurred while fetching contacts.' });
         return;
     } finally {
-        connection.end();
+        await closeDatabaseConnection(connection);
     }
 }
 
@@ -62,7 +62,7 @@ export const handleGetContactById = async (req: Request<{id: string}>, res: Resp
         res.status(500).json({hasError: true, errorMessage: 'An error occurred while fetching the contact.' });
         return;
     } finally {
-        connection.end();
+        await closeDatabaseConnection(connection);
     }
 }
 
@@ -98,7 +98,7 @@ export const handleCreateContact = async (req: Request<{}, {}, Omit<Contact, "id
         res.status(500).json({hasError: true, errorMessage: 'An error occurred while creating the contact.' });
         return;
     } finally {
-        connection.end();
+        await closeDatabaseConnection(connection);
     }
 }
 
@@ -119,7 +119,7 @@ export const handleDeleteContact = async (req: Request<{id: string}>, res: Respo
         res.status(500).json({hasError: true, errorMessage: 'An error occurred while deleting the contact.' });
         return;
     } finally {
-        connection.end();
+        await closeDatabaseConnection(connection);
     }
 }
 
@@ -149,6 +149,6 @@ export const handleUpdateContact = async (req: Request<{id: string}, {}, Omit<Pa
         res.status(500).json({hasError: true, errorMessage: 'An error occurred while updating the contact.' });
         return;
     } finally {
-        connection.end();
+        await closeDatabaseConnection(connection);
     }
 }
