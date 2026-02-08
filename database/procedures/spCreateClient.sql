@@ -1,37 +1,21 @@
 CREATE PROCEDURE `spCreateClient` (
-  IN p_first_name VARCHAR(255),
-  IN p_last_name VARCHAR(255),
-  IN p_email VARCHAR(255),
-  IN p_phone VARCHAR(255),
-  IN p_height INT,
-  IN p_age INT,
-  IN p_img VARCHAR(255),
-  IN p_notes VARCHAR(500)
+  IN p_client_id INT,
+  IN p_trainer_id INT,
+  IN p_height INT
 ) BEGIN
 INSERT INTO
   Client (
-    first_name,
-    last_name,
-    email,
-    phone,
+    contactId,
+    trainerId,
     height,
-    age,
-    img,
-    notes
+    isActive
   )
-VALUES
-  (
-    p_first_name,
-    p_last_name,
-    p_email,
-    p_phone,
+VALUES (
+    p_client_id,
+    p_trainer_id,
     p_height,
-    p_age,
-    p_img,
-    p_notes
-  );
-
+    1
+);
 SELECT
   LAST_INSERT_ID() AS id;
-
 END
