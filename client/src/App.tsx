@@ -23,8 +23,8 @@ function App() {
 		workoutRoutineStages: [],
 		exerciseData: [],
 		auth: {
-			authToken: '',
-			user: 0
+			authToken: undefined,
+			user: undefined
 		}
 	})
 

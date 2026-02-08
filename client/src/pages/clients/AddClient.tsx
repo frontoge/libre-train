@@ -1,50 +1,85 @@
 import Divider from "antd/es/divider";
 import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";
-import { App, Button, message } from "antd";
+import { message } from "antd";
 import { useContext, useState } from "react";
-import TextArea from "antd/es/input/TextArea";
-import { AddClientFormContext, defaultFormValues } from "../../contexts/AddClientFormContext";
-import ClientFormInformation from "../../components/clients/ClientFormInformation";
-import ClientFormGoals from "../../components/clients/ClientFormGoals";
-import ClientMeasurements from "../../components/clients/ClientMeasurements";
-import { type AddClientFormValues } from "../../../../shared/types";
 import { Routes } from "../../../../shared/routes";
 import { getAppConfiguration } from "../../config/app.config";
 import { AppContext } from "../../app-context";
+import { ContactEditCreateForm } from "../../components/Contacts/ContactEditCreateForm";
+import { ClientEditCreateForm } from "../../components/clients/ClientEditCreateForm";
+import type { ClientEditCreateFormValues, ContactEditCreateFormValues } from "../../types/types";
 
 export function AddClient() {
 
     const [messageApi, contextHolder] = message.useMessage();
-    const [formValues, setFormValues] = useState<AddClientFormValues>(defaultFormValues);
-    const { stateRefreshers } = useContext(AppContext);
+    const { stateRefreshers, state } = useContext(AppContext);
+    const [contactFormValues, setContactFormValues] = useState<ContactEditCreateFormValues | undefined>(undefined);
+    const [clientFormValues, setClientFormValues] = useState<ClientEditCreateFormValues | undefined>(undefined);
+    const [formStage, setFormStage] = useState(0);
+
+    const handleContactFormSubmit = (values: ContactEditCreateFormValues): boolean => {
+        setContactFormValues(values);
+        setFormStage(1);
+        return true;
+    }
+
+    const handleClientFormSubmit = (values: ClientEditCreateFormValues): boolean => {
+        setClientFormValues(values);
+        submitAddClientForm();
+        return true;
+    }
+
+    const handleClientFormCancel = () => {
+        setFormStage(0);
+    }
+
+    const formStages = [
+        (<ContactEditCreateForm onSubmit={handleContactFormSubmit} initialValues={contactFormValues} />),
+        (<ClientEditCreateForm onSubmit={handleClientFormSubmit} initialValues={clientFormValues} onCancel={handleClientFormCancel} />)
+    ]
 
     const resetFormValues = () => {
-        setFormValues(defaultFormValues)
+        setContactFormValues(undefined);
+        setClientFormValues(undefined);
+        setFormStage(0);
     }
 
     const submitAddClientForm = async () => {
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formValues)
+        try {
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    firstName: contactFormValues?.firstName,
+                    lastName: contactFormValues?.lastName,
+                    email: contactFormValues?.email,
+                    phoneNumber: contactFormValues?.phoneNumber,
+                    dob: contactFormValues?.dob?.format('YYYY-MM-DD'),
+                    height: clientFormValues?.height,
+                    notes: clientFormValues?.notes,
+                    trainerId: state.auth.user
+                }),
+            }
+            const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}`, requestOptions);
+            if (!response.ok) {
+                messageApi.error('Failed to add client.');
+                return;
+            }
+            await response.json();
+            messageApi.success('Client added successfully.');
+            resetFormValues();
+            stateRefreshers?.refreshClients();
+        } catch (error) {
+            console.error('Error adding client:', error);
+            messageApi.error('An error occurred while adding the client.');
         }
-        const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}`, requestOptions);
-        if (!response.ok) {
-            messageApi.error('Failed to add client.');
-            return;
-        }
-        const data = await response.json();
-        messageApi.success('Client added successfully.');
-        resetFormValues();
-        stateRefreshers?.refreshClients();
     }
 
     return (
-        <AddClientFormContext value={{formValues, setFormValues}}>
-            <>
+        <>
             {contextHolder}
             <PageLayout title="Add Client" style={{
                 padding: "2rem 3rem",
@@ -63,54 +98,12 @@ export function AddClient() {
                         marginBottom: 0,
                         fontSize: '2rem',
                     }}>
-                        Client Intake Form
+                        New Client
                     </h2>
                     <Divider />
-                    <div style={{
-                        width: "100%",
-                        display: 'flex',
-                        height: '100%',
-                    }}>
-                        <div style={{
-                            width: '50%',
-                            height: '100%',
-                        }}>
-                            <ClientFormInformation />
-                            <ClientFormGoals />
-                        </div>
-                        <div style={{
-                            width: '50%',
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            padding: '1rem',
-                            gap: '1rem'
-                        }}>
-                            <ClientMeasurements />
-                            <TextArea placeholder="Notes" maxLength={500} style={{ width: '100%', height: "20%" }} value={formValues.information.notes} onChange={(e) => setFormValues(prev => ({...prev, information: {...prev.information, notes: e.target.value}}))} />
-                            <div style={{
-                                flexGrow: 1,
-                            }}>
-
-                            </div>
-                            <div style={{
-                                justifySelf: 'end',
-                                alignSelf: 'end',
-                                display: 'flex',
-                                gap: '1rem',
-                            }}>
-                                <Button type="primary" onClick={submitAddClientForm}>
-                                    Save
-                                </Button>
-                                <Button type="default" onClick={resetFormValues}>
-                                    Clear
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
+                    {formStages[formStage]}
                 </Panel>
             </PageLayout>
-            </>
-        </AddClientFormContext>
+        </>
     );
 }

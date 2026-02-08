@@ -85,7 +85,7 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
                 body.firstName ?? null,
                 body.lastName ?? null,
                 body.email ?? null,
-                body.phone ?? null,
+                body.phoneNumber ?? null,
                 body.dob ?? null,
                 body.img64 ?? null,
             ]

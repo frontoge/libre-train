@@ -89,7 +89,7 @@ export const handleAuthLogin = async (req: Request, res: Response) => {
         const accessToken = jwt.sign(
             { sub: user.id },
             process.env.JWT_SECRET,
-            { expiresIn: '3h' }
+            { expiresIn: '8h' }
         );
 
         return res.status(200).json({

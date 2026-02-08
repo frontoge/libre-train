@@ -1,4 +1,5 @@
 import type { MenuProps } from "antd/es/menu/menu";
+import type { Dayjs } from "dayjs";
 
 export type MenuItem = Required<MenuProps>['items'][number];
 
@@ -18,6 +19,19 @@ export type DashboardSummaryState = {
     calorieDeficiency?: number | string;
     bmr?: number | string;
     macroAdherence?: number | string;
+}
+
+export type ContactEditCreateFormValues = {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phoneNumber?: string;
+    dob?: Dayjs;
+}
+
+export type ClientEditCreateFormValues = {
+    height?: number;
+    notes?: string;
 }
 
 export enum ModalType {
