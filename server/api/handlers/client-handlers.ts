@@ -1,8 +1,40 @@
 import { Request, Response } from "express";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { AddClientFormValues, Client, DailyUpdateRequest, DashboardData, DashboardResponse, DashboardSummaryQuery, DashboardWeeklySummaryResponse } from "../../../shared/types";
+import { AddClientFormValues, DailyUpdateRequest, DashboardData, DashboardResponse, DashboardSummaryQuery, DashboardWeeklySummaryResponse } from "../../../shared/types";
+import { Client, ClientContact } from "../../../shared/models";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
+export const handleGetClientContacts = async (req: Request<{ id?: string }>, res: Response) => {
+    const { id } = req.params;
+
+    const connection = await getDatabaseConnection();
+    try {
+        const [results] = await connection.query<RowDataPacket[]>({
+            sql: "CALL spGetClientContacts(?)",
+            values: [id ? parseInt(id, 10) : null]
+        });
+
+        res.status(200).json(results[0] as ClientContact[]);
+        
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("Error fetching client contacts:", error.message);
+            res.status(500).json({ message: error.message });
+            return;
+        }
+        console.error("Unexpected error fetching client contacts:", error);
+        res.status(500).json({ message: "An unexpected error occurred." });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
+}
+
+/**
+ * @deprecated - This endpoint is no longer used in the client application, but is left here for potential future use if needed.
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 export const handleGetClients = async (req: Request, res: Response<Client[] | {message: string}>) => {
     const connection = await getDatabaseConnection();
     try {
@@ -44,28 +76,18 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
     }
 
     const body = req.body;
-    
-    if (!body.information || !body.goals || !body.measurements) {
-        res.status(400).json({ message: "Missing required fields: information, goals, measurements" });
-        await closeDatabaseConnection(connection);
-        return;
-    }
-
-    const { information, goals, measurements }: AddClientFormValues = body;
 
     try {
-        // Insert client into database
+        // Insert contact into database
         const [result] = await connection.query<RowDataPacket[][]>({
-            sql: "CALL spCreateClient(?, ?, ?, ?, ?, ?, ?, ?)",
+            sql: "CALL spCreateContact(?, ?, ?, ?, ?, ?)",
             values: [
-                information.firstName ?? null,
-                information.lastName ?? null,
-                information.email ?? null,
-                information.phone ?? null,
-                information.height ?? null,
-                information.age ?? null,
-                information.img64 ?? null,
-                information.notes ?? null
+                body.firstName ?? null,
+                body.lastName ?? null,
+                body.email ?? null,
+                body.phone ?? null,
+                body.dob ?? null,
+                body.img64 ?? null,
             ]
         });
 
@@ -79,63 +101,29 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
 
         const insertId = insertResult[0].id;
 
-        let d = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"})); 
-
-        const [dailyLogResult] = await connection.execute<ResultSetHeader>({
-            sql: "Call spCreateClientDailyLog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        // Insert client into database
+        const [clientResult] = await connection.query<RowDataPacket[][]>({
+            sql: "CALL spCreateClient(?, ?, ?, ?)",
             values: [
                 insertId,
-                d,
-                measurements.weight ?? null,
-                measurements.body_fat ?? null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
+                body.trainerId,
+                body.height ?? null,
+                body.notes ?? null
             ]
         });
 
-        const [measurementResult] = await connection.execute<ResultSetHeader>({
-            sql: "CALL spCreateClientMeasurement(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            values: [
-                insertId,
-                measurements.wrist ?? null,
-                measurements.calves ?? null,
-                measurements.biceps ?? null,
-                measurements.chest ?? null,
-                measurements.thighs ?? null,
-                measurements.waist ?? null,
-                measurements.shoulders ?? null,
-                measurements.hips ?? null,
-                measurements.forearm ?? null,
-                measurements.neck ?? null
-            ]
-        });
+        const clientInsertResult = clientResult[0];
 
-        const [goalResult] = await connection.execute<ResultSetHeader>({
-            sql: "CALL spCreateClientGoal(?, ?, ?, ?, ?)",
-            values: [
-                insertId,
-                goals.goal ?? null,
-                goals.targetWeight ?? null,
-                goals.targetBodyFat ?? null,
-                new Date()
-            ]
-        });
-
-        if (dailyLogResult.affectedRows === 0 || measurementResult.affectedRows === 0 || goalResult.affectedRows === 0) {
-            console.error("Failed to create daily log or measurements:", "Failed to create daily log or measurements.");
-            res.status(500).json({ message: "Failed to create daily log or measurements." });
+        if (!clientInsertResult || clientInsertResult.length === 0 || !clientInsertResult[0]?.id) {
+            console.error("Failed to create client:", "Failed to create contact.");
+            res.status(500).json({ message: "Failed to create client." });
             return;
         }
 
+        // Gonna need this in the create client daily log handler. have to check if it is already there
+        // let d = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"})); 
+
         res.status(201).json({ message: "Client created successfully." });
-
-
     } catch (error) {
         if (error instanceof Error) {
             console.error("Error creating client:", error.message);

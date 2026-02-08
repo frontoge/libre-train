@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { handleHealthCheck } from "./handlers";
 import { Routes } from "../../shared/routes";
-import { handleGetClients, handleCreateClient, handleDailyUpdate, handleGetDashboard, handleGetDashboardSummary, handleDeleteClient } from "./handlers/client-handlers";
+import { handleGetClients, handleCreateClient, handleDailyUpdate, handleGetDashboard, handleGetDashboardSummary, handleDeleteClient, handleGetClientContacts } from "./handlers/client-handlers";
 import { handleAuthSignup, handleAuthLogin } from "./handlers/auth-handlers";
 import { handleDeleteExercise, handleExerciseCreate, handleGetAllExercises } from "./handlers/exercise-handlers";
 import { handleGetTargetMetricModels } from "./handlers/models/target-metric-handler";
@@ -20,6 +20,7 @@ router.post(`${Routes.Clients}/daily-update`, handleDailyUpdate);
 router.get(`${Routes.Clients}/dashboard`, handleGetDashboard);
 router.get(`${Routes.Clients}/dashboard/summary`, handleGetDashboardSummary);
 router.delete(`${Routes.Clients}/:id`, handleDeleteClient);
+router.get(`${Routes.ClientContact}{/:id}`, handleGetClientContacts);
 
 // Exercise routes
 router.post(Routes.ExerciseCreate, handleExerciseCreate);

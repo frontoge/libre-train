@@ -26,12 +26,12 @@ WITH
   )
 SELECT
   c.id clientId,
-  c.first_name first_name,
-  c.last_name last_name,
-  c.phone phone,
-  c.email email,
+  ct.first_name first_name,
+  ct.last_name last_name,
+  ct.phone phone,
+  ct.email email,
   c.height height,
-  c.img img,
+  ct.img img,
   cdl.logged_weight logged_weight,
   cdl.body_fat logged_bodyfat,
   cdl.logged_calories logged_calories,
@@ -49,6 +49,7 @@ FROM
   ClientDailyLog cdl
   LEFT JOIN latestGoal ON latestGoal.client_id = cdl.client_id
   JOIN Client c ON c.id = cdl.client_id
+  JOIN Contact ct ON ct.id = c.contactId
 WHERE
   CAST(cdl.created_at AS DATE) = CAST(p_date AS DATE)
   AND cdl.client_id = p_client_id;

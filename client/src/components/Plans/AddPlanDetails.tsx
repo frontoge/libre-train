@@ -1,7 +1,7 @@
 import { Input, Select, DatePicker, Slider } from "antd";
 import { useContext, useEffect } from "react";
 import { NewPlanContext, type RangeValueType } from "../../contexts/NewPlanContext";
-import type { Client } from "../../../../shared/types";
+import type { Client } from "../../../../shared/models";
 import type dayjs from "dayjs";
 import { Routes } from "../../../../shared/routes";
 import { getAppConfiguration } from "../../config/app.config";
