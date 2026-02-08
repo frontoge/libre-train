@@ -4,8 +4,7 @@ CREATE PROCEDURE `spCreateContact` (
   IN p_email VARCHAR(255),
   IN p_phone VARCHAR(255),
   IN p_dob DATE,
-  IN p_img VARCHAR(255),
-  IN p_notes VARCHAR(500)
+  IN p_img VARCHAR(255)
 ) BEGIN
 INSERT INTO
   Contact (
@@ -14,8 +13,7 @@ INSERT INTO
     email,
     phone,
     date_of_birth,
-    img,
-    notes
+    img
   )
 VALUES
   (
@@ -24,8 +22,7 @@ VALUES
     p_email,
     p_phone,
     p_dob,
-    p_img,
-    p_notes
+    p_img
   );
 
 SELECT

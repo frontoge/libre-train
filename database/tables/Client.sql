@@ -6,6 +6,7 @@ CREATE TABLE `Client` (
   `contactId` int(10) unsigned NOT NULL,
   `trainerId` int(10) unsigned NOT NULL,
   `isActive` tinyint(1) NOT NULL DEFAULT 1,
+  `notes` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `Client_contact_FK` (`contactId`),
   KEY `Client_trainer_FK` (`trainerId`),

@@ -10,7 +10,7 @@ BEGIN
         ct.phone,
         c.height,
         ct.date_of_birth,
-        ct.notes,
+        c.notes,
         c.created_at,
         c.updated_at
     FROM Client c
