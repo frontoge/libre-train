@@ -1,3 +1,5 @@
+import { AssessmentClientLog } from "./models";
+
 export type Goal = {
     id: number;
     goal: string;
@@ -131,4 +133,18 @@ export type Plan = {
     targetMetricValue: number;
     planCreatedAt: string;
     workoutRoutines: WorkoutRoutine[];
+}
+
+export type AssessmentClientLogCreateRequest = {
+    clientId: number;
+    assessments: Omit<AssessmentClientLog, "id" | "clientId">[];
+}
+
+export type AssessmentClientLogSearchOptions = {
+    group?: number;
+    type?: number;
+    start?: string;
+    end?: string;
+    page?: number;
+    pageSize?: number;
 }

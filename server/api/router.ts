@@ -8,6 +8,7 @@ import { handleGetTargetMetricModels } from "./handlers/models/target-metric-han
 import { handleGetWorkoutRoutineStage } from "./handlers/models/workout-routine-stage-handler";
 import { handleCreatePlan, handleDeletePlan, handleGetClientPlans } from "./handlers/plan-handlers";
 import { handleCreateContact, handleDeleteContact, handleGetContactById, handleGetContacts, handleUpdateContact } from "./handlers/contact-handlers";
+import { handleCreateAssessmentLog, handleDeleteAssessmentLog, handleGetAssessmentGroupTypes, handleGetAssessmentLog, handleGetAssessmentTypes, handleUpdateAssessmentLog } from "./handlers/assessment-handlers";
 
 const router = Router();
 
@@ -47,5 +48,13 @@ router.get(`${Routes.Contacts}/:id`, handleGetContactById);
 router.post(Routes.Contacts, handleCreateContact);
 router.put(`${Routes.Contacts}/:id`, handleUpdateContact);
 router.delete(`${Routes.Contacts}/:id`, handleDeleteContact);
+
+// Assessment routes
+router.get(`${Routes.Assessment}/:id`, handleGetAssessmentTypes);
+router.get(`${Routes.AssessmentGroup}/:id`, handleGetAssessmentGroupTypes);
+router.get(`${Routes.AssessmentLog}/:id`, handleGetAssessmentLog);
+router.post(`${Routes.AssessmentLog}`, handleCreateAssessmentLog);
+router.put(`${Routes.AssessmentLog}/:id`, handleUpdateAssessmentLog);
+router.delete(`${Routes.AssessmentLog}/:id`, handleDeleteAssessmentLog);
 
 export default router;

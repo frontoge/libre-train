@@ -28,3 +28,18 @@ export type Client = {
 }
 
 export type ClientContact = Client & Omit<Contact, "id">;
+
+export type AssessmentType = {
+    id: number;
+    name: string;
+    assessmentUnit: string;
+    assessmentGroupId: number;
+}
+
+export type AssessmentClientLog = {
+    id: number;
+    clientId: number;
+    assessmentTypeId: number;
+    assessmentValue: string;
+    assessmentDate: string;
+}
