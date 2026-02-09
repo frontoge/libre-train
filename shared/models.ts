@@ -35,3 +35,11 @@ export type AssessmentType = {
     assessmentUnit: string;
     assessmentGroupId: number;
 }
+
+export type AssessmentClientLog = {
+    id: number;
+    clientId: number;
+    assessmentTypeId: number;
+    assessmentValue: string;
+    assessmentDate: string;
+}
