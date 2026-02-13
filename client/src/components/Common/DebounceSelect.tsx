@@ -2,7 +2,6 @@ import { Select, Spin, type SelectProps } from "antd";
 import { useMemo, useRef, useState } from "react";
 import debounce from "lodash.debounce";
 
-
 export interface DebounceSelectProps<ValueType = any>
   extends Omit<SelectProps<ValueType | ValueType[]>,  'children'> {
   fetchOptions: (search: string) => Promise<ValueType[]>;
