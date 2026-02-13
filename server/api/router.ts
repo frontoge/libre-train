@@ -50,7 +50,7 @@ router.put(`${Routes.Contacts}/:id`, handleUpdateContact);
 router.delete(`${Routes.Contacts}/:id`, handleDeleteContact);
 
 // Assessment routes
-router.get(`${Routes.Assessment}/:id`, handleGetAssessmentTypes);
+router.get(`${Routes.Assessment}{/:id}`, handleGetAssessmentTypes);
 router.get(`${Routes.AssessmentGroup}/:id`, handleGetAssessmentGroupTypes);
 router.get(`${Routes.AssessmentLog}/:id`, handleGetAssessmentLog);
 router.post(`${Routes.AssessmentLog}`, handleCreateAssessmentLog);

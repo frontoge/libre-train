@@ -20,7 +20,7 @@ import { Routes } from "../../../../../shared/routes";
 import { useParams } from "react-router-dom";
 import type { DashboardWeeklySummaryResponse } from "../../../../../shared/types";
 import { type DashboardSummaryState } from "../../../types/types";
-import { mapDashboardSummaryResponse } from "../../../helpers/client-mappers";
+import { mapDashboardSummaryResponse } from "../../../helpers/mappers";
 import { formatStatisticDiff, getStatisticPrefix } from "../../../helpers/client-formatters";
 
 

@@ -37,3 +37,13 @@ export type ClientEditCreateFormValues = {
 export enum ModalType {
     DeleteClient
 };
+
+export interface AssessmentFormValues {
+    date?: Dayjs;
+    result: string;
+    notes?: string;
+}
+
+export interface AssessmentFormProps {
+    onSubmit: (result: AssessmentFormValues) => void;
+}

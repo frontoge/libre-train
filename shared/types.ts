@@ -1,4 +1,4 @@
-import { AssessmentClientLog } from "./models";
+import type { AssessmentClientLog } from "./models";
 
 export type Goal = {
     id: number;

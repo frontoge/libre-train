@@ -5,32 +5,32 @@ import { AssessmentClientLog, AssessmentType } from "../../../shared/models";
 import { AssessmentClientLogCreateRequest, AssessmentClientLogSearchOptions, ResponseWithError } from "../../../shared/types";
 
 
-export const handleGetAssessmentTypes = async (req: Request<{ id: string }>, res: Response<ResponseWithError<AssessmentType>>) => {
+export const handleGetAssessmentTypes = async (req: Request<{ id?: string }>, res: Response<ResponseWithError<AssessmentType[]>>) => {
     const connection = await getDatabaseConnection();
     try {
 
-        if (isNaN(Number(req.params.id))) {
+        if (req.params.id !== undefined && isNaN(Number(req.params.id))) {
             res.status(400).json({ hasError: true, errorMessage: 'Invalid assessment type ID. It must be a number.' });
             return;
         }
 
-        const [results] = await connection.query<RowDataPacket[]>({
-            sql: "SELECT * FROM AssessmentType WHERE id = ?",
-            values: [req.params.id],
+        const results = await connection.query<RowDataPacket[]>({
+            sql: "CALL spGetAssessmentTypes(?)",
+            values: [req.params.id ?? null],
         })
 
-        if (results.length === 0 || !results[0]?.id) {
+        if (!results || !results[0]) {
             res.status(404).json({ hasError: true, errorMessage: 'Assessment type not found.' });
             return;
         }
 
-        const row = results[0];
-        const assessmentType: AssessmentType = {
+        const rows = results[0][0];
+        const assessmentType: AssessmentType[] = rows?.map(row => ({
             id: row.id,
             name: row.name,
             assessmentUnit: row.assessmentUnit,
             assessmentGroupId: row.assessmentGroupId,
-        };
+        })) ?? [];
 
         res.json(assessmentType);
     } catch (error) {
@@ -86,8 +86,8 @@ export const handleCreateAssessmentLog = async (req: Request<{}, {}, AssessmentC
         const { clientId, assessments } = req.body;
         const insertPromises = assessments.map(assessment => {
             return connection.query({
-                sql: "CALL spCreateAssessmentClientLog(?, ?, ?, ?)",
-                values: [clientId, assessment.assessmentTypeId, assessment.assessmentValue, assessment.assessmentDate ?? null],
+                sql: "CALL spCreateAssessmentClientLog(?, ?, ?, ?, ?)",
+                values: [clientId, assessment.assessmentTypeId, assessment.assessmentValue, assessment.assessmentDate ?? null, assessment.notes ?? null],
             });
         });
         
@@ -117,8 +117,6 @@ export const handleGetAssessmentLog = async (
             return;
         }
 
-        console.log('Fetching assessment logs with parameters:', { clientId, group, type, start, end, page, pageSize });
-
         const [results] = await connection.query<RowDataPacket[]>({
             sql: `CALL spGetAssessmentClientLog(?, ?, ?, ?, ?, ?, ?)`,
             values: [
@@ -144,7 +142,6 @@ export const handleGetAssessmentLog = async (
             res.status(200).json([]);
             return;
         }
-        console.log(results);
 
         const assessmentLogs: AssessmentClientLog[] = rows.map(row => ({
             id: row.id,
@@ -152,6 +149,7 @@ export const handleGetAssessmentLog = async (
             assessmentTypeId: row.assessmentTypeId,
             assessmentValue: row.assessmentValue,
             assessmentDate: row.assessmentDate,
+            notes: row.notes,
         }));
 
         res.json(assessmentLogs);
@@ -169,7 +167,7 @@ export const handleUpdateAssessmentLog = async (req: Request<{ id: string }, {},
     const connection = await getDatabaseConnection();
     try {
         const logId = Number(req.params.id);
-        const { assessmentValue, assessmentDate, clientId, assessmentTypeId } = req.body;
+        const { assessmentValue, assessmentDate, clientId, assessmentTypeId, notes } = req.body;
 
         if (isNaN(logId)) {
             res.status(400).json({ hasError: true, errorMessage: 'Invalid log ID. It must be a number.' });
@@ -177,11 +175,9 @@ export const handleUpdateAssessmentLog = async (req: Request<{ id: string }, {},
         }
 
         const [results] = await connection.execute<ResultSetHeader>({
-            sql: "CALL spUpdateAssessmentClientLog(?, ?, ?, ?, ?)",
-            values: [logId, clientId ?? null, assessmentTypeId ?? null, assessmentValue ?? null, assessmentDate ?? null],
+            sql: "CALL spUpdateAssessmentClientLog(?, ?, ?, ?, ?, ?)",
+            values: [logId, clientId ?? null, assessmentTypeId ?? null, assessmentValue ?? null, assessmentDate ?? null, notes ?? null],
         });
-
-        console.log('Update assessment log results:', results);
 
         if (!results || results.affectedRows === 0) {
             res.status(404).json({ hasError: true, errorMessage: 'Assessment log not found.' });

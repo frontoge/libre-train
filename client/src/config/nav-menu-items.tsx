@@ -1,8 +1,9 @@
 import { HomeFilled } from "@ant-design/icons";
 import { type NavMenuItem } from "../types/types";
 import { IoMdPerson } from "react-icons/io";
-import { MdSpaceDashboard } from "react-icons/md";
+import { MdSpaceDashboard, MdAssessment } from "react-icons/md";
 import { IoMdPersonAdd, IoMdAddCircle } from "react-icons/io";
+import { FaListAlt } from "react-icons/fa";
 import { GiWeightLiftingUp } from "react-icons/gi";
 import { ImMap } from "react-icons/im";
 import { FaRegSquarePlus } from "react-icons/fa6";
@@ -32,6 +33,23 @@ export const items: NavMenuItem[] = [
                 label: 'New Client',
                 icon: <IoMdPersonAdd />,
             },
+        ]
+    },
+    {
+        key: 'assessmentsMenu',
+        label: 'Assessments',
+        icon: <MdAssessment />,
+        children: [
+            {
+                key: 'assessment_new',
+                label: 'New',
+                icon: <IoMdAddCircle />,
+            },
+            {
+                key: 'assessment_manage',
+                label: 'History',
+                icon: <FaListAlt />,
+            }
         ]
     },
     {

@@ -15,6 +15,7 @@ import { ExerciseRouter } from "./pages/exercises/ExerciseRouter"
 import { PlanRouter } from "./pages/plans/PlanRouter"
 import { getAppConfiguration } from "./config/app.config"
 import { Routes as ApiRoutes } from "../../shared/routes";
+import { AssessmentRouter } from "./pages/assessments/AssessmentRouter"
 
 function App() {
 
@@ -97,7 +98,6 @@ function App() {
 				},
 			}
 			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.ClientContact}`, requestOptions);
-			console.log(`${getAppConfiguration().apiUrl}${ApiRoutes.ClientContact}`);
 			const data = await response.json();
 			setAppState( prev => ({...prev, clients: data}))
 		} catch (error) {
@@ -105,10 +105,27 @@ function App() {
 		}
 	};
 
+	const fetchAssessmentTypes = async () => {
+		try {
+			const requestOptions = {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}
+			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.Assessment}`, requestOptions);
+			const data = await response.json();
+			setAppState( prev => ({...prev, assessmentTypes: data}))
+		} catch (error) {
+			console.error("Error fetching assessment types:", error);
+		}
+	}
+
 	const stateRefreshers = {
 		refreshExerciseData: fetchExercises,
 		refreshWorkoutRoutineStages: fetchWorkoutRoutineStages,
 		refreshClients: fetchClients,
+		refreshAssessmentTypes: fetchAssessmentTypes,
 	}
 
 	useEffect(() => {
@@ -116,6 +133,7 @@ function App() {
 			fetchWorkoutRoutineStages();
 			fetchExercises();
 			fetchClients();
+			fetchAssessmentTypes();
 		}
 	}, [])
 
@@ -147,6 +165,7 @@ function App() {
 							<Route path="clients/*" element={<RequireAuth><ClientRouter /></RequireAuth>} />
 							<Route path="exercises/*" element={<RequireAuth><ExerciseRouter /></RequireAuth>} />
 							<Route path="plans/*" element={<RequireAuth><PlanRouter /></RequireAuth>} />
+							<Route path="assessments/*" element={<RequireAuth><AssessmentRouter /></RequireAuth>} />
 						</Route>
 						<Route path="/signup" element={<Signup />} />
 						<Route path="/login" element={<Login />} />
