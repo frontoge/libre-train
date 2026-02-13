@@ -43,3 +43,9 @@ export type AssessmentClientLog = {
     assessmentValue: string;
     assessmentDate: string;
 }
+
+export enum AssessmentGroup {
+    Posture = 1,
+    Composition = 2,
+    Performance = 3,
+}

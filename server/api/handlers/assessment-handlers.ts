@@ -5,32 +5,34 @@ import { AssessmentClientLog, AssessmentType } from "../../../shared/models";
 import { AssessmentClientLogCreateRequest, AssessmentClientLogSearchOptions, ResponseWithError } from "../../../shared/types";
 
 
-export const handleGetAssessmentTypes = async (req: Request<{ id: string }>, res: Response<ResponseWithError<AssessmentType>>) => {
+export const handleGetAssessmentTypes = async (req: Request<{ id?: string }>, res: Response<ResponseWithError<AssessmentType[]>>) => {
     const connection = await getDatabaseConnection();
     try {
 
-        if (isNaN(Number(req.params.id))) {
+        if (req.params.id !== undefined && isNaN(Number(req.params.id))) {
             res.status(400).json({ hasError: true, errorMessage: 'Invalid assessment type ID. It must be a number.' });
             return;
         }
 
-        const [results] = await connection.query<RowDataPacket[]>({
-            sql: "SELECT * FROM AssessmentType WHERE id = ?",
-            values: [req.params.id],
+        const results = await connection.query<RowDataPacket[]>({
+            sql: "CALL spGetAssessmentTypes(?)",
+            values: [req.params.id ?? null],
         })
 
-        if (results.length === 0 || !results[0]?.id) {
+        if (!results || !results[0]) {
             res.status(404).json({ hasError: true, errorMessage: 'Assessment type not found.' });
             return;
         }
 
-        const row = results[0];
-        const assessmentType: AssessmentType = {
+        console.log(results[0][0]);
+
+        const rows = results[0][0];
+        const assessmentType: AssessmentType[] = rows?.map(row => ({
             id: row.id,
             name: row.name,
             assessmentUnit: row.assessmentUnit,
             assessmentGroupId: row.assessmentGroupId,
-        };
+        })) ?? [];
 
         res.json(assessmentType);
     } catch (error) {
