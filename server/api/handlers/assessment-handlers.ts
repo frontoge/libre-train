@@ -88,8 +88,8 @@ export const handleCreateAssessmentLog = async (req: Request<{}, {}, AssessmentC
         const { clientId, assessments } = req.body;
         const insertPromises = assessments.map(assessment => {
             return connection.query({
-                sql: "CALL spCreateAssessmentClientLog(?, ?, ?, ?)",
-                values: [clientId, assessment.assessmentTypeId, assessment.assessmentValue, assessment.assessmentDate ?? null],
+                sql: "CALL spCreateAssessmentClientLog(?, ?, ?, ?, ?)",
+                values: [clientId, assessment.assessmentTypeId, assessment.assessmentValue, assessment.assessmentDate ?? null, assessment.notes ?? null],
             });
         });
         
@@ -154,6 +154,7 @@ export const handleGetAssessmentLog = async (
             assessmentTypeId: row.assessmentTypeId,
             assessmentValue: row.assessmentValue,
             assessmentDate: row.assessmentDate,
+            notes: row.notes,
         }));
 
         res.json(assessmentLogs);
@@ -171,7 +172,7 @@ export const handleUpdateAssessmentLog = async (req: Request<{ id: string }, {},
     const connection = await getDatabaseConnection();
     try {
         const logId = Number(req.params.id);
-        const { assessmentValue, assessmentDate, clientId, assessmentTypeId } = req.body;
+        const { assessmentValue, assessmentDate, clientId, assessmentTypeId, notes } = req.body;
 
         if (isNaN(logId)) {
             res.status(400).json({ hasError: true, errorMessage: 'Invalid log ID. It must be a number.' });
@@ -179,8 +180,8 @@ export const handleUpdateAssessmentLog = async (req: Request<{ id: string }, {},
         }
 
         const [results] = await connection.execute<ResultSetHeader>({
-            sql: "CALL spUpdateAssessmentClientLog(?, ?, ?, ?, ?)",
-            values: [logId, clientId ?? null, assessmentTypeId ?? null, assessmentValue ?? null, assessmentDate ?? null],
+            sql: "CALL spUpdateAssessmentClientLog(?, ?, ?, ?, ?, ?)",
+            values: [logId, clientId ?? null, assessmentTypeId ?? null, assessmentValue ?? null, assessmentDate ?? null, notes ?? null],
         });
 
         console.log('Update assessment log results:', results);

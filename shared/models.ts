@@ -42,6 +42,7 @@ export type AssessmentClientLog = {
     assessmentTypeId: number;
     assessmentValue: string;
     assessmentDate: string;
+    notes?: string;
 }
 
 export enum AssessmentGroup {
