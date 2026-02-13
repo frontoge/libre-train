@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, type JSX } from "react";
 import { AssessmentTypeSelect } from "../../components/Assessments/AssessmentTypeSelect";
 import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";
@@ -9,6 +9,7 @@ import type { AssessmentFormValues } from "../../types/types";
 import { getAppConfiguration } from "../../config/app.config";
 import { Routes } from "../../../../shared/routes";
 import message from "antd/es/message";
+import { AssessmentGroup } from "../../../../shared/models";
 
 
 export function CreateAssessment() {
@@ -21,6 +22,8 @@ export function CreateAssessment() {
 
     const [selectedClient, setSelectedClient] = useState<number | null>(null);
     const [assessmentType, setAssessmentType] = useState<number | null>(null);
+
+    const selectedAssessmentType = assessmentTypes.find(type => type.id === assessmentType);
 
     const resetFields = () => {
         setSelectedClient(null);
@@ -57,6 +60,10 @@ export function CreateAssessment() {
         }
     }
 
+    const assessmentForms: { [key in AssessmentGroup]?: JSX.Element } = {
+        [AssessmentGroup.Composition]: (<CompositionAssessmentForm assessmentTypeId={assessmentType!} onSubmit={handleSubmit} />)
+    }
+
 
     return (
         <>
@@ -88,8 +95,8 @@ export function CreateAssessment() {
                             onAssessmentTypeSelect={(typeId) => setAssessmentType(Number(typeId))}
                         />
                     </div>
-                    { selectedClient && assessmentType &&
-                        <CompositionAssessmentForm assessmentTypeId={assessmentType} onSubmit={handleSubmit} />
+                    { selectedClient && selectedAssessmentType &&
+                        assessmentForms[selectedAssessmentType?.assessmentGroupId as AssessmentGroup]
                     }
                 </Panel>
             </PageLayout>
