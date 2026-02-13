@@ -16,7 +16,8 @@ function DebounceSelect<
   } = any,
 >({ fetchOptions, debounceTimeout = 300, ...props }: DebounceSelectProps<ValueType>) {
   const [fetching, setFetching] = useState(false);
-  const [options, setOptions] = useState<ValueType[]>([]);
+  //@ts-ignore - The types match
+  const [options, setOptions] = useState<ValueType[]>(props?.options ?? []);
   const fetchRef = useRef(0);
 
   const debounceFetcher = useMemo(() => {

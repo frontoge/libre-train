@@ -71,7 +71,6 @@ export function AssessmentTypeSelect(props: AssessmentTypeSelectProps) {
     const handleChange = (value: any) => {
         props.onAssessmentTypeSelect?.(value.value);
     }
-
     
     return (
         <Select 
@@ -83,6 +82,7 @@ export function AssessmentTypeSelect(props: AssessmentTypeSelectProps) {
             showSearch
             onSearch={handleOptionSearch}
             onChange={handleChange}
+            {...props}
         >
 
         </Select>

@@ -1,3 +1,4 @@
+import type { AssessmentType } from "../../../shared/models";
 import { type DashboardWeeklySummary } from "../../../shared/types";
 import { type DashboardSummaryState } from "../types/types";
 

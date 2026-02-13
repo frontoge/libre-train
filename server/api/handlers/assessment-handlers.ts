@@ -24,8 +24,6 @@ export const handleGetAssessmentTypes = async (req: Request<{ id?: string }>, re
             return;
         }
 
-        console.log(results[0][0]);
-
         const rows = results[0][0];
         const assessmentType: AssessmentType[] = rows?.map(row => ({
             id: row.id,
@@ -119,8 +117,6 @@ export const handleGetAssessmentLog = async (
             return;
         }
 
-        console.log('Fetching assessment logs with parameters:', { clientId, group, type, start, end, page, pageSize });
-
         const [results] = await connection.query<RowDataPacket[]>({
             sql: `CALL spGetAssessmentClientLog(?, ?, ?, ?, ?, ?, ?)`,
             values: [
@@ -146,7 +142,6 @@ export const handleGetAssessmentLog = async (
             res.status(200).json([]);
             return;
         }
-        console.log(results);
 
         const assessmentLogs: AssessmentClientLog[] = rows.map(row => ({
             id: row.id,
@@ -183,8 +178,6 @@ export const handleUpdateAssessmentLog = async (req: Request<{ id: string }, {},
             sql: "CALL spUpdateAssessmentClientLog(?, ?, ?, ?, ?, ?)",
             values: [logId, clientId ?? null, assessmentTypeId ?? null, assessmentValue ?? null, assessmentDate ?? null, notes ?? null],
         });
-
-        console.log('Update assessment log results:', results);
 
         if (!results || results.affectedRows === 0) {
             res.status(404).json({ hasError: true, errorMessage: 'Assessment log not found.' });

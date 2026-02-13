@@ -20,7 +20,6 @@ export function ClientSearch(props: ClientSearchProps) {
     const [selectedClient, setSelectedClient] = useState();
 
     const handleChange = (value: any) => {
-        console.log("Selected client:", value);
         setSelectedClient(value);
         if (props.onClientSelect) {
             props.onClientSelect(value.key);
@@ -28,7 +27,6 @@ export function ClientSearch(props: ClientSearchProps) {
     }
 
     async function fetchClients(search: string): Promise<UserValue[]> {
-        console.log("Fetching clients with search:", search);
         return clients
         .filter((client) => search.trim() === '' || stringSimilarity(search, formatClientFullName(client.first_name, client.last_name)) > 0.2)
         .map((client) => ({
@@ -38,11 +36,12 @@ export function ClientSearch(props: ClientSearchProps) {
         }))
     }
 
-    const initialOptions = clients.map((client) => ({
-        key: client.id.toString(),
-        label: formatClientFullName(client.first_name, client.last_name),
-        value: client.id.toString(),
-    }));
+    const initialOptions = clients
+        .map((client) => ({
+            key: client.id.toString(),
+            label: formatClientFullName(client.first_name, client.last_name),
+            value: client.id.toString(),
+        }))
 
     return (
         <DebounceSelect
