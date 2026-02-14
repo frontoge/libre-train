@@ -51,9 +51,12 @@ export function mapAssessmentLogToDataTableEntry(logs: AssessmentClientLog[], cl
 
         return {
             id: log.id.toString(),
+            client_id: log.clientId.toString(),
             client_name: formatClientFullName(client?.first_name, client?.last_name),
+            assessment_type_id: log.assessmentTypeId.toString(),
             assessment_name: assessmentType?.name ?? "Unknown Assessment",
-            result: log.assessmentValue + " " + (assessmentType?.assessmentUnit ?? ""),
+            result: log.assessmentValue,
+            resultUnits: assessmentType?.assessmentUnit ?? "",
             notes: log.notes,
             date: log.assessmentDate,
         }
