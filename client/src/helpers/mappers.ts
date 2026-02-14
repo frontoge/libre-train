@@ -1,6 +1,8 @@
-import type { AssessmentType } from "../../../shared/models";
+import type { AssessmentClientLog, AssessmentType, ClientContact } from "../../../shared/models";
 import { type DashboardWeeklySummary } from "../../../shared/types";
+import type { AssessmentHistoryTableEntry } from "../components/Assessments/AssessmentHistoryTable";
 import { type DashboardSummaryState } from "../types/types";
+import { formatClientFullName } from "./label-formatters";
 
 export function mapDashboardSummaryResponse(response: DashboardWeeklySummary[]): DashboardSummaryState {
     
@@ -41,3 +43,19 @@ function calculateLeanMass(weight: number | undefined, bodyFat: number | undefin
     if (!weight || !bodyFat) return undefined;
     return weight * (1 - bodyFat / 100);
 }
+
+export function mapAssessmentLogToDataTableEntry(logs: AssessmentClientLog[], clients: ClientContact[], assessmentTypes: AssessmentType[]): AssessmentHistoryTableEntry[] {
+    return logs.map(log => {
+        const client = clients.find(c => c.id === log.clientId);
+        const assessmentType = assessmentTypes.find(a => a.id === log.assessmentTypeId);
+
+        return {
+            client_name: formatClientFullName(client?.first_name, client?.last_name),
+            assessment_name: assessmentType?.name ?? "Unknown Assessment",
+            result: log.assessmentValue + " " + (assessmentType?.assessmentUnit ?? ""),
+            notes: log.notes,
+            date: log.assessmentDate,
+        }
+    });
+}
+   

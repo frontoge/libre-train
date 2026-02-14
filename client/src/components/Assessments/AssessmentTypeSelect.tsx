@@ -68,13 +68,12 @@ export function AssessmentTypeSelect(props: AssessmentTypeSelectProps) {
         setOptions(getOptions(search));
     }
 
-    const handleChange = (value: any) => {
-        props.onAssessmentTypeSelect?.(value.value);
+    const handleChange = (assessmentTypeId: string) => {
+        props.onAssessmentTypeSelect?.(assessmentTypeId);
     }
     
     return (
         <Select 
-            labelInValue
             filterOption={false}
             placeholder="Select an assessment type" 
             style={{ width: "100%" }}

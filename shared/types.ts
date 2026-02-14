@@ -141,8 +141,8 @@ export type AssessmentClientLogCreateRequest = {
 }
 
 export type AssessmentClientLogSearchOptions = {
-    group?: number;
-    type?: number;
+    group?: string;
+    type?: string;
     start?: string;
     end?: string;
     page?: number;

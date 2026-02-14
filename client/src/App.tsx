@@ -21,6 +21,7 @@ function App() {
 
 	const [appState, setAppState] = useState<AppState>({
 		clients: [],
+		assessmentTypes: [],
 		workoutRoutineStages: [],
 		exerciseData: [],
 		auth: {
