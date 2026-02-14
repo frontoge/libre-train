@@ -10,7 +10,8 @@ export const getDatabaseConnection = async () => {
             port: config.database.port,
             user: process.env.DBUSER,
             password: process.env.DBPASSWORD,
-            database: config.database.database
+            database: config.database.database,
+            dateStrings: true
         });
     } catch (error) {
         console.error('Error connecting to the database:', error);

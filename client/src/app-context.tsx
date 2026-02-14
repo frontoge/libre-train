@@ -10,7 +10,7 @@ export type AppState = {
     selectedModal?: ModalType;
     workoutRoutineStages: WorkoutRoutineStage[];
     exerciseData?: ExerciseData[];
-    assessmentTypes?: AssessmentType[];
+    assessmentTypes: AssessmentType[];
     auth: Auth;
 }
 
@@ -32,6 +32,7 @@ export type AppContext = {
 const initialContext: AppContext = {
     state: {
         selectedClient: undefined,
+        assessmentTypes: [],
         clients: [],
         selectedModal: undefined,
         workoutRoutineStages: [],

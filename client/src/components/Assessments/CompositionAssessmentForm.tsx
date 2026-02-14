@@ -4,7 +4,7 @@ import { AppContext } from "../../app-context";
 import { useContext, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 
-export interface CompositionAssessmentFormProps extends AssessmentFormProps {
+export interface CompositionAssessmentFormProps extends AssessmentFormProps, React.ComponentProps<typeof Form> {
     assessmentTypeId: number;
 }
 
@@ -33,12 +33,13 @@ export function CompositionAssessmentForm(props: CompositionAssessmentFormProps)
         }
         setInvalidResult(false);
     }
-
     return (
+        
         <Form
             layout="vertical"
             form={form}
             onFinish={handleSubmit}
+            initialValues={props?.initialValues}
             style={{
                 width: "100%"
             }}
