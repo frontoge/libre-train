@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Routes } from "../../../../shared/routes";
 import { AppContext } from "../../app-context";
 import { AssessmentHistoryFilters, type AssessmentHistorySearchQuery } from "../../components/Assessments/AssessmentHistoryFilters";
@@ -13,9 +13,11 @@ import { createSearchParams } from "../../helpers/fetch-helpers";
 export function AssessmentHistory() {
     const { state: { clients, assessmentTypes } } = useContext(AppContext);
     const [tableData, setTableData] = useState<AssessmentHistoryTableEntry[]>([]);
+    const [searchQuery, setSearchQuery] = useState<AssessmentHistorySearchQuery | undefined>(undefined);
 
-    const getNewClientLogData = async (searchQuery: AssessmentHistorySearchQuery) => {
+    const getNewClientLogData = async () => {
         try {
+            if (!searchQuery) return;
             const { clientId, ...parameters } = searchQuery;
             const requestOptions = {
                 method: 'GET',
@@ -39,9 +41,11 @@ export function AssessmentHistory() {
         }
     }
 
-    const handleUpdateSearchQuery = (values: AssessmentHistorySearchQuery) => {
-        getNewClientLogData(values);
-    }
+    useEffect(() => {
+        getNewClientLogData();
+    }, [searchQuery])
+
+
 
     return (
         <PageLayout title="Assessment History" style={{
@@ -63,7 +67,7 @@ export function AssessmentHistory() {
                         height: "10%",
                         width: "100%",
                     }}
-                    onUpdateSearchQuery={handleUpdateSearchQuery}
+                    onUpdateSearchQuery={(values) => setSearchQuery(values)}
                 />
                 <AssessmentHistoryTable 
                     style={{
@@ -71,6 +75,7 @@ export function AssessmentHistory() {
                         width: "100%"
                     }}
                     dataSource={tableData}
+                    onAction={getNewClientLogData}
                 />
             </Panel>
         </PageLayout>

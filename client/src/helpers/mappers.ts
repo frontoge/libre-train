@@ -50,6 +50,7 @@ export function mapAssessmentLogToDataTableEntry(logs: AssessmentClientLog[], cl
         const assessmentType = assessmentTypes.find(a => a.id === log.assessmentTypeId);
 
         return {
+            id: log.id.toString(),
             client_name: formatClientFullName(client?.first_name, client?.last_name),
             assessment_name: assessmentType?.name ?? "Unknown Assessment",
             result: log.assessmentValue + " " + (assessmentType?.assessmentUnit ?? ""),

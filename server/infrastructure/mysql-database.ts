@@ -11,8 +11,7 @@ export const getDatabaseConnection = async () => {
             user: process.env.DBUSER,
             password: process.env.DBPASSWORD,
             database: config.database.database,
-            dateStrings: true,
-            timezone: 'America/New_York',
+            dateStrings: true
         });
     } catch (error) {
         console.error('Error connecting to the database:', error);

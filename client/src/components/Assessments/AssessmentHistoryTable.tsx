@@ -1,9 +1,14 @@
-import { Button, Space, Table, type TableProps } from "antd";
+import { Button, Popconfirm, Space, Table, type TableProps } from "antd";
+import { method } from "lodash";
+import { getAppConfiguration } from "../../config/app.config";
+import { Routes } from "../../../../shared/routes";
 
 export interface AssessmentHistoryTableProps extends React.ComponentProps<typeof Table>{
+    onAction?: () => void;
 }
 
 export type AssessmentHistoryTableEntry = {
+    id: string;
     client_name: string;
     assessment_name: string;
     result: string;
@@ -12,6 +17,26 @@ export type AssessmentHistoryTableEntry = {
 }
 
 export function AssessmentHistoryTable(props: AssessmentHistoryTableProps) {
+
+    const handleDeleteEntry = async (entryId: string) => {
+        // Make delete request to backend to delete the assessment log entry
+        try {
+            const requestOptions = {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+            }
+
+            const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AssessmentLog}/${entryId}`, requestOptions);
+
+            if (!response.ok) {
+                throw new Error('Failed to delete assessment log entry');
+            }
+            props.onAction?.();
+        } catch (error) {
+            console.error('Error deleting assessment log entry:', error);
+        }
+    }
+
     const historyTableColumns: TableProps<AssessmentHistoryTableEntry>['columns'] = [
         {
             title: 'Client Name',
@@ -49,7 +74,16 @@ export function AssessmentHistoryTable(props: AssessmentHistoryTableProps) {
             render: (_, record) => (
                 <Space size='middle'>
                     <Button type="link">Edit</Button>
-                    <Button color="danger" variant="filled">Delete</Button>
+                    <Popconfirm
+                        title="Delete Assessment log"
+                        description="Are you sure you want to delete this assessment log? This action cannot be undone."
+                        okText="Yes"
+                        cancelText="No"
+                        placement="topRight"
+                        onConfirm={() => handleDeleteEntry(record.id)}
+                    >
+                        <Button color="danger" variant="filled">Delete</Button>
+                    </Popconfirm>
                 </Space>
             )
         }
