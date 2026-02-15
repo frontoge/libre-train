@@ -1,7 +1,7 @@
 import { Menu } from "antd";
-import { items } from "../config/nav-menu-items";
+import { items } from "../../config/nav-menu-items";
 import { useNavigate } from "react-router-dom";
-import { getNavigationUrl } from "../helpers/navigation-helpers";
+import { getNavigationUrl } from "../../helpers/navigation-helpers";
 
 export function NavMenu() {
     const navigate = useNavigate();

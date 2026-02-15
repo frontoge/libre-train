@@ -1,7 +1,7 @@
 import { Layout } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { Outlet } from "react-router-dom";
-import { NavMenu } from "../components/NavMenu";
+import { NavMenu } from "../components/Common/NavMenu";
 import { AppContext } from "../app-context";
 import { useContext } from "react";
 import { Modals } from "../components/Modals";

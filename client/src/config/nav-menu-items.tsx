@@ -1,12 +1,11 @@
 import { HomeFilled } from "@ant-design/icons";
 import { type NavMenuItem } from "../types/types";
-import { IoMdPerson } from "react-icons/io";
 import { MdSpaceDashboard, MdAssessment } from "react-icons/md";
-import { IoMdPersonAdd, IoMdAddCircle } from "react-icons/io";
+import { IoMdPersonAdd, IoMdAddCircle, IoMdPerson } from "react-icons/io";
 import { FaListAlt } from "react-icons/fa";
 import { GiWeightLiftingUp } from "react-icons/gi";
 import { ImMap } from "react-icons/im";
-import { FaRegSquarePlus } from "react-icons/fa6";
+import { FaRegSquarePlus, FaMagnifyingGlass } from "react-icons/fa6";
 
 
 export const items: NavMenuItem[] = [
@@ -75,9 +74,9 @@ export const items: NavMenuItem[] = [
         icon: <GiWeightLiftingUp />,
         children: [
             {
-                key: 'exercise_new',
-                label: 'Manage Exercises',
-                icon: <IoMdAddCircle />,
+                key: 'exercise_manage',
+                label: 'Browse',
+                icon: <FaMagnifyingGlass />,
             }
         ]
     }

@@ -5,7 +5,7 @@ import ManageExercises from "./ManageExercises";
 export function ExerciseRouter() {
     return (
         <Routes>
-            <Route path="create" element={<ManageExercises />} />
+            <Route index element={<ManageExercises />} />
             <Route path="*" element={<NoPage />} />
         </Routes>
         
