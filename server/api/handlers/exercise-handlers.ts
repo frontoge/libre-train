@@ -2,7 +2,7 @@ import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastruc
 import { Request, Response } from "express";
 import { AddExerciseFormData } from "../../../shared/types";
 import { RowDataPacket } from "mysql2";
-import { ExerciseData, getMuscleGroupFromValue } from "../../../shared/MuscleGroups";
+import { Exercise } from "../../../shared/models";
 
 export const handleExerciseCreate = async (req: Request<{}, {}, AddExerciseFormData>, res: Response) => { 
     const connection = await getDatabaseConnection();
@@ -30,11 +30,16 @@ export const handleGetAllExercises = async (req: Request, res: Response) => {
     try {
         const [results, fields] = await connection.query<RowDataPacket[]>({sql: "SELECT * FROM Exercise"});
 
-        const formattedResults: ExerciseData[] = results.map(row => ({
-            key: row.id.toString(),
-            name: row.exercise_name,
-            muscleGroups: row.muscle_groups.split(',').map((mg: string) => getMuscleGroupFromValue(mg.trim())).filter((mg: any) => mg !== undefined && mg !== null),
-            description: row.exercise_description,
+        const formattedResults: Exercise[] = results.map(row => ({
+            id: row.id.toString(),
+            exercise_name: row.exercise_name,
+            muscle_groups: row.muscle_groups.split(','),
+            video_link: row.video_link,
+            exercise_description: row.exercise_description,
+            equipment: row.equipment,
+            exercise_form: row.exercise_form,
+            movement_pattern: row.movement_pattern,
+            progression_level: row.progression_level,
         }))
         res.status(200).json(formattedResults);
         

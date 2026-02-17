@@ -1,11 +1,11 @@
 import PageLayout from "../../components/PageLayout"
-import { ViewExercises } from "../../components/Exercises/ViewExercises"
-import { AddExercise } from "../../components/Exercises/AddExercise"
 import { ExerciseContext } from "../../contexts/ExercisesContext"
 import { getAppConfiguration } from "../../config/app.config";
 import type { ExerciseData } from "../../../../shared/MuscleGroups";
 import { useEffect, useState, } from "react";
 import { Routes } from "../../../../shared/routes";
+import { Panel } from "../../components/Panel";
+import { ExerciseTable } from "../../components/Exercises/ExerciseTable";
 
 export default function ManageExercises() {
 
@@ -27,24 +27,21 @@ export default function ManageExercises() {
 
     return (
         <ExerciseContext.Provider value={{ refreshExercises, exerciseData: exercises }}>
-            <PageLayout title="Exercise Manager" style={{
+            <PageLayout title="Browse Exercises" style={{
                 display: 'flex',
                 flexDirection: 'row',
                 gap: '2rem',
                 margin: '2rem'
             }}>
-                <div style={{
-                    width: '65%',
-                    height: "100%"
+                <Panel style={{
+                    height: "100%",
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'start',
+                    gap: '2rem',
                 }}>
-                    <ViewExercises />
-                </div>
-                <div style={{
-                    width: "35%",
-                    height: "100%"
-                }}>
-                    <AddExercise />
-                </div>
+                    <ExerciseTable />
+                </Panel>
             </PageLayout>
         </ExerciseContext.Provider>
     )

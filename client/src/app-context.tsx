@@ -1,15 +1,14 @@
 import React, { createContext } from "react";
 import type { ModalType } from "./types/types";
 import type { Auth } from "./auth/authorization";
-import type { AssessmentType, ClientContact, WorkoutRoutineStage } from "../../shared/models";
-import type { ExerciseData } from "../../shared/MuscleGroups";
+import type { AssessmentType, ClientContact, Exercise, WorkoutRoutineStage } from "../../shared/models";
 
 export type AppState = {
     clients: ClientContact[];
     selectedClient?: ClientContact;
     selectedModal?: ModalType;
     workoutRoutineStages: WorkoutRoutineStage[];
-    exerciseData?: ExerciseData[];
+    exerciseData?: Exercise[];
     assessmentTypes: AssessmentType[];
     auth: Auth;
 }
