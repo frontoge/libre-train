@@ -21,7 +21,6 @@ const tagRender: TagRender = (props) => {
     event.preventDefault();
     event.stopPropagation();
   };
-  console.log(props, value)
   return (
     <Tag
       color={muscleValueToColor[value as string] ?? 'gray'}

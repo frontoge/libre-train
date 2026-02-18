@@ -10,11 +10,13 @@ import type { Exercise, ExerciseForm, ExerciseMovementPattern, MuscleGroup } fro
 import { MuscleGroupTag } from "./MuscleGroupTag";
 import { ExerciseTypeLabels, MovementPatternLabels, MuscleGroupLabels } from "../../helpers/label-formatters";
 import { AppContext } from "../../app-context";
-
+import { CreateEditExerciseModal } from "./CreateEditExerciseModal";
 
 export function ExerciseTable(props: any) {
     const { state: { exerciseData }, stateRefreshers} = useContext(AppContext);
     const [filterParams, setFilterParams] = useState<ExerciseSearchParams>({});
+    const [isCreateEditModalOpen, setIsCreateEditModalOpen] = useState(false);
+    const [exerciseIdToEdit, setExerciseIdToEdit] = useState<number | undefined>(undefined);
 
     const handleDelete = async (key: string) => {
         const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Exercise}/${key}`, {
@@ -27,6 +29,21 @@ export function ExerciseTable(props: any) {
             // TODO add error handling/UI feedback
             console.error("Failed to delete exercise");
         }
+    }
+
+    const handleOpenEditModal = (exerciseId: number) => {
+        setExerciseIdToEdit(exerciseId);
+        setIsCreateEditModalOpen(true);
+    }
+
+    const handleOpenNewExercise = () => {
+        setExerciseIdToEdit(undefined);
+        setIsCreateEditModalOpen(true);
+    }
+
+    const resetModalState = () => {
+        setExerciseIdToEdit(undefined);
+        setIsCreateEditModalOpen(false);
     }
 
     const ExerciseTableColumns: TableProps<Exercise>['columns'] = [
@@ -82,12 +99,12 @@ export function ExerciseTable(props: any) {
             key: 'actions',
             render: (_, record) => (
                 <Space size='middle'>
-                    <Link to={record.video_link ?? '#'} target={record.video_link ? "_blank" : undefined} rel="noopener noreferrer">Video</Link>
-                    <Link to={`/exercises/edit/${record.id}`}>Edit</Link>
+                    <Link to={record.video_link ?? '#'} disabled={!record.video_link} target={record.video_link ? "_blank" : undefined} rel="noopener noreferrer">Video</Link>
+                    <Button onClick={() => handleOpenEditModal(record.id)}>Edit</Button>
                     <Button onClick={() => handleDelete(record.id)} type="primary">Delete</Button>
                 </Space>
             ),
-            width: 100,
+            width: 80,
         },
     ];
 
@@ -112,6 +129,7 @@ export function ExerciseTable(props: any) {
                 variant="filled" 
                 icon={<IoAddCircle />}
                 iconPosition="end"
+                onClick={() => handleOpenNewExercise()}
             >
                 Create New
             </Button>
@@ -138,6 +156,14 @@ export function ExerciseTable(props: any) {
                     showSizeChanger: false
                 }}
             />
+            {isCreateEditModalOpen && (
+                <CreateEditExerciseModal 
+                    open={isCreateEditModalOpen}
+                    onCancel={() => setIsCreateEditModalOpen(false)}
+                    initialExerciseId={exerciseIdToEdit}
+                    onComplete={resetModalState}
+                />
+            )}
         </div>
     )
 }

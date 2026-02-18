@@ -58,6 +58,7 @@ export function ExerciseSearch(props: ExerciseSearchProps) {
             <Search
                 placeholder="Search exercises..."
                 onSearch={handleNameSearch}
+                allowClear
                 {...searchProps}
             />
             <Popover

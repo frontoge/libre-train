@@ -3,7 +3,7 @@ import { handleHealthCheck } from "./handlers";
 import { Routes } from "../../shared/routes";
 import { handleGetClients, handleCreateClient, handleDailyUpdate, handleGetDashboard, handleGetDashboardSummary, handleDeleteClient, handleGetClientContacts } from "./handlers/client-handlers";
 import { handleAuthSignup, handleAuthLogin } from "./handlers/auth-handlers";
-import { handleDeleteExercise, handleExerciseCreate, handleGetAllExercises } from "./handlers/exercise-handlers";
+import { handleDeleteExercise, handleExerciseCreate, handleGetAllExercises, handleUpdateExercise } from "./handlers/exercise-handlers";
 import { handleGetTargetMetricModels } from "./handlers/models/target-metric-handler";
 import { handleGetWorkoutRoutineStage } from "./handlers/models/workout-routine-stage-handler";
 import { handleCreatePlan, handleDeletePlan, handleGetClientPlans } from "./handlers/plan-handlers";
@@ -24,9 +24,10 @@ router.delete(`${Routes.Clients}/:id`, handleDeleteClient);
 router.get(`${Routes.ClientContact}{/:id}`, handleGetClientContacts);
 
 // Exercise routes
-router.post(Routes.ExerciseCreate, handleExerciseCreate);
+router.post(Routes.Exercise, handleExerciseCreate);
 router.get(Routes.Exercise, handleGetAllExercises);
 router.delete(`${Routes.Exercise}/:id`, handleDeleteExercise);
+router.put(`${Routes.Exercise}/:id`, handleUpdateExercise); // Using the same handler for create and update for simplicity, can be separated if needed
 
 // Plan routes
 router.post(`${Routes.Plan}/create`, handleCreatePlan)

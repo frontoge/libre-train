@@ -18,7 +18,6 @@ export function ExerciseFilterOptions(props: ExerciseFilterOptionsProps) {
     const [form] = Form.useForm();
 
     const handleApplyFilters = (values: ExerciseFilterOptionsValues) => {
-        console.log("Applying filters with values: ", values);
         if (props.onApplyFilters) {
             props.onApplyFilters(values);
         }
@@ -51,7 +50,7 @@ export function ExerciseFilterOptions(props: ExerciseFilterOptionsProps) {
             </Form.Item>
 
             <Form.Item label="Muscle Groups" name="muscleGroups">
-                <MuscleGroupSearch />
+                <MuscleGroupSearch defaultValue={props.initialValues?.muscleGroups}/>
             </Form.Item>
             <Form.Item label="Progression Level" name="progressionLevel">
                 <Rate character={({ index = 0 }) => index + 1} allowClear/>
