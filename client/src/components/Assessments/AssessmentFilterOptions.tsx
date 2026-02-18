@@ -1,7 +1,7 @@
 import { Button, DatePicker, Form, Select } from "antd";
 import { AssessmentTypeSelect } from "./AssessmentTypeSelect";
 import type { Dayjs } from "dayjs";
-import { AssessmentGroup } from "../../../../shared/models";
+import { assessmentGroupOptions } from "../../helpers/enum-select-options";
 
 export type AssessmentFilterOptionsValues = {
     startDate?: Dayjs;
@@ -28,12 +28,6 @@ export function AssessmentFilterOptions(props: AssessmentFilterOptionsProps) {
         form.resetFields();
         props.onResetFilters?.();
     }
-
-    const assessmentGroupOptions = [
-        { label: "Posture Assessment", value: AssessmentGroup.Posture},
-        { label: "Composition Assessment", value: AssessmentGroup.Composition},
-        { label: "Performance Assessment", value: AssessmentGroup.Performance},
-    ]
 
     return (
         <Form 

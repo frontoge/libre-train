@@ -7,12 +7,12 @@ function getNavigationUrlFromNavKey(navKey: string): string {
         case 'client_overview':
         case 'plan_manage':
         case 'assessment_manage':
+        case 'exercise_manage':
             return '';
         case 'clientsMenu':
             return 'clients';
         case 'plan_new':
         case 'client_new':
-        case 'exercise_new':
         case 'assessment_new':
             return 'create';
         case 'exercisesMenu':
