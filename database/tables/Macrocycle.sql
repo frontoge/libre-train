@@ -1,12 +1,14 @@
-CREATE TABLE Macrocycle (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    cycle_name VARCHAR(255) DEFAULT NULL,
-    client_id INT UNSIGNED NOT NULL,
-    cycle_start_date DATE NOT NULL,
-    cycle_end_date DATE NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    notes VARCHAR(512) DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (client_id) REFERENCES Client(id)
+CREATE TABLE `Macrocycle` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `cycle_name` varchar(255) DEFAULT NULL,
+  `client_id` int(10) unsigned NOT NULL,
+  `cycle_start_date` date NOT NULL,
+  `cycle_end_date` date NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `notes` varchar(512) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `client_id` (`client_id`),
+  CONSTRAINT `Macrocycle_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `Client` (`id`)
 );

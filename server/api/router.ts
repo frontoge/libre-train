@@ -9,6 +9,7 @@ import { handleGetWorkoutRoutineStage } from "./handlers/models/workout-routine-
 import { handleCreatePlan, handleDeletePlan, handleGetClientPlans } from "./handlers/plan-handlers";
 import { handleCreateContact, handleDeleteContact, handleGetContactById, handleGetContacts, handleUpdateContact } from "./handlers/contact-handlers";
 import { handleCreateAssessmentLog, handleDeleteAssessmentLog, handleGetAssessmentGroupTypes, handleGetAssessmentLog, handleGetAssessmentTypes, handleUpdateAssessmentLog } from "./handlers/assessment-handlers";
+import { handleCreateMacrocycle, handleCreateMesocycle, handleCreateMicrocycle, handleDeleteMacrocycle, handleDeleteMesocycle, handleDeleteMicrocycle, handleGetMacrocycle, handleGetMesocycle, handleGetMicrocycle, handleUpdateMacrocycle, handleUpdateMesocycle, handleUpdateMicrocycle } from "./handlers/cycle-handlers";
 
 const router = Router();
 
@@ -57,5 +58,19 @@ router.get(`${Routes.AssessmentLog}/:id`, handleGetAssessmentLog);
 router.post(`${Routes.AssessmentLog}`, handleCreateAssessmentLog);
 router.put(`${Routes.AssessmentLog}/:id`, handleUpdateAssessmentLog);
 router.delete(`${Routes.AssessmentLog}/:id`, handleDeleteAssessmentLog);
+
+// Training Cycle Routes
+router.get(`${Routes.Macrocycle}/:clientId`, handleGetMacrocycle);
+router.get(`${Routes.Mesocycle}/:clientId`, handleGetMesocycle);
+router.get(`${Routes.Microcycle}/:clientId`, handleGetMicrocycle);
+router.post(`${Routes.Macrocycle}`, handleCreateMacrocycle);
+router.post(`${Routes.Mesocycle}`, handleCreateMesocycle);
+router.post(`${Routes.Microcycle}`, handleCreateMicrocycle);
+router.put(`${Routes.Macrocycle}/:id`, handleUpdateMacrocycle);
+router.put(`${Routes.Mesocycle}/:id`, handleUpdateMesocycle);
+router.put(`${Routes.Microcycle}/:id`, handleUpdateMicrocycle);
+router.delete(`${Routes.Macrocycle}/:id`, handleDeleteMacrocycle);
+router.delete(`${Routes.Mesocycle}/:id`, handleDeleteMesocycle);
+router.delete(`${Routes.Microcycle}/:id`, handleDeleteMicrocycle);
 
 export default router;

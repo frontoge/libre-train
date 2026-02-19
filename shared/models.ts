@@ -17,7 +17,6 @@ export type Contact = {
     phone?: string;
     date_of_birth?: string; 
     img?: string;
-    notes?: string;
 }
 
 export type Client = {
@@ -25,6 +24,7 @@ export type Client = {
     height?: number;
     created_at: Date;
     updated_at: Date;
+    notes?: string;
 }
 
 export type ClientContact = Client & Omit<Contact, "id">;
@@ -108,4 +108,38 @@ export type Exercise = {
     exercise_form?: ExerciseForm;
     movement_pattern?: ExerciseMovementPattern;
     progression_level: number;
+}
+
+export type Macrocycle = {
+    id: number;
+    cycle_name?: string;
+    client_id: number;
+    cycle_start_date: Date;
+    cycle_end_date: Date;
+    isActive: boolean;
+    notes?: string;
+}
+
+export type Mesocycle = {
+    id: number;
+    client_id: number;
+    cycle_name?: string;
+    macrocycle_id: number;
+    cycle_start_date: Date;
+    cycle_end_date: Date;
+    isActive: boolean;
+    notes?: string;
+    optLevels?: number[];
+    cardioLevels?: number[];
+}
+
+export type Microcycle = {
+    id: number;
+    mesocycle_id: number;
+    client_id: number;
+    cycle_name?: string;
+    cycle_start_date: Date;
+    cycle_end_date: Date;
+    isActive: boolean;
+    notes?: string;
 }

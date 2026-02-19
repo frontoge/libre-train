@@ -141,3 +141,8 @@ export type AssessmentClientLogSearchOptions = {
     page?: number;
     pageSize?: number;
 }
+
+export type MacrocycleSearchParams = {
+    active?: string;
+    date?: string;
+}

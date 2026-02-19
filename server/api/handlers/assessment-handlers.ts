@@ -25,7 +25,7 @@ export const handleGetAssessmentTypes = async (req: Request<{ id?: string }>, re
         }
 
         const rows = results[0][0];
-        const assessmentType: AssessmentType[] = rows?.map(row => ({
+        const assessmentType: AssessmentType[] = rows?.map((row: any) => ({
             id: row.id,
             name: row.name,
             assessmentUnit: row.assessmentUnit,
@@ -104,7 +104,7 @@ export const handleCreateAssessmentLog = async (req: Request<{}, {}, AssessmentC
 }
 
 export const handleGetAssessmentLog = async (
-    req: Request<{ id: string }, {}, AssessmentClientLogSearchOptions>, 
+    req: Request<{ id: string }, {}, {}, AssessmentClientLogSearchOptions>, 
     res: Response<ResponseWithError<AssessmentClientLog[]>>
 ) => {
     const connection = await getDatabaseConnection();
