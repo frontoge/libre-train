@@ -7,7 +7,12 @@ CREATE PROCEDURE spCreateMacrocycle (
     IN p_notes VARCHAR(512)
 )
 BEGIN
-    IF p_isActive THEN
+
+    IF p_cycle_start_date > p_cycle_end_date THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Start date must be before end date';
+    END IF;
+
+    IF p_isActive OR p_isActive IS NULL THEN
         UPDATE Macrocycle mc
         SET mc.is_active = FALSE
         WHERE mc.client_id = p_client_id

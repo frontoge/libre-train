@@ -9,11 +9,6 @@ CREATE PROCEDURE spCreateMesocycle (
     IN p_is_active BOOLEAN
 )
 BEGIN
-    # If the start and end date are not within the date range of parent macrocycle, throw an error
-
-    # If the mesocycle is active, set all other active mesocycles in the same macrocycle that overlap as inactive
-
-    # Insert the mesocycle and get the client_id from the parent macrocycle
     DECLARE v_client_id INT;
     DECLARE v_macro_start DATE;
     DECLARE v_macro_end DATE;
@@ -29,13 +24,17 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Macrocycle not found';
     END IF;
 
+    IF p_start_date > p_end_date THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Start date must be before end date';
+    END IF;
+
     -- Check if dates are within macrocycle range
     IF p_start_date < v_macro_start OR p_end_date > v_macro_end THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Mesocycle dates must be within macrocycle dates';
     END IF;
 
     -- If active, set overlapping active mesocycles in this macrocycle to inactive
-    IF p_is_active THEN
+    IF p_is_active OR p_is_active IS NULL THEN
         UPDATE Mesocycle
            SET is_active = FALSE
          WHERE macrocycle_id = p_macrocycle_id

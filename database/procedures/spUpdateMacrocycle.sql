@@ -7,6 +7,23 @@ CREATE PROCEDURE spUpdateMacrocycle (
     IN p_notes VARCHAR(512)
 )
 BEGIN
+
+    DECLARE v_toUpdate_start DATE;
+    DECLARE v_toUpdate_end DATE;
+
+    SELECT cycle_start_date, cycle_end_date
+        INTO v_toUpdate_start, v_toUpdate_end
+    FROM Macrocycle
+    WHERE id = p_id;
+
+    IF (
+        (p_cycle_start_date IS NOT NULL AND p_cycle_end_date IS NOT NULL AND p_cycle_start_date > p_cycle_end_date) OR
+        (p_cycle_start_date IS NOT NULL AND p_cycle_end_date IS NULL AND p_cycle_start_date > v_toUpdate_end) OR
+        (p_cycle_end_date IS NOT NULL AND p_cycle_start_date IS NULL AND p_cycle_end_date < v_toUpdate_start)
+    ) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Start must be before end date';
+    END IF;
+
     # Update the macrocycle record with the provided values, using COALESCE to keep existing values if parameters are NULL
     UPDATE Macrocycle
     SET cycle_name = COALESCE(p_cycle_name, cycle_name),

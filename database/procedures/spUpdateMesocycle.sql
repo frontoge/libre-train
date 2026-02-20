@@ -12,15 +12,25 @@ BEGIN
     # Check if updated values are within parent macrocycle range
     DECLARE v_macro_start DATE;
     DECLARE v_macro_end DATE;
+    DECLARE v_toUpdate_start DATE;
+    DECLARE v_toUpdate_end DATE;
 
-    SELECT m.cycle_start_date, m.cycle_end_date
-      INTO v_macro_start, v_macro_end
+    SELECT m.cycle_start_date, m.cycle_end_date, ms.cycle_start_date, ms.cycle_end_date
+      INTO v_macro_start, v_macro_end, v_toUpdate_start, v_toUpdate_end
       FROM Macrocycle m
       INNER JOIN Mesocycle ms ON m.id = ms.macrocycle_id
      WHERE ms.id = p_mesocycle_id;
 
     IF (p_start_date IS NOT NULL AND p_start_date < v_macro_start) OR (p_end_date IS NOT NULL AND p_end_date > v_macro_end) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Mesocycle dates must be within macrocycle dates';
+    END IF;
+
+    IF (
+        (p_start_date IS NOT NULL AND p_end_date IS NOT NULL AND p_start_date > p_end_date) OR
+        (p_start_date IS NOT NULL AND p_end_date IS NULL AND p_start_date > v_toUpdate_end) OR
+        (p_end_date IS NOT NULL AND p_start_date IS NULL AND p_end_date < v_toUpdate_start)
+    ) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Start must be before end date';
     END IF;
 
     # Update the mesocycle
