@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { Macrocycle } from "../../../shared/models";
+import { Macrocycle, Mesocycle } from "../../../shared/models";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { MacrocycleSearchParams, ResponseWithError } from "../../../shared/types";
+import { MacrocycleSearchParams, MesocycleSearchParams, MesocycleUpdateRequest, ResponseWithError } from "../../../shared/types";
 import { RowDataPacket } from "mysql2";
 
 
@@ -130,20 +130,149 @@ export const handleDeleteMacrocycle = async (req: Request<{id: string}>, res: Re
     }
 }
 
-export const handleGetMesocycle = async (req: Request, res: Response) => {
+export const handleGetMesocycle = async (req: Request<{clientId: string}, {}, {}, MesocycleSearchParams>, res: Response<ResponseWithError<Mesocycle[]>>) => {
+    const connection = await getDatabaseConnection();
+    try {
+        const clientId = parseInt(req.params.clientId, 10);
+        if (isNaN(clientId)) {
+            return res.status(400).json({ hasError: true, errorMessage: "Invalid client ID" });
+        }
+        const { active, date, macrocycleId } = req.query;
 
+        const macrocycleIdNumber = parseInt(macrocycleId ?? "", 10);
+
+        const activeBool = active === 'true' ? true : active === 'false' ? false : undefined;
+
+        const [rows] = await connection.query<RowDataPacket[]>({
+            sql: 'CALL spGetMesocycles(?, ?, ?, ?)',
+            values: [
+                clientId,
+                !isNaN(macrocycleIdNumber) ? macrocycleIdNumber : null,
+                activeBool ?? null,
+                date ?? null
+            ]
+        });
+
+        if (!rows || !rows[0]) {
+            return res.status(500).json({ hasError: true, errorMessage: "Error when fetching mesocycles" });
+        }
+
+        const mesocycles: Mesocycle[] = rows[0].map((row: any) => ({
+            id: row.id,
+            client_id: row.client_id,
+            cycle_name: row.cycle_name,
+            macrocycle_id: row.macrocycle_id,
+            cycle_start_date: row.cycle_start_date,
+            cycle_end_date: row.cycle_end_date,
+            optLevels: row.opt_levels ? row.opt_levels.split(",").map((level: string) => parseInt(level, 10)) : undefined,
+            cardioLevels: row.cardio_levels ? row.cardio_levels.split(",").map((level: string) => parseInt(level, 10)) : undefined,
+            notes: row.notes,
+            isActive: row.is_active === 1
+        }));
+
+        res.status(200).json(mesocycles);
+    } catch (error: Error | unknown) {
+        var errorMessage = "Internal server error";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        console.error("Error fetching mesocycle:", error);
+        res.status(500).json({ hasError: true, errorMessage });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
 }
 
-export const handleCreateMesocycle = async (req: Request, res: Response) => {
+export const handleCreateMesocycle = async (req: Request<{}, {}, Omit<Mesocycle, 'id' | 'client_id'>>, res: Response) => {
+    const connection = await getDatabaseConnection();
+    try {
+        const reqBody = req.body;
+        // Validate reqBody here (e.g., check for required fields, data types, etc.)
+        if (!reqBody.macrocycle_id || !reqBody.cycle_start_date || !reqBody.cycle_end_date) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+        const [result] = await connection.execute({
+            sql: "CALL spCreateMesocycle(?, ?, ?, ?, ?, ?, ?, ?)",
+            values: [
+                reqBody.macrocycle_id,
+                reqBody.cycle_name ?? null,
+                reqBody.cycle_start_date,
+                reqBody.cycle_end_date,
+                reqBody.optLevels ? reqBody.optLevels.join(",") : null,
+                reqBody.cardioLevels ? reqBody.cardioLevels.join(",") : null,
+                reqBody.notes ?? null,
+                reqBody.isActive ?? null,
+            ]
+        })
 
+        res.status(201).json({ message: "Mesocycle created successfully" });
+    } catch (error: Error | unknown) {
+        var errorMessage = "Internal server error";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        console.error("Error creating mesocycle:", error);
+        res.status(500).json({ error: errorMessage });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
 }
 
-export const handleUpdateMesocycle = async (req: Request, res: Response) => {
+export const handleUpdateMesocycle = async (req: Request<{id: string}, {}, MesocycleUpdateRequest>, res: Response) => {
+    const connection = await getDatabaseConnection();
+    try {
+        const mesocycleId = parseInt(req.params.id, 10);
+        if (isNaN(mesocycleId)) {
+            return res.status(400).json({ error: "Invalid mesocycle ID" });
+        }
+        
+        const reqBody = req.body;
+        const [results] = await connection.execute({
+            sql: "CALL spUpdateMesocycle(?, ?, ?, ?, ?, ?, ?, ?)",
+            values: [
+                mesocycleId,
+                reqBody.cycle_name ?? null,
+                reqBody.cycle_start_date ?? null,
+                reqBody.cycle_end_date ?? null,
+                reqBody.optLevels ? reqBody.optLevels.join(",") : null,
+                reqBody.cardioLevels ? reqBody.cardioLevels.join(",") : null,
+                reqBody.notes ?? null,
+                reqBody.isActive ?? null,
+            ]
+        })
 
+        res.status(204).send();
+    } catch (error: Error | unknown) {
+        var errorMessage = "Internal server error";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        console.error("Error updating mesocycle:", error);
+        res.status(500).json({ error: errorMessage });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
 }
 
-export const handleDeleteMesocycle = async (req: Request, res: Response) => {
+export const handleDeleteMesocycle = async (req: Request<{id: string}>, res: Response) => {
+    const connection = await getDatabaseConnection();
+    try {
+        const mesocycleId = parseInt(req.params.id, 10);
+        if (isNaN(mesocycleId)) {
+            return res.status(400).json({ error: "Invalid mesocycle ID" });
+        }
 
+        await connection.execute({
+            sql: 'DELETE FROM Mesocycle WHERE id = ?',
+            values: [mesocycleId]
+        });
+        res.status(200).json({ message: "Mesocycle deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting mesocycle:", error);
+        res.status(500).json({ error: "Internal server error" });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
 }
 
 export const handleGetMicrocycle = async (req: Request, res: Response) => {

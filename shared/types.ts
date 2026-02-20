@@ -1,4 +1,4 @@
-import type { AssessmentClientLog } from "./models";
+import type { AssessmentClientLog, Mesocycle } from "./models";
 
 export type Goal = {
     id: number;
@@ -144,5 +144,13 @@ export type AssessmentClientLogSearchOptions = {
 
 export type MacrocycleSearchParams = {
     active?: string;
+    date?: string;
+}
+
+export type MesocycleUpdateRequest = Partial<Omit<Mesocycle, 'id' | 'client_id' | 'macrocycle_id'>>;
+
+export type MesocycleSearchParams = {
+    active?: string;
+    macrocycleId?: string;
     date?: string;
 }
