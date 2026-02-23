@@ -5,24 +5,24 @@ function getNavigationUrlFromNavKey(navKey: string): string {
         // Index pages
         case 'dashboard':
         case 'client_overview':
-        case 'plan_manage':
+        case 'training_plan_manage':
         case 'assessment_manage':
         case 'exercise_manage':
             return '';
         case 'clientsMenu':
             return 'clients';
-        case 'plan_new':
+        case 'training_plan_new':
         case 'client_new':
         case 'assessment_new':
             return 'create';
         case 'exercisesMenu':
             return 'exercises';
-        case 'plansMenu':
-            return 'plans';
+        case 'trainingMenu':
+            return 'training';
         case 'assessmentsMenu':
             return 'assessments';
         default:
-            return '/not-found';
+            return 'not-found';
     }
 }
 

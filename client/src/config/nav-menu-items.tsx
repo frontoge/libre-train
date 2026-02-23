@@ -1,11 +1,11 @@
 import { HomeFilled } from "@ant-design/icons";
 import { type NavMenuItem } from "../types/types";
 import { MdSpaceDashboard, MdAssessment } from "react-icons/md";
-import { IoMdPersonAdd, IoMdAddCircle, IoMdPerson } from "react-icons/io";
+import { IoMdPersonAdd, IoMdPerson } from "react-icons/io";
 import { FaListAlt } from "react-icons/fa";
 import { GiWeightLiftingUp } from "react-icons/gi";
 import { ImMap } from "react-icons/im";
-import { FaRegSquarePlus, FaMagnifyingGlass } from "react-icons/fa6";
+import { FaSquarePlus, FaMagnifyingGlass, FaCalendarXmark } from "react-icons/fa6";
 
 
 export const items: NavMenuItem[] = [
@@ -42,7 +42,7 @@ export const items: NavMenuItem[] = [
             {
                 key: 'assessment_new',
                 label: 'New',
-                icon: <IoMdAddCircle />,
+                icon: <FaSquarePlus />,
             },
             {
                 key: 'assessment_manage',
@@ -52,20 +52,26 @@ export const items: NavMenuItem[] = [
         ]
     },
     {
-        key: 'plansMenu',
-        label: 'Plans',
+        key: 'trainingMenu',
+        label: 'Training Plans',
         icon: <ImMap />,
         children: [
             {
-                key: 'plan_manage',
-                label: 'Manage Plans',
-                icon: <ImMap />
+                key: 'training_plan_new',
+                label: 'New Plan',
+                icon: <FaSquarePlus />,
             },
             {
-                key: 'plan_new',
-                label: 'New Plan',
-                icon: <FaRegSquarePlus />,
+                key: 'training_plan_manage',
+                label: 'Browse Plans',
+                icon: <FaListAlt />
+            },
+            {
+                key: 'training_plan_snapshot',
+                label: "Today's Plan",
+                icon: <FaCalendarXmark />
             }
+            
         ]
     },
     {
@@ -75,7 +81,7 @@ export const items: NavMenuItem[] = [
         children: [
             {
                 key: 'exercise_manage',
-                label: 'Browse',
+                label: 'Search',
                 icon: <FaMagnifyingGlass />,
             }
         ]

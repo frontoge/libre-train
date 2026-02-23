@@ -63,7 +63,7 @@ export const handleCreateMacrocycle = async (req: Request<{}, {}, Omit<Macrocycl
                 reqBody.cycle_name ?? null,
                 reqBody.cycle_start_date,
                 reqBody.cycle_end_date,
-                reqBody.isActive ?? null,
+                reqBody.isActive ?? false,
                 reqBody.notes ?? null
             ]
         });

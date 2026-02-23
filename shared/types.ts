@@ -162,3 +162,9 @@ export type MicrocycleSearchParams = {
     mesocycleId?: string;
     date?: string;
 }
+
+export enum TrainingCycleType {
+    Macrocycle = 1,
+    Mesocycle = 2,
+    Microcycle = 3,
+}
