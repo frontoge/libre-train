@@ -29,6 +29,7 @@ type ParentCycle = {
     cycle_name?: string;
     cycle_start_date: Date;
     cycle_end_date: Date;
+    isActive: boolean;
 }
 
 export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
@@ -48,7 +49,7 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
     const showParentCycleField = selectedCycleType === TrainingCycleType.Microcycle || selectedCycleType === TrainingCycleType.Mesocycle;
 
     const parentCycleOptions = parentCycles.map(cycle => ({
-        label: cycle.cycle_name ? cycle.cycle_name : `${stringFormatDate(cycle.cycle_start_date)} - ${stringFormatDate(cycle.cycle_end_date)}`,
+        label: (cycle.cycle_name ? cycle.cycle_name : `${stringFormatDate(cycle.cycle_start_date)} - ${stringFormatDate(cycle.cycle_end_date)}`) + (!cycle.isActive ? "*" : ""),
         value: cycle.id
     }));
 
@@ -61,7 +62,7 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
         }
         
         setSelectedParentCycleId(undefined);
-        form.setFieldValue("parentCycle", undefined);
+        form.resetFields(['parentCycle', 'dateRange', 'optLevels', 'cardioLevels', 'isActive', 'cycleName', 'notes']);
         
         if (selectedCycleType === TrainingCycleType.Mesocycle) {
             // Fetch macrocycles for selected client and populate parent cycle select options
@@ -70,7 +71,8 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
                 id: cycle.id,
                 cycle_name: cycle.cycle_name,
                 cycle_start_date: cycle.cycle_start_date,
-                cycle_end_date: cycle.cycle_end_date
+                cycle_end_date: cycle.cycle_end_date,
+                isActive: cycle.isActive,
             }))
             setParentCycles(options);
         } else if (selectedCycleType === TrainingCycleType.Microcycle) {
@@ -80,7 +82,8 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
                 id: cycle.id,
                 cycle_name: cycle.cycle_name,
                 cycle_start_date: cycle.cycle_start_date,
-                cycle_end_date: cycle.cycle_end_date
+                cycle_end_date: cycle.cycle_end_date,
+                isActive: cycle.isActive,
             }))
             setParentCycles(options);
         }

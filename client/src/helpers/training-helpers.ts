@@ -2,7 +2,7 @@ import { TrainingCycleType } from "../../../shared/types";
 import type { CreateEditTrainingPlanFormValues } from "../components/Training/CreateEditTrainingPlan";
 import { getAppConfiguration } from "../config/app.config";
 import { Routes } from "../../../shared/routes";
-import type { Macrocycle, Mesocycle } from "../../../shared/models";
+import type { Macrocycle, Mesocycle, Microcycle } from "../../../shared/models";
 import { createSearchParams } from "./fetch-helpers";
 
 async function createMacrocycle(values: CreateEditTrainingPlanFormValues): Promise<boolean> {
@@ -160,17 +160,35 @@ export const fetchChildMesocycles = async (macrocycleId: number, clientId: numbe
             throw new Error(`Failed to fetch child mesocycles: ${response.statusText}`);
         }
         const data = await response.json();
-        return data.map((result: Mesocycle) => ({
-            ...result,
-            cycle_start_date: result.cycle_start_date,
-            cycle_end_date: result.cycle_end_date,
-        })) as Mesocycle[];
+        return data;
 
     } catch (error: Error | unknown) {
         console.error("Error fetching child mesocycles:", error instanceof Error ? error.message : error);
         return [];
     }
 
+}
+
+export const fetchChildMicrocycles = async (mesocycleId: number, clientId: number): Promise<Microcycle[]> => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }
+    const searchParams = createSearchParams({ mesocycleId, active: true});
+    try {
+        const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}/${clientId}?${searchParams}`, requestOptions);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch child microcycles: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+
+    } catch (error: Error | unknown) {
+        console.error("Error fetching child microcycles:", error instanceof Error ? error.message : error);
+        return [];
+    }
 }
 
 export const optLevelTagColors: Record<number, string> = {

@@ -4,7 +4,7 @@ import { stringFormatCondensedDate } from "../../helpers/date-helpers";
 import { cardioLevelTagColors, optLevelTagColors } from "../../helpers/training-helpers";
 import dayjs from "../../config/dayjs";
 
-export interface MesocycleCardProps extends React.ComponentProps<"div"> {
+export interface MesocycleCardProps extends React.ComponentProps<typeof Card> {
     mesocycleData?: Mesocycle;
     index?: number;
 }
@@ -20,13 +20,11 @@ export function MesocycleCard(props: MesocycleCardProps) {
         {
             key: "date_range",
             label: "Date Range",
-            span: 'filled',
             children: dateString
         },
         {
             key: "opt_levels",
             label: "Opt Levels",
-            span: 'filled',
             children: mesocycleData?.optLevels?.map(level => (
                 // @ts-ignore this is only supported in antd v6+ will leave it in for when we update
                 <Tag key={level} color={optLevelTagColors[level]} variant="outlined">
@@ -46,10 +44,10 @@ export function MesocycleCard(props: MesocycleCardProps) {
         }
     ]
 
-    const isCycleCurrent = dayjs().isBetween(dayjs(mesocycleData?.cycle_start_date), dayjs(mesocycleData?.cycle_end_date), 'day', '[]');
-
-    const cardStatus = isCycleCurrent ? "success" : "warning";
-    const statusText = isCycleCurrent ? "Current" : "Pending";
+    const currentDate = dayjs();
+    const isCycleCurrent = currentDate.isBetween(dayjs(mesocycleData?.cycle_start_date), dayjs(mesocycleData?.cycle_end_date), 'day', '[]');
+    const cardStatus = isCycleCurrent ? "success" : currentDate.isBefore(dayjs(mesocycleData?.cycle_start_date)) ? "warning" : "default";
+    const statusText = isCycleCurrent ? "Current" : currentDate.isBefore(dayjs(mesocycleData?.cycle_start_date)) ? "Pending" : "Completed";
 
     return (
         <Card
@@ -66,7 +64,7 @@ export function MesocycleCard(props: MesocycleCardProps) {
                     padding: '0.5rem',
                 }}
             >
-                <Descriptions items={dataFields} />
+                <Descriptions size="small" items={dataFields} column={1} bordered />
             </span>
         </Card>
     )
