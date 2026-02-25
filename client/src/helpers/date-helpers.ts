@@ -15,9 +15,15 @@ export function getWeekRange(date: Dayjs): WeekRange {
     };
 }
 
-export function stringFormatDate(date: Date): string {
+export function stringFormatDate(date: Date, separator: string = "-"): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${year}${separator}${month}${separator}${day}`;
+}
+
+export function stringFormatCondensedDate(date: Date, separator: string = "-"): string {
+    const year = date.getFullYear() % 100;;
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${month}${separator}${year}`;
 }

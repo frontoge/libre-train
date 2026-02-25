@@ -144,3 +144,18 @@ export async function fetchParentMesocycles(clientId: number): Promise<Macrocycl
         return [];
     }
 }
+
+export const optLevelTagColors: Record<number, string> = {
+    1: 'green',
+    2: 'gold',
+    3: 'orange',
+    4: 'volcano',
+    5: 'red',
+}
+
+export const cardioLevelTagColors: Record<number, string> = {
+    1: 'cyan',
+    2: 'blue',
+    3: 'geekblue',
+    4: 'purple',
+}

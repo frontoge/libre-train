@@ -21,6 +21,8 @@ function getNavigationUrlFromNavKey(navKey: string): string {
             return 'training';
         case 'assessmentsMenu':
             return 'assessments';
+        case 'training_plan_snapshot':
+            return 'view';
         default:
             return 'not-found';
     }
