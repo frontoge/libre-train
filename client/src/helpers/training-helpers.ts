@@ -2,7 +2,8 @@ import { TrainingCycleType } from "../../../shared/types";
 import type { CreateEditTrainingPlanFormValues } from "../components/Training/CreateEditTrainingPlan";
 import { getAppConfiguration } from "../config/app.config";
 import { Routes } from "../../../shared/routes";
-import type { Macrocycle } from "../../../shared/models";
+import type { Macrocycle, Mesocycle } from "../../../shared/models";
+import { createSearchParams } from "./fetch-helpers";
 
 async function createMacrocycle(values: CreateEditTrainingPlanFormValues): Promise<boolean> {
     const requestBody = {
@@ -42,8 +43,8 @@ async function createMesocycle(values: CreateEditTrainingPlanFormValues): Promis
         cycle_start_date: values.dateRange[0].format("YYYY-MM-DD"),
         cycle_end_date: values.dateRange[1].format("YYYY-MM-DD"),
         isActive: values.isActive,
-        opt_levels: values.optLevels,
-        cardio_levels: values.cardioLevels,
+        optLevels: values.optLevels,
+        cardioLevels: values.cardioLevels,
         notes: values.notes,
     }
 
@@ -143,6 +144,33 @@ export async function fetchParentMesocycles(clientId: number): Promise<Macrocycl
         console.error("Error fetching parent mesocycles:", error instanceof Error ? error.message : error);
         return [];
     }
+}
+
+export const fetchChildMesocycles = async (macrocycleId: number, clientId: number): Promise<Mesocycle[]> => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }
+    const searchParams = createSearchParams({ macrocycleId, active: true});
+    try {
+        const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Mesocycle}/${clientId}?${searchParams}`, requestOptions);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch child mesocycles: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data.map((result: Mesocycle) => ({
+            ...result,
+            cycle_start_date: result.cycle_start_date,
+            cycle_end_date: result.cycle_end_date,
+        })) as Mesocycle[];
+
+    } catch (error: Error | unknown) {
+        console.error("Error fetching child mesocycles:", error instanceof Error ? error.message : error);
+        return [];
+    }
+
 }
 
 export const optLevelTagColors: Record<number, string> = {

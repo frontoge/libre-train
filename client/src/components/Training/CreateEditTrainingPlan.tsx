@@ -59,7 +59,10 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
         if (isEdit || selectedClient === undefined || selectedCycleType === undefined) {
             return;
         }
-
+        
+        setSelectedParentCycleId(undefined);
+        form.setFieldValue("parentCycle", undefined);
+        
         if (selectedCycleType === TrainingCycleType.Mesocycle) {
             // Fetch macrocycles for selected client and populate parent cycle select options
             const parentCycles = await fetchParentMacrocycles(selectedClient);
@@ -81,6 +84,7 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
             }))
             setParentCycles(options);
         }
+        
     }
 
     useEffect(() => {
@@ -140,6 +144,7 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
                         <Select 
                             options={parentCycleOptions}
                             onChange={(value) => setSelectedParentCycleId(value)}
+                            value={selectedParentCycleId}
                             placeholder="Select parent cycle"
                             style={{
                                 width: "12rem"

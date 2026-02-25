@@ -2,24 +2,26 @@ import { Badge, Card, Descriptions, Tag } from "antd";
 import type { Mesocycle } from "../../../../shared/models";
 import { stringFormatCondensedDate } from "../../helpers/date-helpers";
 import { cardioLevelTagColors, optLevelTagColors } from "../../helpers/training-helpers";
+import dayjs from "../../config/dayjs";
 
-export interface MesocycleCardProps extends React.ComponentProps<"div">{
+export interface MesocycleCardProps extends React.ComponentProps<"div"> {
     mesocycleData?: Mesocycle;
-} 
+    index?: number;
+}
 
 export function MesocycleCard(props: MesocycleCardProps) {
 
-    const { mesocycleData, ...restProps } = props;
-
+    const { mesocycleData, ...restProps } = props; 
     const startDate = mesocycleData?.cycle_start_date ? stringFormatCondensedDate(mesocycleData.cycle_start_date, '/') : '';
     const endDate = mesocycleData?.cycle_end_date ? stringFormatCondensedDate(mesocycleData.cycle_end_date, '/') : '';
+    const dateString = startDate !== endDate ? `${startDate} - ${endDate}` : startDate;
 
     const dataFields = [
         {
             key: "date_range",
             label: "Date Range",
             span: 'filled',
-            children: `${startDate} - ${endDate}`
+            children: dateString
         },
         {
             key: "opt_levels",
@@ -44,14 +46,16 @@ export function MesocycleCard(props: MesocycleCardProps) {
         }
     ]
 
-    const cardStatus = mesocycleData?.isActive ? "success" : "error";
-    const statusText = mesocycleData?.isActive ? "Active" : "Inactive";
+    const isCycleCurrent = dayjs().isBetween(dayjs(mesocycleData?.cycle_start_date), dayjs(mesocycleData?.cycle_end_date), 'day', '[]');
+
+    const cardStatus = isCycleCurrent ? "success" : "warning";
+    const statusText = isCycleCurrent ? "Current" : "Pending";
 
     return (
         <Card
             variant="borderless"
             size="small"
-            title={mesocycleData?.cycle_name ?? `Phase ${props.key}`}
+            title={mesocycleData?.cycle_name && mesocycleData?.cycle_name.trim() !== "" ? mesocycleData.cycle_name : `Phase ${props.index}`}
             extra={<Badge status={cardStatus} text={statusText}/>}
             {...restProps}
         >

@@ -1,4 +1,5 @@
 import type { Dayjs } from "dayjs";
+import dayjs from "../config/dayjs";
 
 export type WeekRange = {
     start: string;
@@ -23,7 +24,5 @@ export function stringFormatDate(date: Date, separator: string = "-"): string {
 }
 
 export function stringFormatCondensedDate(date: Date, separator: string = "-"): string {
-    const year = date.getFullYear() % 100;;
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    return `${month}${separator}${year}`;
+    return dayjs.tz(date).format(`MM${separator}YY`);
 }
