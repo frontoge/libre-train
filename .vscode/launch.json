@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "bun",
+            "request": "launch",
+            "name": "Debug Express (Hot Reload)",
+            "program": "${workspaceFolder}/server/index.ts",
+            "cwd": "${workspaceFolder}/server",
+            "watchMode": "hot",                  // enables --hot → true hot reloading
+            "stopOnEntry": false,
+            "args": [],                           // add any CLI args your index.ts expects
+            "runtime": "bun",                     // usually auto-detected, but safe to set
+            "runtimeArgs": [
+                // "--inspect",                   // optional – usually not needed with type: bun
+                // "--inspect-wait"               // optional – pauses until debugger attaches
+            ],
+            "skipFiles": [
+                "<node_internals>/**",
+                "bun:internal/**"
+            ]
+        },
+
+        // Fallback: classic attach style (if the above doesn't work smoothly)
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to Bun (after bun --inspect)",
+            "port": 6499,
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        }
+  ]
+}

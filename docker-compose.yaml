@@ -16,7 +16,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - .env
+      - ./server/.env
     volumes:
       - ./server:/app/server
       - ./shared:/app/shared

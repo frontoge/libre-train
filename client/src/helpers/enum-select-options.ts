@@ -1,4 +1,5 @@
 import { AssessmentGroup, ExerciseForm, ExerciseMovementPattern, MuscleGroup } from "../../../shared/models";
+import { TrainingCycleType } from "../../../shared/types";
 import { MuscleGroupLabels } from "./label-formatters";
 
 export const assessmentGroupOptions = [
@@ -29,3 +30,9 @@ export const muscleGroupOptions = Object.entries(MuscleGroupLabels).map(([value,
     label,
     value: Number(value) as MuscleGroup
 }));
+
+export const cycleTypeOptions = [
+    { label: "Macrocycle", value: TrainingCycleType.Macrocycle },
+    { label: "Mesocycle", value: TrainingCycleType.Mesocycle },
+    { label: "Microcycle", value: TrainingCycleType.Microcycle },
+]
