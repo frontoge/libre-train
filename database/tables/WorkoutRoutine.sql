@@ -1,6 +1,5 @@
 CREATE TABLE `WorkoutRoutine` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `workout_program_id` int(10) unsigned NOT NULL,
   `routine_day` int(10) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
