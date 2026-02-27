@@ -1,4 +1,4 @@
-import React, { type SetStateAction } from "react";
+import React from "react";
 
 import { type DashboardData } from "../../../shared/types";
 import type { Dayjs } from "dayjs";

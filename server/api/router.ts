@@ -4,9 +4,6 @@ import { Routes } from "../../shared/routes";
 import { handleGetClients, handleCreateClient, handleDailyUpdate, handleGetDashboard, handleGetDashboardSummary, handleDeleteClient, handleGetClientContacts } from "./handlers/client-handlers";
 import { handleAuthSignup, handleAuthLogin } from "./handlers/auth-handlers";
 import { handleDeleteExercise, handleExerciseCreate, handleGetAllExercises, handleUpdateExercise } from "./handlers/exercise-handlers";
-import { handleGetTargetMetricModels } from "./handlers/models/target-metric-handler";
-import { handleGetWorkoutRoutineStage } from "./handlers/models/workout-routine-stage-handler";
-import { handleCreatePlan, handleDeletePlan, handleGetClientPlans } from "./handlers/plan-handlers";
 import { handleCreateContact, handleDeleteContact, handleGetContactById, handleGetContacts, handleUpdateContact } from "./handlers/contact-handlers";
 import { handleCreateAssessmentLog, handleDeleteAssessmentLog, handleGetAssessmentGroupTypes, handleGetAssessmentLog, handleGetAssessmentTypes, handleUpdateAssessmentLog } from "./handlers/assessment-handlers";
 import { handleCreateMacrocycle, handleCreateMesocycle, handleCreateMicrocycle, handleDeleteMacrocycle, handleDeleteMesocycle, handleDeleteMicrocycle, handleGetMacrocycle, handleGetMesocycle, handleGetMicrocycle, handleUpdateMacrocycle, handleUpdateMesocycle, handleUpdateMicrocycle } from "./handlers/cycle-handlers";
@@ -29,16 +26,6 @@ router.post(Routes.Exercise, handleExerciseCreate);
 router.get(Routes.Exercise, handleGetAllExercises);
 router.delete(`${Routes.Exercise}/:id`, handleDeleteExercise);
 router.put(`${Routes.Exercise}/:id`, handleUpdateExercise); // Using the same handler for create and update for simplicity, can be separated if needed
-
-// Plan routes
-router.post(`${Routes.Plan}/create`, handleCreatePlan)
-router.delete(`${Routes.Plan}/:id`, handleDeletePlan);
-router.get(`${Routes.ClientPlan}/:id`, handleGetClientPlans);
-
-// Models
-// Target Metric Types
-router.get(Routes.TargetMetricTypes, handleGetTargetMetricModels);
-router.get(Routes.WorkoutRoutineStages, handleGetWorkoutRoutineStage);
 
 //Auth routes
 router.post(Routes.AuthSignup, handleAuthSignup);

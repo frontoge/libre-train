@@ -53,7 +53,6 @@ export const handleGetContactById = async (req: Request<{id: string}>, res: Resp
             phone: row.phone,
             img: row.img,
             date_of_birth: row.date_of_birth,
-            notes: row.notes
          };
 
         res.json(contact);
@@ -68,18 +67,17 @@ export const handleGetContactById = async (req: Request<{id: string}>, res: Resp
 
 export const handleCreateContact = async (req: Request<{}, {}, Omit<Contact, "id">>, res: Response<ResponseWithError<number>>) => {
     const connection = await getDatabaseConnection();
-    const { first_name, last_name, email, phone, img, date_of_birth, notes } = req.body;
+    const { first_name, last_name, email, phone, img, date_of_birth } = req.body;
     try {
         const [result] = await connection.query<RowDataPacket[][]>({
-            sql: "CALL spCreateContact(?, ?, ?, ?, ?, ?, ?)",
+            sql: "CALL spCreateContact(?, ?, ?, ?, ?, ?)",
             values: [
                 first_name,
                 last_name,
                 email,
                 phone,
                 date_of_birth,
-                img,
-                notes
+                img
             ]
         });
 
@@ -127,10 +125,10 @@ export const handleUpdateContact = async (req: Request<{id: string}, {}, Omit<Pa
     const connection = await getDatabaseConnection();
     
     const { id } = req.params;
-    const { first_name, last_name, email, phone, img, date_of_birth, notes } = req.body;
+    const { first_name, last_name, email, phone, img, date_of_birth } = req.body;
     try {
         const [result, fields] = await connection.execute({
-            sql: "CALL spUpdateContact(?, ?, ?, ?, ?, ?, ?, ?)", 
+            sql: "CALL spUpdateContact(?, ?, ?, ?, ?, ?, ?)", 
             values: [
                 parseInt(id),
                 first_name ?? null,
@@ -139,7 +137,6 @@ export const handleUpdateContact = async (req: Request<{id: string}, {}, Omit<Pa
                 phone ?? null,
                 date_of_birth ?? null,
                 img ?? null,
-                notes ?? null
             ]
         });
 
