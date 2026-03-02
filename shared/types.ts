@@ -1,4 +1,4 @@
-import type { AssessmentClientLog, Mesocycle, Microcycle } from "./models";
+import type { AssessmentClientLog, Mesocycle, Microcycle, WorkoutRoutine } from "./models";
 
 export type Goal = {
     id: number;
@@ -83,51 +83,6 @@ export type DashboardWeeklySummary = {
 
 export type DashboardWeeklySummaryResponse = DashboardWeeklySummary[] | ErrorResponse;
 
-export type RoutineExercise = {
-    routineStage: number;
-    stage_index: number;
-    exerciseId: number;
-    sets?: number;
-    reps?: number;
-    weight?: number;
-    duration?: number;
-    distance?: number;
-    restTime?: number;
-    pace?: string;
-    targetRPE?: number;
-}
-
-export type WorkoutRoutine = {
-    dayName: string;
-    exercises: RoutineExercise[];
-}
-
-export type SubmitPlanRequest = {
-    clientId: number;
-    planLabel?: string;
-    parentPlanId?: number;
-    plan_phase: number;
-    dates: [string, string];
-    targetMetricId: number;
-    targetMetricValue: number;
-    workoutRoutines: WorkoutRoutine[]
-
-}
-
-export type Plan = {
-    id: number;
-    planName: string;
-    parentPlanId?: number;
-    planPhase: number;
-    startDate: string;
-    endDate: string;
-    isActive: boolean;
-    targetMetricId: number; 
-    targetMetricValue: number;
-    planCreatedAt: string;
-    workoutRoutines: WorkoutRoutine[];
-}
-
 export type AssessmentClientLogCreateRequest = {
     clientId: number;
     assessments: Omit<AssessmentClientLog, "id" | "clientId">[];
@@ -168,3 +123,5 @@ export enum TrainingCycleType {
     Mesocycle = 2,
     Microcycle = 3,
 }
+
+export type UpdateWorkoutRoutineRequest = Omit<WorkoutRoutine, "id" | 'microcycle_id' | 'routine_index' | 'isActive'>;

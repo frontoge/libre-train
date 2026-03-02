@@ -13,7 +13,5 @@ export const Routes = {
     Macrocycle: "/cycle/macro",
     Mesocycle: "/cycle/meso",
     Microcycle: "/cycle/micro",
-    Plan: "/plan",
-    TargetMetricTypes: "/models/target-metrics",
-    WorkoutRoutineStages: "/models/workout-routine-stages",
+    WorkoutRoutine: "/workout-routine",
 }

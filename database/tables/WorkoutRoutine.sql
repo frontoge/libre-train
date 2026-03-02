@@ -5,7 +5,8 @@ CREATE TABLE `WorkoutRoutine` (
   `routine_name` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `isActive` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `WorkoutRoutine_relation_1` (`workout_program_id`),
-  CONSTRAINT `WorkoutRoutine_relation_1` FOREIGN KEY (`workout_program_id`) REFERENCES `WorkoutProgram` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci
+  KEY `WorkoutRoutine_parent` (`microcycle_id`),
+  CONSTRAINT `WorkoutRoutine_parent` FOREIGN KEY (`microcycle_id`) REFERENCES `Microcycle` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+)

@@ -7,6 +7,7 @@ import { handleDeleteExercise, handleExerciseCreate, handleGetAllExercises, hand
 import { handleCreateContact, handleDeleteContact, handleGetContactById, handleGetContacts, handleUpdateContact } from "./handlers/contact-handlers";
 import { handleCreateAssessmentLog, handleDeleteAssessmentLog, handleGetAssessmentGroupTypes, handleGetAssessmentLog, handleGetAssessmentTypes, handleUpdateAssessmentLog } from "./handlers/assessment-handlers";
 import { handleCreateMacrocycle, handleCreateMesocycle, handleCreateMicrocycle, handleDeleteMacrocycle, handleDeleteMesocycle, handleDeleteMicrocycle, handleGetMacrocycle, handleGetMesocycle, handleGetMicrocycle, handleUpdateMacrocycle, handleUpdateMesocycle, handleUpdateMicrocycle } from "./handlers/cycle-handlers";
+import { handleCreateWorkoutRoutine, handleDeleteWorkoutRoutine, handleGetCycleWorkoutRoutines, handleUpdateWorkoutRoutine } from "./handlers/workout-routine-handlers";
 
 const router = Router();
 
@@ -59,5 +60,11 @@ router.put(`${Routes.Microcycle}/:id`, handleUpdateMicrocycle);
 router.delete(`${Routes.Macrocycle}/:id`, handleDeleteMacrocycle);
 router.delete(`${Routes.Mesocycle}/:id`, handleDeleteMesocycle);
 router.delete(`${Routes.Microcycle}/:id`, handleDeleteMicrocycle);
+
+// Workout Routine Routes
+router.post(Routes.WorkoutRoutine, handleCreateWorkoutRoutine);
+router.get(`${Routes.Microcycle}/:microcycleId${Routes.WorkoutRoutine}`, handleGetCycleWorkoutRoutines);
+router.delete(`${Routes.WorkoutRoutine}/:id`, handleDeleteWorkoutRoutine);
+router.put(`${Routes.WorkoutRoutine}/:id`, handleUpdateWorkoutRoutine); // Using the same handler for create and update for simplicity, can be separated if needed
 
 export default router;

@@ -1,34 +1,23 @@
 
-export type ClientPlanDTO = {
-    id: number;
-    plan_label: string;
-    parent_plan_id?: number;
-    plan_phase: number;
-    start_date: string;
-    end_date: string;
-    is_active: boolean;
-    target_metric_id: number;
-    target_value: number;
-    created_at: string;
-}
-
-export type ClientPlanExerciseDTO = {
-    planId: number;
-    routine_day: number;
+export type WorkoutRoutineExerciseDTO = {
+    routineId: number;
+    microcycle_id: number;
+    routine_index: number;
     routine_name?: string;
+    isActive: number;
+    group_index: number;
+    rest_after?: number;
+    rest_between?: number;
     exercise_id: number;
-    number_reps?: number;
-    number_sets?: number;
-    weight?: number;
-    duration?: number;
-    distance?: number;
-    rest_time?: number;
+    exercise_group_index: number;
+    repetitions?: number;
+    exercise_sets?: number;
+    exercise_weight?: number;
+    exercise_duration?: number;
+    exercise_distance?: number;
+    target_heart_rate?: number;
     pace?: string;
     rpe?: number;
-    routine_stage: number;
-    stage_index: number;
-}
-
-export type ClientPlanWithExercisesDTO = ClientPlanDTO & {
-    exercises: ClientPlanExerciseDTO[];
+    target_calories?: number;
+    target_mets?: number;
 }
