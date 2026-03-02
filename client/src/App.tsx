@@ -22,7 +22,6 @@ function App() {
 	const [appState, setAppState] = useState<AppState>({
 		clients: [],
 		assessmentTypes: [],
-		workoutRoutineStages: [],
 		exerciseData: [],
 		auth: {
 			authToken: undefined,
@@ -51,25 +50,6 @@ function App() {
 
 		return true;
 	}
-
-	const fetchWorkoutRoutineStages = async () => {
-		try {
-			const requestOptions = {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}
-			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.WorkoutRoutineStages}`, requestOptions);
-			const data = await response.json();
-			setAppState(prevState => ({
-				...prevState,
-				workoutRoutineStages: data
-			}));
-		} catch (error) {
-			console.error("Error fetching workout routine stages:", error);
-		}
-	};
 
 	const fetchExercises = async () => {
 		try {
@@ -124,14 +104,12 @@ function App() {
 
 	const stateRefreshers = {
 		refreshExerciseData: fetchExercises,
-		refreshWorkoutRoutineStages: fetchWorkoutRoutineStages,
 		refreshClients: fetchClients,
 		refreshAssessmentTypes: fetchAssessmentTypes,
 	}
 
 	useEffect(() => {
 		if (isAuthenticated() || getAppConfiguration().disableAuth) {
-			fetchWorkoutRoutineStages();
 			fetchExercises();
 			fetchClients();
 			fetchAssessmentTypes();

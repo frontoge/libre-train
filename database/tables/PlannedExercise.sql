@@ -1,0 +1,23 @@
+CREATE TABLE `PlannedExercise` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `exercise_id` int(10) unsigned NOT NULL,
+  `exercise_group_id` int(10) unsigned NOT NULL,
+  `repetitions` int(11) DEFAULT NULL,
+  `exercise_weight` int(11) DEFAULT NULL,
+  `exercise_duration` int(11) DEFAULT NULL,
+  `exercise_distance` decimal(10, 2) DEFAULT NULL,
+  `target_heart_rate` int(11) DEFAULT NULL,
+  `pace` varchar(32) DEFAULT NULL,
+  `rpe` int(11) DEFAULT NULL,
+  `target_calories` int(11) DEFAULT NULL,
+  `target_mets` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `exercise_sets` int(11) DEFAULT NULL,
+  `exercise_group_index` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_exercise` (`exercise_id`),
+  KEY `fk_exercise_group` (`exercise_group_id`),
+  CONSTRAINT `fk_exercise` FOREIGN KEY (`exercise_id`) REFERENCES `Exercise` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_exercise_group` FOREIGN KEY (`exercise_group_id`) REFERENCES `PlannedExerciseGroup` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+)

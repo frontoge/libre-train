@@ -4,11 +4,6 @@ export type TargetMetric = {
     target_unit: string;
 }
 
-export type WorkoutRoutineStage = {
-    id: number;
-    stage_name: string;
-}
-
 export type Contact = {
     id: number;
     first_name: string;
@@ -142,4 +137,33 @@ export type Microcycle = {
     cycle_end_date: Date;
     isActive: boolean;
     notes?: string;
+}
+
+export type PlannedExercise = {
+    exercise_id: number;
+    repetitions?: number;
+    sets?: number;
+    weight?: number;
+    duration?: number;
+    distance?: number;
+    target_heart_rate?: number;
+    pace?: string;
+    rpe?: number;
+    target_calories?: number;
+    target_mets?: number;
+}
+
+export type PlannedExerciseGroup = {
+    rest_between?: number;
+    rest_after?: number;
+    exercises: PlannedExercise[];
+}
+
+export type WorkoutRoutine = {
+    id: number;
+    microcycle_id: number;
+    routine_index: number;
+    routine_name?: string;
+    isActive: boolean;
+    exercise_groups: PlannedExerciseGroup[];
 }

@@ -66,6 +66,8 @@ export const handleGetClients = async (req: Request, res: Response<Client[] | {m
     }
 };
 
+// This should not all be handled on this endpoint. This should only take a contact ID and client create data
+// TODO: Fix this
 export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValues>, res: Response) => {
     const connection = await getDatabaseConnection();
 

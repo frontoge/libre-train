@@ -1,13 +1,12 @@
 import React, { createContext } from "react";
 import type { ModalType } from "./types/types";
 import type { Auth } from "./auth/authorization";
-import type { AssessmentType, ClientContact, Exercise, WorkoutRoutineStage } from "../../shared/models";
+import type { AssessmentType, ClientContact, Exercise } from "../../shared/models";
 
 export type AppState = {
     clients: ClientContact[];
     selectedClient?: ClientContact;
     selectedModal?: ModalType;
-    workoutRoutineStages: WorkoutRoutineStage[];
     exerciseData?: Exercise[];
     assessmentTypes: AssessmentType[];
     auth: Auth;
@@ -16,7 +15,6 @@ export type AppState = {
 export type StateRefreshers = {
     refreshExerciseData: () => void;
     refreshClients: () => void;
-    refreshWorkoutRoutineStages: () => void;
     refreshAssessmentTypes: () => void;
 }
 
@@ -34,7 +32,6 @@ const initialContext: AppContext = {
         assessmentTypes: [],
         clients: [],
         selectedModal: undefined,
-        workoutRoutineStages: [],
         auth: {
             authToken: '',
             user: 0
