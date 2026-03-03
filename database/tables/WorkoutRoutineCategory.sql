@@ -1,4 +1,5 @@
-CREATE TABLE WorkoutRoutineCategory (
-    id SERIAL PRIMARY KEY,
-    category_name VARCHAR(255) NOT NULL
+CREATE TABLE `WorkoutRoutineCategory` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `category_name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
 )

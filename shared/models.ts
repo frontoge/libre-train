@@ -156,6 +156,7 @@ export type PlannedExercise = {
 export type PlannedExerciseGroup = {
     rest_between?: number;
     rest_after?: number;
+    routine_category: number;
     exercises: PlannedExercise[];
 }
 

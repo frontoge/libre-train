@@ -144,12 +144,13 @@ async function createWorkoutRoutine(routine: Omit<WorkoutRoutine, 'id'>): Promis
 
         // Create the exercise groups for the routine
         await Promise.all(exercise_groups.map(async (group: PlannedExerciseGroup, index: number) => {
-            const { rest_between, rest_after, exercises } = group;
-            const [groupResult] = await connection.execute("CALL spCreatePlannedExerciseGroup(?, ?, ?, ?)", [
+            const { rest_between, rest_after, routine_category, exercises } = group;
+            const [groupResult] = await connection.execute("CALL spCreatePlannedExerciseGroup(?, ?, ?, ?, ?)", [
                 workoutRoutineId,
                 index, // group index
                 rest_between ?? null,
-                rest_after ?? null
+                rest_after ?? null,
+                routine_category
             ]);
             const groupId = (groupResult as any)[0][0].planned_exercise_group_id;
 

@@ -33,6 +33,7 @@ export function mapWorkoutRoutineExerciseDTOToWorkoutRoutine(rows: WorkoutRoutin
                 rest_after: nullToUndefined(row.rest_after),
                 rest_between: nullToUndefined(row.rest_between),
                 group_index: row.group_index,
+                routine_category: row.routine_category,
                 exercises: []
             };
             routine.exercise_groups.push(group);

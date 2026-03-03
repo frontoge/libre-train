@@ -1,4 +1,4 @@
-CREATE VIEW WorkoutRoutineExercises AS
+CREATE OR REPLACE VIEW WorkoutRoutineExercises AS
 SELECT 
   wr.id as routineId,
   wr.microcycle_id,
@@ -8,6 +8,7 @@ SELECT
   peg.group_index,
   peg.rest_after,
   peg.rest_between,
+  peg.routine_category,
   pe.exercise_id,
   pe.exercise_group_index,
   pe.repetitions,
