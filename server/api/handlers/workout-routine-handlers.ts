@@ -134,12 +134,14 @@ async function createWorkoutRoutine(routine: Omit<WorkoutRoutine, 'id'>): Promis
     const connection = await getDatabaseConnection();
     try {
         const { microcycle_id, routine_index, routine_name, isActive, exercise_groups } = routine;
-        const [result] = await connection.execute("CALL spCreateWorkoutRoutine(?, ?, ?, ?)", [
-            microcycle_id,
-            routine_index,
-            routine_name,
-            isActive
-        ]);
+        const [result] = await connection.execute({
+            sql: "CALL spCreateWorkoutRoutine(?, ?, ?, ?)", 
+            values: [
+                microcycle_id,
+                routine_index,
+                routine_name,
+                isActive
+        ]});
         const workoutRoutineId = (result as any)[0][0].workout_routine_id;
 
         // Create the exercise groups for the routine

@@ -8,16 +8,18 @@ export const handleExerciseCreate = async (req: Request<{}, {}, Omit<Exercise, '
     const connection = await getDatabaseConnection();
     try {
         const { exercise_name, muscle_groups, exercise_description, video_link, equipment, exercise_form, movement_pattern, progression_level } = req.body;
-        const [results, fields] = await connection.execute("CALL spCreateExercise(?, ?, ?, ?, ?, ?, ?, ?)", [
-            exercise_name,
-            muscle_groups ? muscle_groups.join(',') : null,
-            exercise_description ?? null,
-            video_link ?? null,
-            equipment ?? null,
-            exercise_form,
-            movement_pattern ?? null,
-            progression_level ?? null
-        ]);
+        const [results, fields] = await connection.execute({
+            sql: "CALL spCreateExercise(?, ?, ?, ?, ?, ?, ?, ?)", 
+            values: [
+                exercise_name,
+                muscle_groups ? muscle_groups.join(',') : null,
+                exercise_description ?? null,
+                video_link ?? null,
+                equipment ?? null,
+                exercise_form,
+                movement_pattern ?? null,
+                progression_level ?? null
+        ]});
         res.status(201).json({ message: "Exercise created successfully" });
 
     } catch (error) {
