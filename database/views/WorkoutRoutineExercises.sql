@@ -10,6 +10,7 @@ SELECT
   peg.rest_between,
   peg.routine_category,
   pe.exercise_id,
+  e.exercise_name as exercise_name,
   pe.exercise_group_index,
   pe.repetitions,
   pe.exercise_sets,
@@ -24,8 +25,8 @@ SELECT
 FROM PlannedExercise pe
   JOIN PlannedExerciseGroup peg ON peg.id = pe.exercise_group_id
   JOIN WorkoutRoutine wr ON wr.id = peg.workout_routine_id
+  LEFT JOIN Exercise e ON pe.exercise_id = e.id
 ORDER BY
   routineId ASC,
   group_index ASC,
   exercise_group_index ASC
-  

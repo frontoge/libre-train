@@ -36,7 +36,7 @@ export const handleGetAllExercises = async (req: Request, res: Response<Response
         const [results, fields] = await connection.query<RowDataPacket[]>({sql: "SELECT * FROM Exercise"});
 
         const formattedResults: Exercise[] = results.map(row => ({
-            id: row.id.toString(),
+            id: row.id,
             exercise_name: row.exercise_name,
             muscle_groups: row.muscle_groups.split(',').map((mg: string) => parseInt(mg, 10)),
             video_link: row.video_link,

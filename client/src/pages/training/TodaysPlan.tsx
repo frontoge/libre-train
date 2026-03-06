@@ -1,34 +1,88 @@
-import type { Macrocycle, Mesocycle } from "../../../../shared/models";
+import type { WorkoutRoutine } from "../../../../shared/models";
 import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";
-import { MacrocycleDisplay } from "../../components/Training/MacrocycleDisplay";
-import { MesocycleDisplay } from "../../components/Training/MesocycleDisplay";
+import { WorkoutRoutineDisplay } from "../../components/Routines/WorkoutRoutineDisplay";
 
 export function TodaysPlan(props: any) {
 
-    const macrocycle: Macrocycle = {
-        id: 1,
-        cycle_name: "Macrocycle Test",
-        // @ts-ignore
-        cycle_start_date: "2026-01-01",
-        // @ts-ignore
-        cycle_end_date: "2026-12-31",
-        isActive: true,
-        client_id: 34
-    }
-
-    const mesocycle: Mesocycle = {
-        id: 1,
-        macrocycle_id: 1,
-        cycle_name: "Mesocycle Test",
-        // @ts-ignore
-        cycle_start_date: "2026-01-01",
-        // @ts-ignore
-        cycle_end_date: "2026-03-31",
-        optLevels: [1, 2, 3],
-        cardioLevels: [1],
-        isActive: true,
-        client_id: 34
+    const routine: WorkoutRoutine = {
+        "id": 22,
+        "microcycle_id": 8,
+        "routine_index": 1,
+        "routine_name": "Legs",
+        "isActive": true,
+        "exercise_groups": [
+            {
+                "rest_after": 60,
+                "rest_between": 0,
+                "routine_category": 1,
+                "exercises": [
+                    {
+                        "exercise_id": 1,
+                        "exerciseName": "Squat",
+                        "repetitions": 10,
+                        "sets": 3,
+                        "weight": 185
+                    }
+                ]
+            },
+            {
+                "rest_after": 60,
+                "rest_between": 0,
+                "routine_category": 2,
+                "exercises": [
+                    {
+                        "exercise_id": 2,
+                        "exerciseName": "Bench Press",
+                        "repetitions": 10,
+                        "sets": 3,
+                        "weight": 135
+                    },
+                    {
+                        "exercise_id": 34,
+                        "exerciseName": "Triceps Rope pushdown",
+                        "repetitions": 10,
+                        "sets": 3,
+                        "weight": 55
+                    }
+                ]
+            },
+            {
+                "rest_after": 60,
+                "rest_between": 0,
+                "routine_category": 4,
+                "exercises": [
+                    {
+                        "exercise_id": 2,
+                        "exerciseName": "Bench Press",
+                        "repetitions": 10,
+                        "sets": 3,
+                        "weight": 135
+                    },
+                    {
+                        "exercise_id": 34,
+                        "exerciseName": "Triceps Rope pushdown",
+                        "repetitions": 10,
+                        "sets": 3,
+                        "weight": 55
+                    }
+                ]
+            },
+            {
+                "rest_after": 60,
+                "rest_between": 0,
+                "routine_category": 4,
+                "exercises": [
+                    {
+                        "exercise_id": 3,
+                        "exerciseName": "Lat Pulldown",
+                        "repetitions": 10,
+                        "sets": 3,
+                        "weight": 135
+                    }
+                ]
+            }
+        ]
     }
 
     return (
@@ -51,16 +105,11 @@ export function TodaysPlan(props: any) {
                     flexDirection: 'column',
                 }}
             >
-                <MacrocycleDisplay
-                    macrocycle={macrocycle}
+                <WorkoutRoutineDisplay 
+                    routine={routine} 
+                    isEdit={true}
                     style={{
-                        width: "100%"
-                    }}
-                />
-                <MesocycleDisplay
-                    mesocycle={mesocycle}
-                    style={{
-                        width: '100%',
+                        width: "30%"
                     }}
                 />
             </Panel>

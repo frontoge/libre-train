@@ -1,4 +1,4 @@
-import { ExerciseForm, ExerciseMovementPattern, MuscleGroup } from "../../../shared/models";
+import { ExerciseForm, ExerciseMovementPattern, MuscleGroup, WorkoutRoutineCategory } from "../../../shared/models";
 
 export const formatClientFullName = (firstName?: string, lastName?: string) => {
     return `${firstName ?? ""} ${lastName ?? ""}`.trim();
@@ -78,4 +78,13 @@ export const ExerciseTypeLabels: Record<ExerciseForm, string> = {
     [ExerciseForm.Plyometric]: "Plyometric",
     [ExerciseForm.SAQ]: "SAQ",
     [ExerciseForm.Resistance]: "Resistance",
+}
+
+export const WorkoutRoutineCategoryLabels: Record<WorkoutRoutineCategory, string> = {
+    [WorkoutRoutineCategory.Warmup]: "Warmup",
+    [WorkoutRoutineCategory.Activation]: "Activation",
+    [WorkoutRoutineCategory.SkillDevelopment]: "Skill Development",
+    [WorkoutRoutineCategory.ResistanceTraining]: "Resistance Training",
+    [WorkoutRoutineCategory.ClientsChoice]: "Client's Choice",
+    [WorkoutRoutineCategory.Cooldown]: "Cooldown"
 }

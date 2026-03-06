@@ -42,6 +42,7 @@ export function mapWorkoutRoutineExerciseDTOToWorkoutRoutine(rows: WorkoutRoutin
 
         group.exercises.push({
             exercise_id: row.exercise_id,
+            exerciseName: row.exercise_name,
             exercise_group_index: row.exercise_group_index,
             repetitions: nullToUndefined(row.repetitions),
             sets: nullToUndefined(row.exercise_sets),

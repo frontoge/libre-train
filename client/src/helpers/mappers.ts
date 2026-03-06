@@ -1,7 +1,7 @@
-import type { AssessmentClientLog, AssessmentType, ClientContact } from "../../../shared/models";
+import type { AssessmentClientLog, AssessmentType, ClientContact, PlannedExercise, PlannedExerciseGroup } from "../../../shared/models";
 import { type DashboardWeeklySummary } from "../../../shared/types";
 import type { AssessmentHistoryTableEntry } from "../components/Assessments/AssessmentHistoryTable";
-import { type DashboardSummaryState } from "../types/types";
+import { WorkoutNodeType, type DashboardSummaryState, type WorkoutRoutineExerciseNode, type WorkoutRoutineGroupNode } from "../types/types";
 import { formatClientFullName } from "./label-formatters";
 
 export function mapDashboardSummaryResponse(response: DashboardWeeklySummary[]): DashboardSummaryState {
@@ -59,6 +59,39 @@ export function mapAssessmentLogToDataTableEntry(logs: AssessmentClientLog[], cl
             resultUnits: assessmentType?.assessmentUnit ?? "",
             notes: log.notes,
             date: log.assessmentDate,
+        }
+    });
+}
+
+export function mapPlannedExerciseToTreeNode(exercise: PlannedExercise, key: string, rest?: number): WorkoutRoutineExerciseNode {
+    return {
+        title: exercise.exerciseName ?? "Unknown Exercise",
+        key: key,
+        nodeType: WorkoutNodeType.Exercise,
+        data: exercise,
+        restAfter: rest,
+    }
+}
+
+export function mapWorkoutRoutineGroupToTreeData(groups: PlannedExerciseGroup[]): Array<WorkoutRoutineGroupNode | WorkoutRoutineExerciseNode> {
+    return groups.map((group, index) => {
+        const groupKey = `${group.routine_category - 1}-${index}`;
+        if (group.exercises.length === 1) {
+            return mapPlannedExerciseToTreeNode(group.exercises[0], groupKey, group.rest_after);
+        } else {
+            return {
+                title: group.exercises.length > 2 ? "Circuit" : "Superset",
+                key: groupKey,
+                nodeType: WorkoutNodeType.Group,
+                data: {
+                    rest_after: group.rest_after,
+                    rest_between: group.rest_between
+                },
+                children: group.exercises.map((exercise, exerciseIndex) => {
+                    const exerciseNode = mapPlannedExerciseToTreeNode(exercise, `${groupKey}-${exerciseIndex}`);
+                    return exerciseNode;
+                }),
+            } as WorkoutRoutineGroupNode;
         }
     });
 }

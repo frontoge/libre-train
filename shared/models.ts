@@ -141,6 +141,7 @@ export type Microcycle = {
 
 export type PlannedExercise = {
     exercise_id: number;
+    exerciseName?: string;
     repetitions?: number;
     sets?: number;
     weight?: number;
@@ -167,4 +168,13 @@ export type WorkoutRoutine = {
     routine_name?: string;
     isActive: boolean;
     exercise_groups: PlannedExerciseGroup[];
+}
+
+export enum WorkoutRoutineCategory {
+    Warmup = 1,
+    Activation = 2,
+    SkillDevelopment = 3,
+    ResistanceTraining = 4,
+    ClientsChoice = 5,
+    Cooldown = 6
 }
