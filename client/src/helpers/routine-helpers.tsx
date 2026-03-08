@@ -1,4 +1,4 @@
-import { WorkoutRoutineCategory, type WorkoutRoutine } from "../../../shared/models";
+import { WorkoutRoutineCategory, type PlannedExerciseGroup, type WorkoutRoutine } from "../../../shared/models";
 import { WorkoutNodeType, type WorkoutRoutineCategoryNode, type WorkoutRoutineExerciseNode, type WorkoutRoutineGroupNode, type WorkoutRoutineTreeNode } from "../types/types";
 import { WorkoutRoutineCategoryLabels } from "./label-formatters";
 import { FaFire, FaDumbbell, FaBolt, FaBrain } from "react-icons/fa6";
@@ -7,7 +7,7 @@ import { GiMeltingIceCube } from "react-icons/gi";
 import { mapWorkoutRoutineGroupToTreeData } from "./mappers";
 
 // Builds a workout routine tree data structure from a workout routine
-export function getInitialWorkoutRoutineTreeData(routine: WorkoutRoutine): WorkoutRoutineCategoryNode[] {
+export function getWorkoutRoutineTreeData(routine: WorkoutRoutine): WorkoutRoutineCategoryNode[] {
     const routineCategoryProperties = {
         checkable: false,
         isLeaf: false,
@@ -105,20 +105,6 @@ function getNodePositionByKey(key: string, routineTree: WorkoutRoutineTreeNode[]
     return [];
 }
 
-function recalculateTreeKeys(tree: WorkoutRoutineTreeNode[]): WorkoutRoutineTreeNode[] {
-    return tree.map((categoryNode, categoryIndex) => ({
-        ...categoryNode,
-        children: categoryNode.children?.map((groupOrExerciseNode, groupIndex) => ({
-            ...groupOrExerciseNode,
-            key: `${categoryIndex}-${groupIndex}`,
-            children: groupOrExerciseNode.children?.map((exerciseNode, exerciseIndex) => ({
-                ...exerciseNode,
-                key: `${categoryIndex}-${groupIndex}-${exerciseIndex}`
-            }))
-        }))
-    } as WorkoutRoutineCategoryNode));
-}
-
 function getNodeAtPosition(position: number[], tree: WorkoutRoutineTreeNode[]): WorkoutRoutineTreeNode | undefined {
     if (position.length === 1) {
         return tree[position[0]];
@@ -203,22 +189,17 @@ export function handleRoutineDrop(routineTree: WorkoutRoutineTreeNode[], sourceN
                 } else {
                     // Create new group with target node and source node as children
                     // Replace target node with the new group
-                    // Remove target node
-                    updatedTree[targetPos[0]].children?.splice(targetPos[1], 1);
-                    // Create new group node
-                    const newGroupNode: WorkoutRoutineGroupNode = {
+                    updatedTree[targetPos[0]].children?.splice(targetPos[1], 1, {
                         title: "Superset",
                         // This will be recalculated
                         key: "group_new",
                         data: {
-                            rest_after: targetNode.restAfter ?? sourceNode.restAfter ?? 0,
+                            rest_after: 0,
                             rest_between: 0,
                         },
                         nodeType: WorkoutNodeType.Group,
                         children: [{...targetNode, restAfter: 0}, {...sourceNode, restAfter: 0}],
-                    }
-                    // Insert new group node at target node position
-                    updatedTree[targetPos[0]].children?.splice(targetPos[1], 0, newGroupNode);
+                    } as WorkoutRoutineGroupNode);
                 }
             }
         }
@@ -241,33 +222,34 @@ export function handleRoutineDrop(routineTree: WorkoutRoutineTreeNode[], sourceN
         }            
     } 
 
-    return recalculateTreeKeys(updatedTree);
+    return updatedTree;
 }
 
-// TODO fix this when we need to map tree to routine groups for saving
-// export function mapRoutineTreeToRoutineGroups(tree: WorkoutRoutineCategoryNode[]): PlannedExerciseGroup[] {
-//     const groups: PlannedExerciseGroup[] = [];
-//     tree.forEach((categoryNode, index) => {
-//         categoryNode.children.forEach(groupOrExerciseNode => {
-//             if (groupOrExerciseNode.nodeType === WorkoutNodeType.Group) {
-//                 groups.push({
-//                     ...groupOrExerciseNode,
-//                     routine_category: index + 1,
-//                     exercises: groupOrExerciseNode.children.map(exerciseNode => exerciseNode.data)
-//                 })
-//             } else {
-//                 const {restAfter, ...exerciseData} = groupOrExerciseNode.data;
-//                 groups.push({
-//                     rest_between: 0,
-//                     rest_after: restAfter,
-//                     routine_category: index + 1,
-//                     exercises: [exerciseData]
-//                 })
-//             }
-//         })
-//     })
-//     return groups;
-// }
+export function mapRoutineTreeToRoutineGroups(tree: WorkoutRoutineCategoryNode[]): PlannedExerciseGroup[] {
+    const groups: PlannedExerciseGroup[] = [];
+    tree.forEach((categoryNode, index) => {
+        categoryNode.children.forEach(groupOrExerciseNode => {
+            if (groupOrExerciseNode.nodeType === WorkoutNodeType.Group) 
+            {
+                if (groupOrExerciseNode.children.length !== 0) {
+                    groups.push({
+                        ...groupOrExerciseNode.data,
+                        routine_category: index + 1,
+                        exercises: groupOrExerciseNode.children.map(exerciseNode => exerciseNode.data)
+                    })
+                }
+            } else {
+                groups.push({
+                    rest_between: 0,
+                    rest_after: groupOrExerciseNode.restAfter ?? 0,
+                    routine_category: index + 1,
+                    exercises: [groupOrExerciseNode.data]
+                })
+            }
+        })
+    })
+    return groups;
+}
 
 export const collectAllTreeKeys = (nodes: any[]) => {
     let keys: string[] = [];
@@ -278,4 +260,29 @@ export const collectAllTreeKeys = (nodes: any[]) => {
         }
     });
     return keys;
+}
+
+export const deleteNodesByKeys = (tree: WorkoutRoutineCategoryNode[], keys: string[]): WorkoutRoutineCategoryNode[] => {
+    const updatedTree = [...tree];
+    
+    keys.forEach((key) => {
+        const position = getNodePositionByKey(key, tree);
+        const node = getNodeAtPosition(position, tree) as WorkoutRoutineGroupNode | WorkoutRoutineExerciseNode | undefined;
+        const depth = position.length;
+        if (node === undefined || depth <= 1) return;
+
+        if (depth === 2) {
+            if (node.children && node.children.length > 0) {
+                // Insert children nodes into category after the target node
+                updatedTree[position[0]].children?.splice(position[1] + 1, 0, ...node.children as WorkoutRoutineExerciseNode[]);
+            }
+            // Remove the target node
+            updatedTree[position[0]].children?.splice(position[1], 1);
+        } else {
+            // Remove node at target
+            updatedTree[position[0]].children?.[position[1]].children?.splice(position[2], 1);
+        }
+    });
+    
+    return updatedTree;
 }

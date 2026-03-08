@@ -1,11 +1,11 @@
-import type { WorkoutRoutine } from "../../../../shared/models";
+import { useState } from "react";
+import type { PlannedExerciseGroup, WorkoutRoutine } from "../../../../shared/models";
 import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";
 import { WorkoutRoutineDisplay } from "../../components/Routines/WorkoutRoutineDisplay";
 
 export function TodaysPlan(props: any) {
-
-    const routine: WorkoutRoutine = {
+    const [routine, setRoutine] = useState<WorkoutRoutine>({
         "id": 22,
         "microcycle_id": 8,
         "routine_index": 1,
@@ -83,6 +83,13 @@ export function TodaysPlan(props: any) {
                 ]
             }
         ]
+    });
+
+    const handleEditRoutine = (updatedGroups: PlannedExerciseGroup[]) => {
+        setRoutine(prev => ({
+            ...prev,
+            exercise_groups: updatedGroups
+        }))
     }
 
     return (
@@ -107,7 +114,8 @@ export function TodaysPlan(props: any) {
             >
                 <WorkoutRoutineDisplay 
                     routine={routine} 
-                    isEdit={true}
+                    isEdit={false}
+                    onEdit={handleEditRoutine}
                     style={{
                         width: "30%"
                     }}
