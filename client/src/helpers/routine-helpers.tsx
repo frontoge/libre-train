@@ -5,6 +5,9 @@ import { FaFire, FaDumbbell, FaBolt, FaBrain } from "react-icons/fa6";
 import { FaStar } from "react-icons/fa";
 import { GiMeltingIceCube } from "react-icons/gi";
 import { mapWorkoutRoutineGroupToTreeData } from "./mappers";
+import type { RoutineExerciseCreateEditFormProps } from "../components/Routines/RoutineExerciseCreateEditForm";
+import { secondsToTimeString } from "./date-helpers";
+import type { RoutineGroupEditFormValues } from "../components/Routines/RoutineGroupEditForm";
 
 // Builds a workout routine tree data structure from a workout routine
 export function getWorkoutRoutineTreeData(routine: WorkoutRoutine): WorkoutRoutineCategoryNode[] {
@@ -285,4 +288,30 @@ export const deleteNodesByKeys = (tree: WorkoutRoutineCategoryNode[], keys: stri
     });
     
     return updatedTree;
+}
+
+export const getExerciseFormValuesFromNode = (node: WorkoutRoutineExerciseNode): RoutineExerciseCreateEditFormProps['initialValues'] => {
+    return {
+        category: parseInt(node.key.toString().split('-')[0]) + 1,
+        exercise_id: node.data.exercise_id,
+        repetitions: node.data.repetitions,
+        sets: node.data.sets,
+        weight: node.data.weight,
+        duration: node.data.duration ? secondsToTimeString(node.data.duration) : undefined,
+        distance: node.data.distance,
+        pace: node.data.pace,
+        target_heart_rate: node.data.target_heart_rate,
+        target_mets: node.data.target_mets,
+        target_calories: node.data.target_calories,
+        rpe: node.data.rpe,
+        rest_after: node.restAfter,
+        nodeDepth: node.key.toString().split('-').length,
+    }
+}
+
+export const getGroupFormValuesFromNode = (node: WorkoutRoutineGroupNode): RoutineGroupEditFormValues => {
+    return {
+        rest_after: node.data.rest_after,
+        rest_between: node.data.rest_between,
+    }
 }
