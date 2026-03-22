@@ -115,6 +115,7 @@ export type MicrocycleUpdateRequest = Partial<Omit<Microcycle, 'id' | 'client_id
 export type MicrocycleSearchParams = {
     active?: string;
     mesocycleId?: string;
+    clientId?: string;
     date?: string;
 }
 

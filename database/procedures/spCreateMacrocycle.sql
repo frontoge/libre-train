@@ -23,4 +23,5 @@ BEGIN
 
     INSERT INTO Macrocycle (client_id, cycle_name, cycle_start_date, cycle_end_date, is_active, notes)
     VALUES (p_client_id, p_cycle_name, p_cycle_start_date, p_cycle_end_date, p_isActive, p_notes);
+    SELECT LAST_INSERT_ID() AS macrocycle_id;
 END

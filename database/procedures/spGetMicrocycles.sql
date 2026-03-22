@@ -1,4 +1,5 @@
 CREATE PROCEDURE spGetMicrocycles (
+    IN p_cycle_id INT,
     IN p_client_id INT,
     IN p_mesocycle_id INT,
     IN p_active BOOLEAN,
@@ -15,7 +16,9 @@ BEGIN
         notes, 
         is_active
     FROM Microcycle
-    WHERE client_id = p_client_id
+    WHERE 
+        (p_cycle_id IS NULL OR id = p_cycle_id)
+        AND (p_client_id IS NULL OR client_id = p_client_id)
         AND (p_mesocycle_id IS NULL OR mesocycle_id = p_mesocycle_id)
         AND (p_active IS NULL OR is_active = p_active)
         AND (p_date IS NULL OR (cycle_start_date <= p_date AND cycle_end_date >= p_date));

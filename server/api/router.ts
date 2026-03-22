@@ -48,9 +48,11 @@ router.put(`${Routes.AssessmentLog}/:id`, handleUpdateAssessmentLog);
 router.delete(`${Routes.AssessmentLog}/:id`, handleDeleteAssessmentLog);
 
 // Training Cycle Routes
+// TODO update these to use cycle ID instead of client ID
 router.get(`${Routes.Macrocycle}/:clientId`, handleGetMacrocycle);
 router.get(`${Routes.Mesocycle}/:clientId`, handleGetMesocycle);
-router.get(`${Routes.Microcycle}/:clientId`, handleGetMicrocycle);
+router.get(`${Routes.Microcycle}/:id`, handleGetMicrocycle);
+router.get(`${Routes.Microcycle}`, handleGetMicrocycle);
 router.post(`${Routes.Macrocycle}`, handleCreateMacrocycle);
 router.post(`${Routes.Mesocycle}`, handleCreateMesocycle);
 router.post(`${Routes.Microcycle}`, handleCreateMicrocycle);

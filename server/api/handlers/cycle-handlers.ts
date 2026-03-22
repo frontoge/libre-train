@@ -56,7 +56,7 @@ export const handleCreateMacrocycle = async (req: Request<{}, {}, Omit<Macrocycl
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-        const [result] = await connection.execute({
+        const [result] = await connection.query<RowDataPacket[]>({
             sql: 'CALL spCreateMacrocycle(?, ?, ?, ?, ?, ?)',
             values: [
                 reqBody.client_id,
@@ -68,7 +68,16 @@ export const handleCreateMacrocycle = async (req: Request<{}, {}, Omit<Macrocycl
             ]
         });
 
-        res.status(201).json({ message: "Macrocycle created successfully" });
+        const insertResult = result[0];
+
+        if (!insertResult || insertResult.length === 0 || !insertResult[0]?.macrocycle_id) {
+            console.error("Failed to create macrocycle:", "Failed to create macrocycle.");
+            res.status(500).json({ message: "Failed to create macrocycle." });
+            return;
+        }
+
+        const macrocycleId = insertResult[0].macrocycle_id;
+        res.status(201).json({ macrocycleId });
     } catch (error) {
         console.error("Error creating macrocycle:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -190,7 +199,7 @@ export const handleCreateMesocycle = async (req: Request<{}, {}, Omit<Mesocycle,
         if (!reqBody.macrocycle_id || !reqBody.cycle_start_date || !reqBody.cycle_end_date) {
             return res.status(400).json({ error: "Missing required fields" });
         }
-        const [result] = await connection.execute({
+        const [result] = await connection.query<RowDataPacket[]>({
             sql: "CALL spCreateMesocycle(?, ?, ?, ?, ?, ?, ?, ?)",
             values: [
                 reqBody.macrocycle_id,
@@ -204,7 +213,16 @@ export const handleCreateMesocycle = async (req: Request<{}, {}, Omit<Mesocycle,
             ]
         })
 
-        res.status(201).json({ message: "Mesocycle created successfully" });
+        const insertResult = result[0];
+
+        if (!insertResult || insertResult.length === 0 || !insertResult[0]?.mesocycle_id) {
+            console.error("Failed to create mesocycle:", "Failed to create mesocycle.");
+            res.status(500).json({ message: "Failed to create mesocycle." });
+            return;
+        }
+
+        const mesocycleId = insertResult[0].mesocycle_id;
+        res.status(201).json({ mesocycleId });
     } catch (error: Error | unknown) {
         var errorMessage = "Internal server error";
         if (error instanceof Error) {
@@ -274,23 +292,23 @@ export const handleDeleteMesocycle = async (req: Request<{id: string}>, res: Res
     }
 }
 
-export const handleGetMicrocycle = async (req: Request<{clientId: string}, {}, {}, MicrocycleSearchParams>, res: Response) => {
+export const handleGetMicrocycle = async (req: Request<{id: string}, {}, {}, MicrocycleSearchParams>, res: Response) => {
     const connection = await getDatabaseConnection();
     try {
-        const clientId = parseInt(req.params.clientId, 10);
-        if (isNaN(clientId)) {
-            return res.status(400).json({ error: "Invalid client ID" });
-        }
-        const { active, date, mesocycleId } = req.query;
+        const cycleId = parseInt(req.params.id, 10);
+        
+        const { active, date, mesocycleId, clientId } = req.query;
 
         const mesocycleIdNumber = parseInt(mesocycleId ?? "", 10);
+        const clientIdNumber = parseInt(clientId ?? "", 10);
 
         const activeBool = active === 'true' ? true : active === 'false' ? false : undefined;
 
         const [rows] = await connection.query<RowDataPacket[]>({
-            sql: 'CALL spGetMicrocycles(?, ?, ?, ?)',
+            sql: 'CALL spGetMicrocycles(?, ?, ?, ?, ?)',
             values: [
-                clientId,
+                !isNaN(cycleId) ? cycleId : null,
+                !isNaN(clientIdNumber) ? clientIdNumber : null,
                 !isNaN(mesocycleIdNumber) ? mesocycleIdNumber : null,
                 activeBool ?? null,
                 date ?? null
@@ -333,7 +351,7 @@ export const handleCreateMicrocycle = async (req: Request<{}, {}, Omit<Microcycl
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-        const [result] = await connection.execute({
+        const [result] = await connection.query<RowDataPacket[]>({
             sql: "CALL spCreateMicrocycle(?, ?, ?, ?, ?, ?)",
             values: [
                 reqBody.mesocycle_id,
@@ -345,7 +363,16 @@ export const handleCreateMicrocycle = async (req: Request<{}, {}, Omit<Microcycl
             ]
         })
 
-        res.status(201).json({ message: "Microcycle created successfully" });
+        const insertResult = result[0];
+
+        if (!insertResult || insertResult.length === 0 || !insertResult[0]?.microcycle_id) {
+            console.error("Failed to create microcycle:", "Failed to create microcycle.");
+            res.status(500).json({ message: "Failed to create microcycle." });
+            return;
+        }
+
+        const microcycleId = insertResult[0].microcycle_id;
+        res.status(201).json({ microcycleId });
     } catch (error: Error | unknown) {
         var errorMessage = "Internal server error";
         if (error instanceof Error) {

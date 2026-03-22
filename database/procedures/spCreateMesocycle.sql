@@ -66,4 +66,5 @@ BEGIN
         p_notes,
         p_is_active
     );
+    SELECT LAST_INSERT_ID() AS mesocycle_id;
 END
