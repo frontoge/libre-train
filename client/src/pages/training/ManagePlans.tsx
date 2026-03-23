@@ -1,4 +1,3 @@
-import { Segmented } from "antd";
 import { ClientSearch } from "../../components/clients/ClientSearch";
 import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";

@@ -5,9 +5,9 @@ import { MdEdit } from "react-icons/md";
 import { FaTrash } from "react-icons/fa";
 import dayjs from "../../config/dayjs";
 import { fetchMicrocycleRoutines } from "../../helpers/routine-helpers";
-import { WorkoutRoutineDisplay } from "../Routines/WorkoutRoutineDisplay";
 import { useNavigate } from "react-router-dom";
 import { deleteMicrocycle } from "../../helpers/api";
+import { RoutineCard } from "../Routines/RoutineCard";
 
 export interface MicrocycleDisplayProps extends React.ComponentProps<typeof Card> {
     microcycle: Microcycle;
@@ -79,7 +79,11 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
 
     const resultContent = subCards.length > 0 ? subCards.map((subCard, index) => (
         <Card.Grid key={index} style={gridStyle}>
-            <WorkoutRoutineDisplay routine={subCard} bodyStyle={{padding: '1px'}} variant="borderless" />
+            <RoutineCard
+                routine={subCard}
+                title={`Day ${index + 1}`}
+                variant="borderless"
+            />
         </Card.Grid>
     )) : (
         <Result   

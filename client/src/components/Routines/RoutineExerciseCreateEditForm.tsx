@@ -26,7 +26,6 @@ export function RoutineExerciseCreateEditForm(props: RoutineExerciseCreateEditFo
     const isEdit = Object.keys(initialFormValues).length > 0;
 
     const onFinish = (values: RoutineExerciseCreateEditFormValues) => {
-        console.log(values);
         onSubmitForm?.(values);
         form.resetFields();
     }

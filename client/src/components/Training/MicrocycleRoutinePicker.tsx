@@ -1,9 +1,9 @@
 import { Fragment, useRef, useState } from "react";
-import { Button, Card, theme } from "antd";
+import { Card, theme } from "antd";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import "../../styles/MicrocycleRoutinePicker.css";
 import type { WorkoutRoutineEdit } from "../../types/types";
-import { FaTrashCan } from "react-icons/fa6";
+import { RoutineCard } from "../Routines/RoutineCard";
 
 
 export interface MicrocycleRoutinePickerProps extends React.HTMLProps<HTMLDivElement> {
@@ -160,7 +160,9 @@ export function MicrocycleRoutinePicker(props: MicrocycleRoutinePickerProps) {
                         }}
                         style={{ flex: `0 0 ${cardWidth}`, height: '100%' }}
                     >
-                        <Card
+                        <RoutineCard
+                            title={`Day ${index + 1}`}
+                            routine={routine}
                             style={{
                                 width: '100%',
                                 height: '100%',
@@ -181,54 +183,25 @@ export function MicrocycleRoutinePicker(props: MicrocycleRoutinePickerProps) {
                                     transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease'
                                 }
                             }}
+                            deleteButtonStyle={{
+                                position: 'absolute',
+                                right: '-0.5rem',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '2.25rem',
+                                height: '2.25rem',
+                                padding: 0,
+                                color: token.colorTextTertiary,
+                                opacity: hoveredRoutineIndex === index ? 1 : 0,
+                                pointerEvents: hoveredRoutineIndex === index ? 'auto' : 'none',
+                                transition: 'opacity 0.2s ease, color 0.2s ease'
+                            }}
+                            onDeleteRoutine={() => onDeleteRoutine?.(index)}
                         >
-                            <div
-                                style={{
-                                    width: '100%',
-                                    position: 'relative',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}
-                            >
-                                <Button
-                                    aria-label={`Delete routine ${index + 1}`}
-                                    onClick={(event) => {
-                                        event.stopPropagation();
-                                        onDeleteRoutine?.(index);
-                                    }}
-                                    onMouseDown={(event) => {
-                                        event.stopPropagation();
-                                    }}
-                                    onDragStart={(event) => {
-                                        event.preventDefault();
-                                        event.stopPropagation();
-                                    }}
-                                    type="text"
-                                    icon={<FaTrashCan />}
-                                    style={{
-                                        position: 'absolute',
-                                        right: '-0.5rem',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        width: '2.25rem',
-                                        height: '2.25rem',
-                                        padding: 0,
-                                        color: token.colorTextTertiary,
-                                        opacity: hoveredRoutineIndex === index ? 1 : 0,
-                                        pointerEvents: hoveredRoutineIndex === index ? 'auto' : 'none',
-                                        transition: 'opacity 0.2s ease, color 0.2s ease'
-                                    }}
-                                    className="routine-delete-button"
-                                />
-                                <span>Day {index + 1}</span>
-                                <span style={{fontSize: '1rem'}}>{routine.routine_name}</span>
-                            </div>
-                        </Card>
+                        </RoutineCard>
                     </div>
                 </Fragment>
             ))}
