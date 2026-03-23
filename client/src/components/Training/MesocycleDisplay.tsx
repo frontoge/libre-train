@@ -1,4 +1,4 @@
-import { Card, Result, Skeleton } from "antd";
+import { Card, Popconfirm, Result, Skeleton } from "antd";
 import type { Mesocycle, Microcycle } from "../../../../shared/models";
 import dayjs from "../../config/dayjs";
 import { MdEdit } from "react-icons/md";
@@ -6,9 +6,11 @@ import { FaTrash } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { fetchChildMicrocycles } from "../../helpers/training-helpers";
 import { MicrocycleCard } from "./MicrocycleCard";
+import { deleteMesocycle } from "../../helpers/api";
 
 export interface MesocycleDisplayProps extends React.ComponentProps<typeof Card> {
     mesocycle: Mesocycle;
+    onChange?: () => void;
 }
 
 export function MesocycleDisplay(props: MesocycleDisplayProps) {
@@ -24,8 +26,13 @@ export function MesocycleDisplay(props: MesocycleDisplayProps) {
 
     }
 
-    const handleDelete = () => {
-
+    const handleDelete = async () => {
+        try {
+            await deleteMesocycle(props.mesocycle.id);
+            props.onChange?.();
+        } catch (error) {
+            console.error('Error deleting mesocycle:', error);
+        }
     }
 
     const fetchMicrocycles = async () => {
@@ -44,9 +51,15 @@ export function MesocycleDisplay(props: MesocycleDisplayProps) {
             <div key="edit" style={{width: '100%'}} onClick={handleEdit}>
                 <MdEdit onClick={handleEdit} />
             </div>,
-            <div key="delete" style={{width: '100%'}} onClick={handleDelete}>
-                <FaTrash onClick={handleDelete} />
-            </div>
+            <Popconfirm
+                key="delete"
+                title="Are you sure you want to delete this mesocycle? This action cannot be undone."
+                onConfirm={handleDelete}
+            >
+                <div key="delete" style={{width: '100%'}}>
+                    <FaTrash />
+                </div>
+            </Popconfirm>
         ]
 
     const loadingSkeleton = Array.from({ length: 6 }).map((_, index) => (
@@ -65,10 +78,10 @@ export function MesocycleDisplay(props: MesocycleDisplayProps) {
             <MicrocycleCard microcycleData={subCard} index={index} />
         </Card.Grid>
     )) : (
-        <Result            
+        <Result   
             status="warning"
-            title="No Mesocycles Available"
-            subTitle="There are no mesocycles to display for this mesocycle."
+            title="No Microcycles Available"
+            subTitle="There are no microcycles to display for this mesocycle."
         />
     )
 

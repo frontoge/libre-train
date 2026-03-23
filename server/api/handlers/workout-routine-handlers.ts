@@ -88,6 +88,7 @@ export async function handleGetCycleWorkoutRoutines(req: Request<{ microcycleId:
         }
 
         const rows = result[0] as WorkoutRoutineExerciseDTO[];
+
         const workoutRoutines = mapWorkoutRoutineExerciseDTOToWorkoutRoutine(rows);
         res.status(200).json(workoutRoutines);
         
@@ -130,26 +131,29 @@ async function getWorkoutRoutineById(id: string): Promise<WorkoutRoutine | undef
     }
 }
 
-async function createWorkoutRoutine(routine: Omit<WorkoutRoutine, 'id'>): Promise<number | undefined> {
+export async function createWorkoutRoutine(routine: Omit<WorkoutRoutine, 'id'>): Promise<number | undefined> {
     const connection = await getDatabaseConnection();
     try {
         const { microcycle_id, routine_index, routine_name, isActive, exercise_groups } = routine;
-        const [result] = await connection.execute("CALL spCreateWorkoutRoutine(?, ?, ?, ?)", [
-            microcycle_id,
-            routine_index,
-            routine_name,
-            isActive
-        ]);
+        const [result] = await connection.execute({
+            sql: "CALL spCreateWorkoutRoutine(?, ?, ?, ?)", 
+            values: [
+                microcycle_id,
+                routine_index,
+                routine_name,
+                isActive
+        ]});
         const workoutRoutineId = (result as any)[0][0].workout_routine_id;
 
         // Create the exercise groups for the routine
         await Promise.all(exercise_groups.map(async (group: PlannedExerciseGroup, index: number) => {
-            const { rest_between, rest_after, exercises } = group;
-            const [groupResult] = await connection.execute("CALL spCreatePlannedExerciseGroup(?, ?, ?, ?)", [
+            const { rest_between, rest_after, routine_category, exercises } = group;
+            const [groupResult] = await connection.execute("CALL spCreatePlannedExerciseGroup(?, ?, ?, ?, ?)", [
                 workoutRoutineId,
                 index, // group index
                 rest_between ?? null,
-                rest_after ?? null
+                rest_after ?? null,
+                routine_category
             ]);
             const groupId = (groupResult as any)[0][0].planned_exercise_group_id;
 
@@ -174,6 +178,27 @@ async function createWorkoutRoutine(routine: Omit<WorkoutRoutine, 'id'>): Promis
             }))
         }));
         return workoutRoutineId;
+    } catch (error) {
+        console.error("Error creating workout routine:", error);
+        throw new Error("Failed to create workout routine");
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
+}
+
+export async function deactivateCycleRoutines(cycleId: number): Promise<void> {
+    const connection = await getDatabaseConnection();
+    try {
+        await connection.execute("UPDATE WorkoutRoutine SET isActive = FALSE WHERE microcycle_id = ?", [cycleId]);
+    }
+    catch (error: Error | unknown) {
+        if (error instanceof Error) {
+            console.error("Error deactivating workout routines:", error.message);
+            throw new Error("Failed to deactivate workout routines");
+        } else {
+            console.error("Unknown error deactivating workout routines:", error);
+            throw new Error("An unknown error occurred while deactivating workout routines");
+        }
     } finally {
         await closeDatabaseConnection(connection);
     }

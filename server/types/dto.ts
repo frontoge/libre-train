@@ -8,7 +8,9 @@ export type WorkoutRoutineExerciseDTO = {
     group_index: number;
     rest_after?: number;
     rest_between?: number;
+    routine_category: number;
     exercise_id: number;
+    exercise_name?: string;
     exercise_group_index: number;
     repetitions?: number;
     exercise_sets?: number;

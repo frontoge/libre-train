@@ -3,14 +3,16 @@ import { AppContext } from "../../app-context";
 import { useContext, useState } from "react";
 import { AssessmentGroup } from "../../../../shared/models";
 import stringSimilarity from "string-similarity-js";
+import { type SelectProps } from "antd";
 
-export interface AssessmentTypeSelectProps extends Omit<React.ComponentProps<typeof Select>, 'options' | 'onChange'> {
+export interface AssessmentTypeSelectProps extends Omit<SelectProps, 'options' | 'onChange'> {
     onAssessmentTypeSelect?: (assessmentTypeId: string) => void;
 }
 
-
 export function AssessmentTypeSelect(props: AssessmentTypeSelectProps) {
     const { state: { assessmentTypes } } = useContext(AppContext);
+
+    const { onAssessmentTypeSelect, ...otherProps } = props;
 
     const getOptions = (search?: string) => {
         const similarityThreshold = 0.3; // Adjust this threshold as needed
@@ -81,7 +83,7 @@ export function AssessmentTypeSelect(props: AssessmentTypeSelectProps) {
             showSearch
             onSearch={handleOptionSearch}
             onChange={handleChange}
-            {...props}
+            {...otherProps}
         >
 
         </Select>

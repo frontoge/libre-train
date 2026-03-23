@@ -1,0 +1,15 @@
+/* Hide scrollbar for Chrome, Safari, and Edge */
+.microcycle-routine-picker-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.routine-delete-button {
+    background: transparent !important;
+    border: none !important;
+}
+
+.routine-delete-button:hover,
+.routine-delete-button:focus-visible {
+    color: #ff4d4f !important;
+    background: transparent !important;
+}

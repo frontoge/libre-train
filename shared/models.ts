@@ -139,8 +139,9 @@ export type Microcycle = {
     notes?: string;
 }
 
-export type PlannedExercise = {
+export interface PlannedExercise {
     exercise_id: number;
+    exerciseName?: string;
     repetitions?: number;
     sets?: number;
     weight?: number;
@@ -153,17 +154,27 @@ export type PlannedExercise = {
     target_mets?: number;
 }
 
-export type PlannedExerciseGroup = {
+export interface PlannedExerciseGroup {
     rest_between?: number;
     rest_after?: number;
+    routine_category: number;
     exercises: PlannedExercise[];
 }
 
-export type WorkoutRoutine = {
+export interface WorkoutRoutine {
     id: number;
     microcycle_id: number;
     routine_index: number;
     routine_name?: string;
     isActive: boolean;
     exercise_groups: PlannedExerciseGroup[];
+}
+
+export enum WorkoutRoutineCategory {
+    Warmup = 1,
+    Activation = 2,
+    SkillDevelopment = 3,
+    ResistanceTraining = 4,
+    ClientsChoice = 5,
+    Cooldown = 6
 }

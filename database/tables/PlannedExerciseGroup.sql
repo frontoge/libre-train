@@ -1,11 +1,13 @@
-CREATE TABLE PlannedExerciseGroup (
-    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    workout_routine_id INT UNSIGNED NOT NULL,
-    group_index INT NOT NULL,
-    rest_between INT,
-    rest_after INT,
-    UNIQUE (workout_routine_id, group_index),
-    PRIMARY KEY (id),
-    CONSTRAINT fk_workout_routine FOREIGN KEY (workout_routine_id) REFERENCES WorkoutRoutine(id) ON DELETE CASCADE ON UPDATE NO ACTION,
-    
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE `PlannedExerciseGroup` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `workout_routine_id` int(10) unsigned NOT NULL,
+  `group_index` int(11) NOT NULL,
+  `rest_between` int(11) DEFAULT NULL,
+  `rest_after` int(11) DEFAULT NULL,
+  `routine_category` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `PlannedExerciseGroup_index_3` (`workout_routine_id`, `group_index`),
+  KEY `fk_group_workout_category` (`routine_category`),
+  CONSTRAINT `fk_group_workout_category` FOREIGN KEY (`routine_category`) REFERENCES `WorkoutRoutineCategory` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_workout_routine` FOREIGN KEY (`workout_routine_id`) REFERENCES `WorkoutRoutine` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+)

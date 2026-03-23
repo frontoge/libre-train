@@ -112,9 +112,14 @@ export type MesocycleSearchParams = {
 
 export type MicrocycleUpdateRequest = Partial<Omit<Microcycle, 'id' | 'client_id' | 'mesocycle_id'>>;
 
+export type MicrocycleUpdateRoutinesRequest = {
+    routines: Array<Omit<WorkoutRoutine, 'id' | 'microcycle_id' | 'routine_index' | 'isActive'>>
+}
+
 export type MicrocycleSearchParams = {
     active?: string;
     mesocycleId?: string;
+    clientId?: string;
     date?: string;
 }
 

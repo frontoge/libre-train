@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { Macrocycle, Mesocycle, Microcycle } from "../../../shared/models";
+import { Macrocycle, Mesocycle, Microcycle, WorkoutRoutine } from "../../../shared/models";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { MacrocycleSearchParams, MesocycleSearchParams, MesocycleUpdateRequest, MicrocycleSearchParams, MicrocycleUpdateRequest, ResponseWithError } from "../../../shared/types";
+import { MacrocycleSearchParams, MesocycleSearchParams, MesocycleUpdateRequest, MicrocycleSearchParams, MicrocycleUpdateRequest, MicrocycleUpdateRoutinesRequest, ResponseWithError } from "../../../shared/types";
 import { RowDataPacket } from "mysql2";
+import { createWorkoutRoutine, deactivateCycleRoutines } from "./workout-routine-handlers";
 
 export const handleGetMacrocycle = async (req: Request<{clientId: string}, {}, {}, MacrocycleSearchParams>, res: Response<ResponseWithError<Macrocycle[]>>) => {
     const connection = await getDatabaseConnection();
@@ -56,7 +57,7 @@ export const handleCreateMacrocycle = async (req: Request<{}, {}, Omit<Macrocycl
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-        const [result] = await connection.execute({
+        const [result] = await connection.query<RowDataPacket[]>({
             sql: 'CALL spCreateMacrocycle(?, ?, ?, ?, ?, ?)',
             values: [
                 reqBody.client_id,
@@ -68,7 +69,16 @@ export const handleCreateMacrocycle = async (req: Request<{}, {}, Omit<Macrocycl
             ]
         });
 
-        res.status(201).json({ message: "Macrocycle created successfully" });
+        const insertResult = result[0];
+
+        if (!insertResult || insertResult.length === 0 || !insertResult[0]?.macrocycle_id) {
+            console.error("Failed to create macrocycle:", "Failed to create macrocycle.");
+            res.status(500).json({ message: "Failed to create macrocycle." });
+            return;
+        }
+
+        const macrocycleId = insertResult[0].macrocycle_id;
+        res.status(201).json({ macrocycleId });
     } catch (error) {
         console.error("Error creating macrocycle:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -190,7 +200,7 @@ export const handleCreateMesocycle = async (req: Request<{}, {}, Omit<Mesocycle,
         if (!reqBody.macrocycle_id || !reqBody.cycle_start_date || !reqBody.cycle_end_date) {
             return res.status(400).json({ error: "Missing required fields" });
         }
-        const [result] = await connection.execute({
+        const [result] = await connection.query<RowDataPacket[]>({
             sql: "CALL spCreateMesocycle(?, ?, ?, ?, ?, ?, ?, ?)",
             values: [
                 reqBody.macrocycle_id,
@@ -204,7 +214,16 @@ export const handleCreateMesocycle = async (req: Request<{}, {}, Omit<Mesocycle,
             ]
         })
 
-        res.status(201).json({ message: "Mesocycle created successfully" });
+        const insertResult = result[0];
+
+        if (!insertResult || insertResult.length === 0 || !insertResult[0]?.mesocycle_id) {
+            console.error("Failed to create mesocycle:", "Failed to create mesocycle.");
+            res.status(500).json({ message: "Failed to create mesocycle." });
+            return;
+        }
+
+        const mesocycleId = insertResult[0].mesocycle_id;
+        res.status(201).json({ mesocycleId });
     } catch (error: Error | unknown) {
         var errorMessage = "Internal server error";
         if (error instanceof Error) {
@@ -274,23 +293,23 @@ export const handleDeleteMesocycle = async (req: Request<{id: string}>, res: Res
     }
 }
 
-export const handleGetMicrocycle = async (req: Request<{clientId: string}, {}, {}, MicrocycleSearchParams>, res: Response) => {
+export const handleGetMicrocycle = async (req: Request<{id: string}, {}, {}, MicrocycleSearchParams>, res: Response) => {
     const connection = await getDatabaseConnection();
     try {
-        const clientId = parseInt(req.params.clientId, 10);
-        if (isNaN(clientId)) {
-            return res.status(400).json({ error: "Invalid client ID" });
-        }
-        const { active, date, mesocycleId } = req.query;
+        const cycleId = parseInt(req.params.id, 10);
+        
+        const { active, date, mesocycleId, clientId } = req.query;
 
         const mesocycleIdNumber = parseInt(mesocycleId ?? "", 10);
+        const clientIdNumber = parseInt(clientId ?? "", 10);
 
         const activeBool = active === 'true' ? true : active === 'false' ? false : undefined;
 
         const [rows] = await connection.query<RowDataPacket[]>({
-            sql: 'CALL spGetMicrocycles(?, ?, ?, ?)',
+            sql: 'CALL spGetMicrocycles(?, ?, ?, ?, ?)',
             values: [
-                clientId,
+                !isNaN(cycleId) ? cycleId : null,
+                !isNaN(clientIdNumber) ? clientIdNumber : null,
                 !isNaN(mesocycleIdNumber) ? mesocycleIdNumber : null,
                 activeBool ?? null,
                 date ?? null
@@ -333,7 +352,7 @@ export const handleCreateMicrocycle = async (req: Request<{}, {}, Omit<Microcycl
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-        const [result] = await connection.execute({
+        const [result] = await connection.query<RowDataPacket[]>({
             sql: "CALL spCreateMicrocycle(?, ?, ?, ?, ?, ?)",
             values: [
                 reqBody.mesocycle_id,
@@ -345,7 +364,16 @@ export const handleCreateMicrocycle = async (req: Request<{}, {}, Omit<Microcycl
             ]
         })
 
-        res.status(201).json({ message: "Microcycle created successfully" });
+        const insertResult = result[0];
+
+        if (!insertResult || insertResult.length === 0 || !insertResult[0]?.microcycle_id) {
+            console.error("Failed to create microcycle:", "Failed to create microcycle.");
+            res.status(500).json({ message: "Failed to create microcycle." });
+            return;
+        }
+
+        const microcycleId = insertResult[0].microcycle_id;
+        res.status(201).json({ microcycleId });
     } catch (error: Error | unknown) {
         var errorMessage = "Internal server error";
         if (error instanceof Error) {
@@ -386,6 +414,53 @@ export const handleUpdateMicrocycle = async (req: Request<{id: string}, {}, Micr
             errorMessage = error.message;
         }
         console.error("Error updating microcycle:", error);
+        res.status(500).json({ error: errorMessage });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
+}
+
+export const handleUpdateMicrocycleRoutines = async (req: Request<{id: string}, {}, MicrocycleUpdateRoutinesRequest>, res: Response) => {
+    // Set all routines for the microcycle to be inactive
+    // Create new routine for each in the request body and link to microcycle
+    const connection = await getDatabaseConnection();
+    try {
+        const microcycleId = parseInt(req.params.id, 10);
+        if (isNaN(microcycleId)) {
+            return res.status(400).json({ error: "Invalid microcycle ID" });
+        }
+
+        const reqBody = req.body;
+
+        const createRoutineBodies: Omit<WorkoutRoutine, 'id'>[] = reqBody.routines.map((routine, index) => ({
+            microcycle_id: microcycleId,
+            routine_index: index,
+            routine_name: routine.routine_name,
+            isActive: true,
+            exercise_groups: routine.exercise_groups
+        }));
+
+        await connection.beginTransaction();
+
+        await deactivateCycleRoutines(microcycleId);
+
+        const results = await Promise.all(createRoutineBodies.map(async routine => await createWorkoutRoutine(routine)));
+
+        if (results.some(result => result === undefined)) {
+            await connection.rollback();
+            console.error("Failed to create one or more workout routines:", "Failed to create one or more workout routines.");
+            res.status(500).json({ message: "Failed to create workout routines." });
+            return;
+        }
+
+        await connection.commit();
+        res.status(204).send();
+    } catch (error: Error | unknown) {
+        var errorMessage = "Internal server error";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        console.error("Error updating microcycle routines:", error);
         res.status(500).json({ error: errorMessage });
     } finally {
         await closeDatabaseConnection(connection);

@@ -27,12 +27,17 @@ export function mapWorkoutRoutineExerciseDTOToWorkoutRoutine(rows: WorkoutRoutin
             routineMap.set(row.routineId, routine);
         }
 
+        if (row.group_index === null) {
+            return;
+        }
+
         let group = routine.exercise_groups[row.group_index];
         if (!group) {
             group = {
                 rest_after: nullToUndefined(row.rest_after),
                 rest_between: nullToUndefined(row.rest_between),
                 group_index: row.group_index,
+                routine_category: row.routine_category,
                 exercises: []
             };
             routine.exercise_groups.push(group);
@@ -41,6 +46,7 @@ export function mapWorkoutRoutineExerciseDTOToWorkoutRoutine(rows: WorkoutRoutin
 
         group.exercises.push({
             exercise_id: row.exercise_id,
+            exerciseName: row.exercise_name,
             exercise_group_index: row.exercise_group_index,
             repetitions: nullToUndefined(row.repetitions),
             sets: nullToUndefined(row.exercise_sets),

@@ -1,5 +1,7 @@
+import type { TreeDataNode } from "antd";
 import type { MenuProps } from "antd/es/menu/menu";
 import type { Dayjs } from "dayjs";
+import type { PlannedExercise, PlannedExerciseGroup, WorkoutRoutine } from "../../../shared/models";
 
 export type MenuItem = Required<MenuProps>['items'][number];
 
@@ -47,3 +49,33 @@ export interface AssessmentFormValues {
 export interface AssessmentFormProps {
     onSubmit: (result: AssessmentFormValues) => void;
 }
+
+export enum WorkoutNodeType {
+    Category = 1,
+    Group = 2,
+    Exercise = 3
+}
+
+export interface WorkoutRoutineExerciseNode extends TreeDataNode {
+    nodeType: WorkoutNodeType.Exercise;
+    data: PlannedExercise;
+    title: string;
+    restAfter?: number;
+}
+
+export interface WorkoutRoutineGroupNode extends TreeDataNode{
+    nodeType: WorkoutNodeType.Group;
+    title: string;
+    data: Omit<PlannedExerciseGroup, 'exercises' | 'routine_category'>;
+    children: WorkoutRoutineExerciseNode[];
+}
+
+export interface WorkoutRoutineCategoryNode extends TreeDataNode {
+    nodeType: WorkoutNodeType.Category;
+    title: string;
+    children: Array<WorkoutRoutineGroupNode | WorkoutRoutineExerciseNode>;
+}
+
+export type WorkoutRoutineTreeNode = WorkoutRoutineCategoryNode | WorkoutRoutineGroupNode | WorkoutRoutineExerciseNode;
+
+export type WorkoutRoutineEdit = Omit<WorkoutRoutine, 'id' | 'routine_index' | 'isActive'>

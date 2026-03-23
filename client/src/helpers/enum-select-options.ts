@@ -1,6 +1,6 @@
-import { AssessmentGroup, ExerciseForm, ExerciseMovementPattern, MuscleGroup } from "../../../shared/models";
+import { AssessmentGroup, ExerciseForm, ExerciseMovementPattern, MuscleGroup, WorkoutRoutineCategory } from "../../../shared/models";
 import { TrainingCycleType } from "../../../shared/types";
-import { MuscleGroupLabels } from "./label-formatters";
+import { MuscleGroupLabels, TrainingCycleTypeLabels, WorkoutRoutineCategoryLabels } from "./label-formatters";
 
 export const assessmentGroupOptions = [
     { label: "Posture Assessment", value: AssessmentGroup.Posture},
@@ -32,7 +32,16 @@ export const muscleGroupOptions = Object.entries(MuscleGroupLabels).map(([value,
 }));
 
 export const cycleTypeOptions = [
-    { label: "Macrocycle", value: TrainingCycleType.Macrocycle },
-    { label: "Mesocycle", value: TrainingCycleType.Mesocycle },
-    { label: "Microcycle", value: TrainingCycleType.Microcycle },
+    { label: TrainingCycleTypeLabels.Macrocycle, value: TrainingCycleType.Macrocycle },
+    { label: TrainingCycleTypeLabels.Mesocycle, value: TrainingCycleType.Mesocycle },
+    { label: TrainingCycleTypeLabels.Microcycle, value: TrainingCycleType.Microcycle },
+]
+
+export const routineCategoryOptions = [
+    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.Warmup], value: WorkoutRoutineCategory.Warmup },
+    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.Activation], value: WorkoutRoutineCategory.Activation },
+    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.SkillDevelopment], value: WorkoutRoutineCategory.SkillDevelopment },
+    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.ResistanceTraining], value: WorkoutRoutineCategory.ResistanceTraining },
+    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.ClientsChoice], value: WorkoutRoutineCategory.ClientsChoice },
+    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.Cooldown], value: WorkoutRoutineCategory.Cooldown },
 ]
