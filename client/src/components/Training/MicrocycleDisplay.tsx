@@ -8,6 +8,7 @@ import { fetchMicrocycleRoutines } from "../../helpers/routine-helpers";
 import { useNavigate } from "react-router-dom";
 import { deleteMicrocycle } from "../../helpers/api";
 import { RoutineCard } from "../Routines/RoutineCard";
+import { RoutineDisplayModal } from "../Routines/RoutineDisplayModal";
 
 export interface MicrocycleDisplayProps extends React.ComponentProps<typeof Card> {
     microcycle: Microcycle;
@@ -19,6 +20,7 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
     const { microcycle, onChange, ...cardProps } = props;
     const [isLoading, setIsLoading] = useState(true);
     const [subCards, setSubCards] = useState<WorkoutRoutine[]>([]);
+    const [selectedRoutineIndex, setSelectedRoutineIndex] = useState<number | undefined>(undefined);
 
     const gridStyle: React.CSSProperties = {
         width: subCards.length >= 4 ? 'calc(100% / 5)' : `calc(100% / ${subCards.length})`,
@@ -83,6 +85,7 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
                 routine={subCard}
                 title={`Day ${index + 1}`}
                 variant="borderless"
+                onClick={() => setSelectedRoutineIndex(index)}
             />
         </Card.Grid>
     )) : (
@@ -94,6 +97,7 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
     )
 
     return (
+        <>
         <Card
             title={`${microcycle.cycle_name} (${dayjs(microcycle.cycle_start_date).format("YYYY-MM-DD")} - ${dayjs(microcycle.cycle_end_date).format("YYYY-MM-DD")})`}
             actions={cardActions}
@@ -104,5 +108,14 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
         >
             {isLoading ? loadingSkeleton : resultContent}
         </Card>
+        {selectedRoutineIndex !== undefined && (
+            <RoutineDisplayModal
+                routine={subCards[selectedRoutineIndex]}
+                open={selectedRoutineIndex !== undefined}
+                onCancel={() => setSelectedRoutineIndex(undefined)}
+                okButtonProps={{ style: { display: 'none' } }}
+            />
+        )}
+        </>
     )
 }
