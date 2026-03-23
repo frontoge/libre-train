@@ -4,8 +4,10 @@ import { Panel } from "../../components/Panel";
 import { CreateEditTrainingPlan, type CreateEditTrainingPlanFormValues } from "../../components/Training/CreateEditTrainingPlan";
 import { cycleCreateHelpers } from "../../helpers/training-helpers";
 import { TrainingCycleType } from "../../../../shared/types";
+import { useNavigate } from "react-router";
 
 export function NewPlan() {
+    const navigate = useNavigate();
     const [messageApi, contextHolder] = useMessage();
     const handleSubmit = async (values: CreateEditTrainingPlanFormValues) => {
         const result = await cycleCreateHelpers[values.cycleType](values);
@@ -15,6 +17,7 @@ export function NewPlan() {
             if (values.cycleType === TrainingCycleType.Microcycle) {
                 const microcycleId = result;
                 // Redirect to cycle routine builder
+                navigate(`/training/cycle/${microcycleId}/builder/`);
             }
         } else {
             messageApi.error("Failed to create training plan.");

@@ -1,4 +1,4 @@
-import { Card, Result, Skeleton } from "antd";
+import { Card, Popconfirm, Result, Skeleton } from "antd";
 import { useEffect, useState } from "react";
 import type { Microcycle, WorkoutRoutine } from "../../../../shared/models";
 import { MdEdit } from "react-icons/md";
@@ -6,13 +6,17 @@ import { FaTrash } from "react-icons/fa";
 import dayjs from "../../config/dayjs";
 import { fetchMicrocycleRoutines } from "../../helpers/routine-helpers";
 import { WorkoutRoutineDisplay } from "../Routines/WorkoutRoutineDisplay";
+import { useNavigate } from "react-router-dom";
+import { deleteMicrocycle } from "../../helpers/api";
 
 export interface MicrocycleDisplayProps extends React.ComponentProps<typeof Card> {
     microcycle: Microcycle;
+    onChange?: () => void;
 }
 
 export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
-    const { microcycle, ...cardProps } = props;
+    const navigate = useNavigate();
+    const { microcycle, onChange, ...cardProps } = props;
     const [isLoading, setIsLoading] = useState(true);
     const [subCards, setSubCards] = useState<WorkoutRoutine[]>([]);
 
@@ -23,11 +27,16 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
     };
 
     const handleEdit = () => {
-
+        navigate(`/training/cycle/${microcycle.id}/builder/`);
     }
 
-    const handleDelete = () => {
-
+    const handleDelete = async () => {
+        const result = await deleteMicrocycle(microcycle.id);
+        if (result.ok) {
+            onChange?.();
+        } else {
+            // show error notification
+        }
     }
 
     const fetchRoutines = async () => {
@@ -45,9 +54,16 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
             <div key="edit" style={{width: '100%'}} onClick={handleEdit}>
                 <MdEdit onClick={handleEdit} />
             </div>,
-            <div key="delete" style={{width: '100%'}} onClick={handleDelete}>
-                <FaTrash onClick={handleDelete} />
-            </div>
+            <Popconfirm
+                key="delete"
+                title="Are you sure you want to delete this microcycle? This action cannot be undone."
+                onConfirm={handleDelete}
+            >
+                <div key="delete" style={{width: '100%'}}>
+                    <FaTrash />
+                </div>
+            </Popconfirm>
+            
         ]
 
     const loadingSkeleton = Array.from({ length: 6 }).map((_, index) => (

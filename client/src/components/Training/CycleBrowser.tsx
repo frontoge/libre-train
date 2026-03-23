@@ -30,6 +30,11 @@ export function CycleBrowser(props: CycleBrowserProps) {
         fetchCycleData(clientId);
     }, [props.clientId])
 
+    const handleChange = () => {
+        if (!clientId) return;
+        fetchCycleData(clientId);
+    }
+
     const segmentOptions = [
         ...cycleTypeOptions.map((option, index) => ({
             label: option.label + 's',
@@ -73,12 +78,12 @@ export function CycleBrowser(props: CycleBrowserProps) {
                 {cycleData[selectedCycleType]?.map((cycle) => {
                     if (selectedCycleType === 0) {
                         return (
-                            <MacrocycleDisplay macrocycle={cycle}/>
+                            <MacrocycleDisplay onChange={handleChange} macrocycle={cycle}/>
                         )
                     } else if (selectedCycleType === 1) {
-                        return (<MesocycleDisplay mesocycle={cycle}/>)
+                        return (<MesocycleDisplay onChange={handleChange} mesocycle={cycle}/>)
                     } else if (selectedCycleType === 2) {
-                        return (<MicrocycleDisplay microcycle={cycle} />)
+                        return (<MicrocycleDisplay onChange={handleChange} microcycle={cycle} />)
                     }
                 })}
             </div>

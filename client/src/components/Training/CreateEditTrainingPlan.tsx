@@ -160,8 +160,8 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
             <>
                 <Form.Item required label="Date Range" name="dateRange">
                     <DatePicker.RangePicker
-                        minDate={dayjs(selectedParentCycle?.cycle_start_date)}
-                        maxDate={dayjs(selectedParentCycle?.cycle_end_date)}
+                        minDate={selectedParentCycle !== undefined ? dayjs(selectedParentCycle?.cycle_start_date) : undefined}
+                        maxDate={selectedParentCycle !== undefined ? dayjs(selectedParentCycle?.cycle_end_date) : undefined}
                     />
                 </Form.Item>
                 <Form.Item label="Cycle Name" name="cycleName">

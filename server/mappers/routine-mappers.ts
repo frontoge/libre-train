@@ -27,6 +27,10 @@ export function mapWorkoutRoutineExerciseDTOToWorkoutRoutine(rows: WorkoutRoutin
             routineMap.set(row.routineId, routine);
         }
 
+        if (row.group_index === null) {
+            return;
+        }
+
         let group = routine.exercise_groups[row.group_index];
         if (!group) {
             group = {

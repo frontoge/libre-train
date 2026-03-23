@@ -6,7 +6,7 @@ import { handleAuthSignup, handleAuthLogin } from "./handlers/auth-handlers";
 import { handleDeleteExercise, handleExerciseCreate, handleGetAllExercises, handleUpdateExercise } from "./handlers/exercise-handlers";
 import { handleCreateContact, handleDeleteContact, handleGetContactById, handleGetContacts, handleUpdateContact } from "./handlers/contact-handlers";
 import { handleCreateAssessmentLog, handleDeleteAssessmentLog, handleGetAssessmentGroupTypes, handleGetAssessmentLog, handleGetAssessmentTypes, handleUpdateAssessmentLog } from "./handlers/assessment-handlers";
-import { handleCreateMacrocycle, handleCreateMesocycle, handleCreateMicrocycle, handleDeleteMacrocycle, handleDeleteMesocycle, handleDeleteMicrocycle, handleGetMacrocycle, handleGetMesocycle, handleGetMicrocycle, handleUpdateMacrocycle, handleUpdateMesocycle, handleUpdateMicrocycle } from "./handlers/cycle-handlers";
+import { handleCreateMacrocycle, handleCreateMesocycle, handleCreateMicrocycle, handleDeleteMacrocycle, handleDeleteMesocycle, handleDeleteMicrocycle, handleGetMacrocycle, handleGetMesocycle, handleGetMicrocycle, handleUpdateMacrocycle, handleUpdateMesocycle, handleUpdateMicrocycle, handleUpdateMicrocycleRoutines } from "./handlers/cycle-handlers";
 import { handleCreateWorkoutRoutine, handleDeleteWorkoutRoutine, handleGetCycleWorkoutRoutines, handleUpdateWorkoutRoutine } from "./handlers/workout-routine-handlers";
 
 const router = Router();
@@ -59,6 +59,7 @@ router.post(`${Routes.Microcycle}`, handleCreateMicrocycle);
 router.put(`${Routes.Macrocycle}/:id`, handleUpdateMacrocycle);
 router.put(`${Routes.Mesocycle}/:id`, handleUpdateMesocycle);
 router.put(`${Routes.Microcycle}/:id`, handleUpdateMicrocycle);
+router.put(`${Routes.Microcycle}/:id${Routes.WorkoutRoutine}`, handleUpdateMicrocycleRoutines);
 router.delete(`${Routes.Macrocycle}/:id`, handleDeleteMacrocycle);
 router.delete(`${Routes.Mesocycle}/:id`, handleDeleteMesocycle);
 router.delete(`${Routes.Microcycle}/:id`, handleDeleteMicrocycle);

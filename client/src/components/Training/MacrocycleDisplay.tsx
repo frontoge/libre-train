@@ -1,4 +1,4 @@
-import { Card, Result, Skeleton } from "antd";
+import { Card, Popconfirm, Result, Skeleton } from "antd";
 import { FaTrash } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { MesocycleCard } from "./MesocycleCard";
@@ -6,9 +6,11 @@ import type { Macrocycle, Mesocycle } from "../../../../shared/models";
 import { useEffect, useState } from "react";
 import { fetchChildMesocycles } from "../../helpers/training-helpers";
 import dayjs from "../../config/dayjs";
+import { deleteMacrocycle } from "../../helpers/api";
 
 export interface MacrocycleDisplayProps extends React.ComponentProps<typeof Card> {
     macrocycle: Macrocycle;
+    onChange?: () => void;
 }
 
 export function MacrocycleDisplay(props: MacrocycleDisplayProps) {
@@ -20,12 +22,17 @@ export function MacrocycleDisplay(props: MacrocycleDisplayProps) {
         padding: '0.25rem',
     };
 
-    const handleDelete = () => {
-        console.log("Delete macrocycle");
+    const handleDelete = async () => {
+        try {
+            await deleteMacrocycle(props.macrocycle.id);
+            props.onChange?.();
+        } catch (error) {
+            console.error('Error deleting macrocycle:', error);
+        }
     }
 
     const handleEdit = () => {
-        console.log("Edit macrocycle");
+        
     }
 
     const fetchMesocycles = async () => {
@@ -44,9 +51,15 @@ export function MacrocycleDisplay(props: MacrocycleDisplayProps) {
         <div key="edit" style={{width: '100%'}} onClick={handleEdit}>
             <MdEdit onClick={handleEdit} />
         </div>,
-        <div key="delete" style={{width: '100%'}} onClick={handleDelete}>
-            <FaTrash onClick={handleDelete} />
-        </div>
+        <Popconfirm
+            key="delete"
+            title="Are you sure you want to delete this macrocycle? This action cannot be undone."
+            onConfirm={handleDelete}
+        >
+            <div key="delete" style={{width: '100%'}}>
+                <FaTrash />
+            </div>
+        </Popconfirm>
     ]
 
     const loadingSkeleton = Array.from({ length: 6 }).map((_, index) => (

@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { Macrocycle, Mesocycle, Microcycle } from "../../../shared/models";
+import { Macrocycle, Mesocycle, Microcycle, WorkoutRoutine } from "../../../shared/models";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { MacrocycleSearchParams, MesocycleSearchParams, MesocycleUpdateRequest, MicrocycleSearchParams, MicrocycleUpdateRequest, ResponseWithError } from "../../../shared/types";
+import { MacrocycleSearchParams, MesocycleSearchParams, MesocycleUpdateRequest, MicrocycleSearchParams, MicrocycleUpdateRequest, MicrocycleUpdateRoutinesRequest, ResponseWithError } from "../../../shared/types";
 import { RowDataPacket } from "mysql2";
+import { createWorkoutRoutine, deactivateCycleRoutines } from "./workout-routine-handlers";
 
 export const handleGetMacrocycle = async (req: Request<{clientId: string}, {}, {}, MacrocycleSearchParams>, res: Response<ResponseWithError<Macrocycle[]>>) => {
     const connection = await getDatabaseConnection();
@@ -413,6 +414,53 @@ export const handleUpdateMicrocycle = async (req: Request<{id: string}, {}, Micr
             errorMessage = error.message;
         }
         console.error("Error updating microcycle:", error);
+        res.status(500).json({ error: errorMessage });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
+}
+
+export const handleUpdateMicrocycleRoutines = async (req: Request<{id: string}, {}, MicrocycleUpdateRoutinesRequest>, res: Response) => {
+    // Set all routines for the microcycle to be inactive
+    // Create new routine for each in the request body and link to microcycle
+    const connection = await getDatabaseConnection();
+    try {
+        const microcycleId = parseInt(req.params.id, 10);
+        if (isNaN(microcycleId)) {
+            return res.status(400).json({ error: "Invalid microcycle ID" });
+        }
+
+        const reqBody = req.body;
+
+        const createRoutineBodies: Omit<WorkoutRoutine, 'id'>[] = reqBody.routines.map((routine, index) => ({
+            microcycle_id: microcycleId,
+            routine_index: index,
+            routine_name: routine.routine_name,
+            isActive: true,
+            exercise_groups: routine.exercise_groups
+        }));
+
+        await connection.beginTransaction();
+
+        await deactivateCycleRoutines(microcycleId);
+
+        const results = await Promise.all(createRoutineBodies.map(async routine => await createWorkoutRoutine(routine)));
+
+        if (results.some(result => result === undefined)) {
+            await connection.rollback();
+            console.error("Failed to create one or more workout routines:", "Failed to create one or more workout routines.");
+            res.status(500).json({ message: "Failed to create workout routines." });
+            return;
+        }
+
+        await connection.commit();
+        res.status(204).send();
+    } catch (error: Error | unknown) {
+        var errorMessage = "Internal server error";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        console.error("Error updating microcycle routines:", error);
         res.status(500).json({ error: errorMessage });
     } finally {
         await closeDatabaseConnection(connection);

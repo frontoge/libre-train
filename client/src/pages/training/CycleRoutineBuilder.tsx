@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";
 import { useEffect, useState } from "react";
@@ -10,9 +10,10 @@ import type { Microcycle } from "../../../../shared/models";
 import { Button, Popconfirm } from "antd";
 import type { WorkoutRoutineEdit } from "../../types/types";
 import { QuestionCircleOutlined } from '@ant-design/icons';
+import { updateMicrocycleRoutines } from "../../helpers/api";
 
 export function CycleRoutineBuilder(props: any) {
-
+    const navigate = useNavigate();
     const { cycleId } = useParams<{ cycleId: string }>();
 
     const [microcycle, setMicrocycle] = useState<Microcycle | undefined>(undefined);
@@ -91,8 +92,19 @@ export function CycleRoutineBuilder(props: any) {
         setRoutines(prev => prev.map((routine, index) => index === selectedRoutine ? updatedRoutine : routine));
     }
 
-    const handleSave = () => {
-        console.log("Saving routines:", routines);
+    const handleSave = async () => {
+        try {
+            const result = await updateMicrocycleRoutines(Number(cycleId), routines);
+            if (result.ok) {
+                // Redirect to cycle browser?
+                navigate(`/training/`)
+            }
+            else {
+                // Show error notification
+            }
+        } catch (error) {
+            console.error("Error saving routines:", error);
+        }
     }
 
     useEffect(() => {
@@ -153,7 +165,7 @@ export function CycleRoutineBuilder(props: any) {
                     <Button type="primary" onClick={handleSave}>Save</Button>
                     <Popconfirm
                         title="Are you sure you want to cancel (All unsaved changes will be lost)?"
-                        onConfirm={() => console.log("Cancelled")}
+                        onConfirm={() => {}}
                         okText="Yes"
                         cancelText="No"
                         placement="topRight"
