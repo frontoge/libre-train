@@ -1,0 +1,18 @@
+CREATE TABLE DietPlan (
+    id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    clientId INT(10) UNSIGNED NOT NULL,
+    trainerId INT(10) UNSIGNED NOT NULL,
+    isActive BOOLEAN NOT NULL DEFAULT TRUE,
+    targetCalories INT NOT NULL,
+    targetProtein INT NOT NULL,
+    targetCarbs INT NOT NULL,
+    targetFats INT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY `DietPlan_client_FK` (clientId),
+    KEY `DietPlan_trainer_FK` (trainerId),
+    CONSTRAINT `DietPlan_client_FK` FOREIGN KEY (clientId) REFERENCES Client (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `DietPlan_trainer_FK` FOREIGN KEY (trainerId) REFERENCES User (id) ON DELETE CASCADE ON UPDATE CASCADE
+) 
