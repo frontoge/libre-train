@@ -1,7 +1,7 @@
 import type { TreeDataNode } from "antd";
 import type { MenuProps } from "antd/es/menu/menu";
 import type { Dayjs } from "dayjs";
-import type { PlannedExercise, PlannedExerciseGroup } from "../../../shared/models";
+import type { PlannedExercise, PlannedExerciseGroup, WorkoutRoutine } from "../../../shared/models";
 
 export type MenuItem = Required<MenuProps>['items'][number];
 
@@ -77,3 +77,5 @@ export interface WorkoutRoutineCategoryNode extends TreeDataNode {
 }
 
 export type WorkoutRoutineTreeNode = WorkoutRoutineCategoryNode | WorkoutRoutineGroupNode | WorkoutRoutineExerciseNode;
+
+export type WorkoutRoutineEdit = Omit<WorkoutRoutine, 'id' | 'routine_index' | 'isActive'>

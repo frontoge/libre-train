@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { cycleTypeOptions } from "../../helpers/enum-select-options";
 import { TrainingCycleType } from "../../../../shared/types";
 import dayjs, { Dayjs } from "dayjs";
-import { fetchParentMacrocycles, fetchParentMesocycles } from "../../helpers/training-helpers";
+import { fetchClientMacrocycles, fetchClientMesocycles } from "../../helpers/training-helpers";
 import { stringFormatDate } from "../../helpers/date-helpers";
 
 export interface CreateEditTrainingPlanProps extends React.ComponentProps<typeof Form>{
@@ -66,7 +66,7 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
         
         if (selectedCycleType === TrainingCycleType.Mesocycle) {
             // Fetch macrocycles for selected client and populate parent cycle select options
-            const parentCycles = await fetchParentMacrocycles(selectedClient);
+            const parentCycles = await fetchClientMacrocycles(selectedClient);
             const options = parentCycles.map(cycle => ({
                 id: cycle.id,
                 cycle_name: cycle.cycle_name,
@@ -77,7 +77,7 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
             setParentCycles(options);
         } else if (selectedCycleType === TrainingCycleType.Microcycle) {
             // Fetch mesocycles for selected client and populate parent cycle select options
-            const parentCycles = await fetchParentMesocycles(selectedClient);
+            const parentCycles = await fetchClientMesocycles(selectedClient);
             const options = parentCycles.map(cycle => ({
                 id: cycle.id,
                 cycle_name: cycle.cycle_name,

@@ -3,6 +3,7 @@ import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";
 import { CreateEditTrainingPlan, type CreateEditTrainingPlanFormValues } from "../../components/Training/CreateEditTrainingPlan";
 import { cycleCreateHelpers } from "../../helpers/training-helpers";
+import { TrainingCycleType } from "../../../../shared/types";
 
 export function NewPlan() {
     const [messageApi, contextHolder] = useMessage();
@@ -11,6 +12,10 @@ export function NewPlan() {
         if (result) {
             messageApi.success("Training plan created successfully!");
             // Navigate to training plan viewer for the newly created plan
+            if (values.cycleType === TrainingCycleType.Microcycle) {
+                const microcycleId = result;
+                // Redirect to cycle routine builder
+            }
         } else {
             messageApi.error("Failed to create training plan.");
         }

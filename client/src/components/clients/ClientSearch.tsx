@@ -5,15 +5,15 @@ import { stringSimilarity } from 'string-similarity-js'
 import { Select } from "antd";
 
 export interface ClientSearchProps extends Omit<React.ComponentProps<typeof Select>, 'fetchOptions'> {
-    onClientSelect?: (clientId: string) => void;
+    onClientSelect?: (clientId?: string) => void;
 }
 
 export function ClientSearch(props: ClientSearchProps) {
-
+    const { onClientSelect, ...otherProps} = props;
     const { state: { clients }} = useContext(AppContext);
     const [selectedClient, setSelectedClient] = useState<string | undefined>(undefined);
 
-    const handleChange = (value: any) => {
+    const handleChange = (value?: string) => {
         setSelectedClient(value);
         if (props.onClientSelect) {
             props.onClientSelect(value);
@@ -45,9 +45,10 @@ export function ClientSearch(props: ClientSearchProps) {
             onSearch={fetchClients}
             onChange={handleChange}
             style={{width: "100%"}}
-            {...props}
+            allowClear
+            {...otherProps}
         >
-            
+        
         </Select>
         
     )

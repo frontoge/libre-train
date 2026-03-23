@@ -1,4 +1,5 @@
 import { ExerciseForm, ExerciseMovementPattern, MuscleGroup, WorkoutRoutineCategory } from "../../../shared/models";
+import { TrainingCycleType } from "../../../shared/types";
 
 export const formatClientFullName = (firstName?: string, lastName?: string) => {
     return `${firstName ?? ""} ${lastName ?? ""}`.trim();
@@ -87,4 +88,13 @@ export const WorkoutRoutineCategoryLabels: Record<WorkoutRoutineCategory, string
     [WorkoutRoutineCategory.ResistanceTraining]: "Resistance Training",
     [WorkoutRoutineCategory.ClientsChoice]: "Client's Choice",
     [WorkoutRoutineCategory.Cooldown]: "Cooldown"
+}
+
+export const TrainingCycleTypeLabels = {
+    [TrainingCycleType.Macrocycle]: "Macrocycle",
+    [TrainingCycleType.Mesocycle]: "Mesocycle",
+    [TrainingCycleType.Microcycle]: "Microcycle",
+    Macrocycle: "Macrocycle",
+    Mesocycle: "Mesocycle",
+    Microcycle: "Microcycle",
 }

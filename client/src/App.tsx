@@ -16,6 +16,7 @@ import { TrainingRouter } from "./pages/training/TrainingRouter"
 import { getAppConfiguration } from "./config/app.config"
 import { Routes as ApiRoutes } from "../../shared/routes";
 import { AssessmentRouter } from "./pages/assessments/AssessmentRouter"
+import "./styles/app.css"
 
 function App() {
 

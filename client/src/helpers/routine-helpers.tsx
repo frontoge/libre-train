@@ -1,5 +1,5 @@
 import { WorkoutRoutineCategory, type PlannedExerciseGroup, type WorkoutRoutine } from "../../../shared/models";
-import { WorkoutNodeType, type WorkoutRoutineCategoryNode, type WorkoutRoutineExerciseNode, type WorkoutRoutineGroupNode, type WorkoutRoutineTreeNode } from "../types/types";
+import { WorkoutNodeType, type WorkoutRoutineCategoryNode, type WorkoutRoutineEdit, type WorkoutRoutineExerciseNode, type WorkoutRoutineGroupNode, type WorkoutRoutineTreeNode } from "../types/types";
 import { WorkoutRoutineCategoryLabels } from "./label-formatters";
 import { FaFire, FaDumbbell, FaBolt, FaBrain } from "react-icons/fa6";
 import { FaStar } from "react-icons/fa";
@@ -8,9 +8,11 @@ import { mapWorkoutRoutineGroupToTreeData } from "./mappers";
 import type { RoutineExerciseCreateEditFormProps } from "../components/Routines/RoutineExerciseCreateEditForm";
 import { secondsToTimeString } from "./date-helpers";
 import type { RoutineGroupEditFormValues } from "../components/Routines/RoutineGroupEditForm";
+import { getAppConfiguration } from "../config/app.config";
+import { Routes } from "../../../shared/routes";
 
 // Builds a workout routine tree data structure from a workout routine
-export function getWorkoutRoutineTreeData(routine: WorkoutRoutine): WorkoutRoutineCategoryNode[] {
+export function getWorkoutRoutineTreeData(routine: WorkoutRoutineEdit): WorkoutRoutineCategoryNode[] {
     const routineCategoryProperties = {
         checkable: false,
         isLeaf: false,
@@ -313,5 +315,26 @@ export const getGroupFormValuesFromNode = (node: WorkoutRoutineGroupNode): Routi
     return {
         rest_after: node.data.rest_after,
         rest_between: node.data.rest_between,
+    }
+}
+
+export const fetchMicrocycleRoutines = async (microcycleId: number): Promise<WorkoutRoutine[]> => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }
+    try {
+        const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}/${microcycleId}/workout-routine`, requestOptions);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch routines for microcycle ${microcycleId}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+
+    } catch (error: Error | unknown) {
+        console.error(`Error fetching routines for microcycle ${microcycleId}:`, error instanceof Error ? error.message : error);
+        return [];
     }
 }

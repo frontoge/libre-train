@@ -1,6 +1,6 @@
 import { AssessmentGroup, ExerciseForm, ExerciseMovementPattern, MuscleGroup, WorkoutRoutineCategory } from "../../../shared/models";
 import { TrainingCycleType } from "../../../shared/types";
-import { MuscleGroupLabels, WorkoutRoutineCategoryLabels } from "./label-formatters";
+import { MuscleGroupLabels, TrainingCycleTypeLabels, WorkoutRoutineCategoryLabels } from "./label-formatters";
 
 export const assessmentGroupOptions = [
     { label: "Posture Assessment", value: AssessmentGroup.Posture},
@@ -32,9 +32,9 @@ export const muscleGroupOptions = Object.entries(MuscleGroupLabels).map(([value,
 }));
 
 export const cycleTypeOptions = [
-    { label: "Macrocycle", value: TrainingCycleType.Macrocycle },
-    { label: "Mesocycle", value: TrainingCycleType.Mesocycle },
-    { label: "Microcycle", value: TrainingCycleType.Microcycle },
+    { label: TrainingCycleTypeLabels.Macrocycle, value: TrainingCycleType.Macrocycle },
+    { label: TrainingCycleTypeLabels.Mesocycle, value: TrainingCycleType.Mesocycle },
+    { label: TrainingCycleTypeLabels.Microcycle, value: TrainingCycleType.Microcycle },
 ]
 
 export const routineCategoryOptions = [

@@ -1,15 +1,15 @@
 import { Button, Card, Input, Tree } from "antd";
-import { type PlannedExerciseGroup, type WorkoutRoutine } from "../../../../shared/models";
+import { type PlannedExerciseGroup } from "../../../../shared/models";
 
 import { useEffect, useState } from "react";
 import { PlannedExerciseDisplay } from "./PlannedExerciseDisplay";
 import { PlannedExerciseGroupDisplay } from "./PlannedExerciseGroupDisplay";
-import { WorkoutNodeType, type WorkoutRoutineCategoryNode, type WorkoutRoutineTreeNode } from "../../types/types";
+import { WorkoutNodeType, type WorkoutRoutineCategoryNode, type WorkoutRoutineEdit, type WorkoutRoutineTreeNode } from "../../types/types";
 import { collectAllTreeKeys, deleteNodesByKeys, getWorkoutRoutineTreeData, handleRoutineDrop, mapRoutineTreeToRoutineGroups } from "../../helpers/routine-helpers";
 import { MdEdit } from "react-icons/md";
 
 export interface WorkoutRoutineProps extends React.ComponentProps<typeof Card> {
-    routine: WorkoutRoutine
+    routine: WorkoutRoutineEdit
     treeProps?: React.ComponentProps<typeof Tree>;
     isEdit?: boolean;
     onEdit?: (updatedGroups: PlannedExerciseGroup[]) => void;
@@ -38,7 +38,6 @@ export function WorkoutRoutineDisplay(props: WorkoutRoutineProps) {
     const handleSelect = (newSelection: any, info: any) => {
         if (!isEdit) return;
         setSelectedKeys(newSelection);
-        console.log(newSelection, selectedKeys, info);
         if (newSelection.length === 1) {
             onSelectNode?.(info.selectedNodes[0] as WorkoutRoutineTreeNode);
         }
@@ -65,7 +64,7 @@ export function WorkoutRoutineDisplay(props: WorkoutRoutineProps) {
     }
 
     useEffect(() => {
-        if (selectedKeys.length === 0) {
+        if (selectedKeys.length !== 1) {
             onSelectNode?.(undefined);
         }
     }, [selectedKeys])
@@ -89,6 +88,11 @@ export function WorkoutRoutineDisplay(props: WorkoutRoutineProps) {
             title={updatingTitle ? <Input defaultValue={routine.routine_name} autoFocus onBlur={handleTitleChange} /> : routine.routine_name}
             extra={isEdit ? <Button color="default" variant="text" icon={<MdEdit />} onClick={toggleTitleUpdate} /> : undefined}
             {...cardProps}
+            style={{
+                height: "100%",
+                overflowY: 'auto',
+                ...cardProps.style
+            }}
         >
             <Tree
                 multiple
@@ -107,6 +111,12 @@ export function WorkoutRoutineDisplay(props: WorkoutRoutineProps) {
                 titleRender={titleRender}
                 onSelect={handleSelect}
                 selectedKeys={selectedKeys}
+                style={{
+                    maxHeight: "90%",
+                    maxWidth: "100%",
+                    padding: '1rem',
+                    ...treeProps?.style
+                }}
             />
             <div style={{
                 display: selectedKeys.length === 0 ? 'none' : 'flex',
