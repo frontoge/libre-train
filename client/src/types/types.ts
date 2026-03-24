@@ -5,7 +5,10 @@ import type { PlannedExercise, PlannedExerciseGroup, WorkoutRoutine } from "../.
 
 export type MenuItem = Required<MenuProps>['items'][number];
 
-export type NavMenuItem = MenuItem;
+export type NavMenuItem = MenuItem & {
+    urlPath?: string;
+    children?: NavMenuItem[];
+};
 
 export type ClientListMenuItem = MenuItem;
 
