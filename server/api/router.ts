@@ -8,6 +8,7 @@ import { handleCreateContact, handleDeleteContact, handleGetContactById, handleG
 import { handleCreateAssessmentLog, handleDeleteAssessmentLog, handleGetAssessmentGroupTypes, handleGetAssessmentLog, handleGetAssessmentTypes, handleUpdateAssessmentLog } from "./handlers/assessment-handlers";
 import { handleCreateMacrocycle, handleCreateMesocycle, handleCreateMicrocycle, handleDeleteMacrocycle, handleDeleteMesocycle, handleDeleteMicrocycle, handleGetMacrocycle, handleGetMesocycle, handleGetMicrocycle, handleUpdateMacrocycle, handleUpdateMesocycle, handleUpdateMicrocycle, handleUpdateMicrocycleRoutines } from "./handlers/cycle-handlers";
 import { handleCreateWorkoutRoutine, handleDeleteWorkoutRoutine, handleGetCycleWorkoutRoutines, handleUpdateWorkoutRoutine } from "./handlers/workout-routine-handlers";
+import { handleCreateDietLog, handleCreateDietPlan, handleDeleteDietLog, handleDeleteDietPlan, handleGetDietLog, handleGetDietPlan, handleUpdateDietLog, handleUpdateDietPlan } from "./handlers/diet-handlers";
 
 const router = Router();
 
@@ -69,5 +70,15 @@ router.post(Routes.WorkoutRoutine, handleCreateWorkoutRoutine);
 router.get(`${Routes.Microcycle}/:microcycleId${Routes.WorkoutRoutine}`, handleGetCycleWorkoutRoutines);
 router.delete(`${Routes.WorkoutRoutine}/:id`, handleDeleteWorkoutRoutine);
 router.put(`${Routes.WorkoutRoutine}/:id`, handleUpdateWorkoutRoutine); // Using the same handler for create and update for simplicity, can be separated if needed
+
+router.post(`${Routes.DietPlan}`, handleCreateDietPlan);
+router.get(`${Routes.DietPlan}{/:planId}`, handleGetDietPlan);
+router.put(`${Routes.DietPlan}/:planId`, handleUpdateDietPlan);
+router.delete(`${Routes.DietPlan}/:planId`, handleDeleteDietPlan);
+
+router.get(`${Routes.DietLog}{/:logId}`, handleGetDietLog);
+router.post(`${Routes.DietLog}`, handleCreateDietLog);
+router.put(`${Routes.DietLog}/:logId`, handleUpdateDietLog);
+router.delete(`${Routes.DietLog}/:logId`, handleDeleteDietLog);
 
 export default router;
