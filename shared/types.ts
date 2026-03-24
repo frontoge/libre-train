@@ -136,3 +136,11 @@ export type GetDietPlanSearchParams = {
     trainerId?: string;
     isActive?: string;
 }
+
+export type GetDietPlanLogEntrySearchParams = {
+    clientId?: string;
+    dietPlanId?: string;
+    logDate?: string;
+    startDate?: string;
+    endDate?: string;
+}

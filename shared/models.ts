@@ -191,3 +191,14 @@ export interface DietPlan {
     targetFats?: number;
     notes?: string;
 }
+
+export interface DietPlanLogEntry {
+    id: number;
+    dietPlanId: number;
+    clientId: number;
+    logDate: string;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fats: number;
+}

@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { DietPlan } from "../../../shared/models";
+import { DietPlan, DietPlanLogEntry } from "../../../shared/models";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
 import { RowDataPacket } from "mysql2";
-import { GetDietPlanSearchParams } from "../../../shared/types";
+import { GetDietPlanLogEntrySearchParams, GetDietPlanSearchParams } from "../../../shared/types";
 
 export const handleGetDietPlan = async (req: Request<{ planId?: string }, {}, {}, GetDietPlanSearchParams>, res: Response) => {
     const connection = await getDatabaseConnection();
@@ -23,7 +23,7 @@ export const handleGetDietPlan = async (req: Request<{ planId?: string }, {}, {}
             return res.status(404).json({ message: "Diet plan not found" });
         }
 
-        const dietPlans = results[0][0].map(plan => ({
+        const dietPlans = results[0][0].map((plan: RowDataPacket) => ({
             ...plan,
             isActive: plan.isActive === 1
         }));
@@ -114,18 +114,127 @@ export const handleDeleteDietPlan = async (req: Request<{ planId: string }>, res
     }
 }
 
-export const handleGetDietLog = async (req: Request<{ logId: string }>, res: Response) => {
+export const handleCreateDietLog = async (req: Request<{}, {}, Omit<DietPlanLogEntry, "id" | 'dietPlanId'>>, res: Response) => {
+    const connection = await getDatabaseConnection();
+    try {
+        const { clientId, logDate, calories, protein, carbs, fats } = req.body;
+        if (!clientId) {
+            return res.status(400).json({ message: "clientId is required" });
+        }
 
+        const [result] = await connection.query<RowDataPacket[]>({
+            sql: "CALL spCreateDietLogEntry(?, ?, ?, ?, ?, ?)",
+            values: [
+                clientId,
+                logDate ?? null,
+                calories,
+                protein,
+                carbs,
+                fats
+            ]
+        });
+
+        if (result[0] === undefined || result[0][0] === undefined) {
+            return res.status(500).json({ message: "Failed to create diet log entry" });
+        }
+
+        const insertId = result[0][0].newLogEntryId;
+        res.status(201).json({ id: insertId });
+    } catch (error: Error | unknown) {
+        console.error("Error creating diet log:", error);
+        res.status(500).json({ message: "Internal server error" });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
 }
 
-export const handleCreateDietLog = async (req: Request, res: Response) => {
+export const handleGetDietLog = async (req: Request<{ logId?: string }, {}, {}, GetDietPlanLogEntrySearchParams>, res: Response) => {
+    const connection = await getDatabaseConnection();
+    try {
+        const { logId } = req.params;
+        const { clientId, dietPlanId, logDate, startDate, endDate } = req.query;
 
+        const [result] = await connection.query<RowDataPacket[]>({
+            sql: "CALL spGetDietLogEntries(?, ?, ?, ?, ?, ?)",
+            values: [
+                logId ?? null,
+                clientId ?? null,
+                dietPlanId ?? null,
+                logDate ?? null,
+                startDate ?? null,
+                endDate ?? null
+            ]
+        });
+
+        const rows = (result as RowDataPacket[][])[0] ?? [];
+        const dietLogs = rows.map((entry: RowDataPacket) => ({
+            id: entry.id ?? entry.logEntryId,
+            dietPlanId: entry.dietPlanId,
+            clientId: entry.clientId,
+            logDate: entry.logDate,
+            calories: entry.calories,
+            protein: entry.protein,
+            carbs: entry.carbs,
+            fats: entry.fats
+        }));
+
+        return res.json(dietLogs);
+    } catch (error: Error | unknown) {
+        console.error("Error fetching diet logs:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
 }
 
-export const handleUpdateDietLog = async (req: Request<{ logId: string }>, res: Response) => {
+export const handleUpdateDietLog = async (req: Request<{ logId: string }, {}, Partial<Omit<DietPlanLogEntry, "id" | "dietPlanId" | "clientId" | "logDate">>>, res: Response) => {
+    const connection = await getDatabaseConnection();
+    try {
+        const { logId } = req.params;
+        const { calories, protein, carbs, fats } = req.body;
 
+        if (!logId || logId === "*") {
+            return res.status(400).json({ message: "logId is required" });
+        }
+
+        await connection.query({
+            sql: "CALL spUpdateDietLogEntry(?, ?, ?, ?, ?)",
+            values: [
+                logId,
+                calories ?? null,
+                protein ?? null,
+                carbs ?? null,
+                fats ?? null
+            ]
+        });
+
+        return res.status(200).json({ message: "Diet log entry updated successfully" });
+    } catch (error: Error | unknown) {
+        console.error("Error updating diet log:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
 }
 
 export const handleDeleteDietLog = async (req: Request<{ logId: string }>, res: Response) => {
+    const connection = await getDatabaseConnection();
+    try {
+        const { logId } = req.params;
+        if (!logId || logId === "*") {
+            return res.status(400).json({ message: "logId is required" });
+        }
 
+        await connection.query({
+            sql: "CALL spDeleteDietLogEntry(?)",
+            values: [logId]
+        });
+
+        return res.status(204).send();
+    } catch (error: Error | unknown) {
+        console.error("Error deleting diet log:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
 }
