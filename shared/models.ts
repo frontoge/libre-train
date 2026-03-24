@@ -202,3 +202,14 @@ export interface DietPlanLogEntry {
     carbs: number;
     fats: number;
 }
+
+export interface ClientDietPlan {
+    first_name: string;
+    last_name: string;
+    trainerId: number;
+    targetCalories?: number;
+    targetProtein?: number;
+    targetCarbs?: number;
+    targetFats?: number;
+    dietPlanId?: number;
+}

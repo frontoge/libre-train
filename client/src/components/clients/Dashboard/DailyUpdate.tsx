@@ -3,7 +3,7 @@ import { NutritionSummary } from "../../Nutrition/NutritionSummary";
 import { ClientDashboardContext } from "../../../contexts/ClientDashboardContext";
 import React from "react";
 import { type DailyUpdateData } from "../../../../../shared/types";
-import { undefinedIfNull } from "../../../helpers/boolean-helpers";
+import { undefinedIfNull } from "../../../../../shared/utilities";
 import { useParams } from "react-router-dom";
 import { getAppConfiguration } from "../../../config/app.config";
 import { Routes } from "../../../../../shared/routes";
