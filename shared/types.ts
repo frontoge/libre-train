@@ -130,3 +130,9 @@ export enum TrainingCycleType {
 }
 
 export type UpdateWorkoutRoutineRequest = Omit<WorkoutRoutine, "id" | 'microcycle_id' | 'routine_index' | 'isActive'>;
+
+export type GetDietPlanSearchParams = {
+    clientId?: string;
+    trainerId?: string;
+    isActive?: string;
+}

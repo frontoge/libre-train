@@ -14,4 +14,6 @@ export const Routes = {
     Mesocycle: "/cycle/meso",
     Microcycle: "/cycle/micro",
     WorkoutRoutine: "/workout-routine",
+    DietPlan: "/diet/plan",
+    DietLog: "/diet/log"
 }

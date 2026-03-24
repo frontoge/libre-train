@@ -178,3 +178,16 @@ export enum WorkoutRoutineCategory {
     ClientsChoice = 5,
     Cooldown = 6
 }
+
+export interface DietPlan {
+    id: number;
+    planName?: string;
+    clientId: number;
+    trainerId: number;
+    isActive: boolean;
+    targetCalories?: number;
+    targetProtein?: number;
+    targetCarbs?: number;
+    targetFats?: number;
+    notes?: string;
+}
