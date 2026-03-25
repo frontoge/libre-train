@@ -4,24 +4,23 @@ import React from "react";
 import { Routes } from "../../../shared/routes";
 import { getAppConfiguration } from "../config/app.config";
 import { AppContext } from "../app-context";
-import { Navigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export function Login() {
-
+    const navigate = useNavigate();
     const [error, setError] = React.useState<string | null>(null);
     const [loading, setLoading] = React.useState<boolean>(false);
 
-    const location = useLocation();
+    const { setAuth, isAuthenticated, state: { auth } } = React.useContext(AppContext);
 
-    const { setAuth, isAuthenticated } = React.useContext(AppContext);
-
-    // Use useEffect to redirect when authentication state changes
     React.useEffect(() => {
+        console.log('Checking authentication status on Login page', { auth });
         if (isAuthenticated()) {
             // User is already authenticated, redirect to home
+            navigate("/", { replace: true });
             return;
         }
-    }, [isAuthenticated]);
+    }, [auth, isAuthenticated, navigate]);
 
     type FieldType = {
         username?: string;
@@ -64,11 +63,8 @@ export function Login() {
         console.log('Failed:', errorInfo);
     }
 
-    // If user is already authenticated, redirect to home page
-    if (isAuthenticated()) {
-        return (
-            <Navigate to="/" replace state={{ from: location }}/>
-        )
+    if (auth.user !== undefined) {
+        return (<></>)
     }
 
     return (

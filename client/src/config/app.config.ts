@@ -7,7 +7,7 @@ export type AppConfig = {
 const config: { [key: string]: AppConfig } = {
     local: {
         apiUrl: "http://localhost:3000/api",
-        disableAuth: false,
+        disableAuth: true,
     },
     dev: {
         apiUrl: "https://dev-api.example.com/api",

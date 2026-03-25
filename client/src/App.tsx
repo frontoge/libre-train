@@ -20,6 +20,7 @@ import "./styles/app.css"
 import { DietRouter } from "./pages/diet/DietRouter"
 
 function App() {
+	const env = import.meta.env.VITE_ENV || 'local';
 
 	const [appState, setAppState] = useState<AppState>({
 		clients: [],
@@ -27,11 +28,22 @@ function App() {
 		exerciseData: [],
 		auth: {
 			authToken: undefined,
-			user: undefined
+			user: (env === 'local' && getAppConfiguration().disableAuth) ? 10 : undefined
 		}
 	})
 
 	const setAuth = (auth: Auth) => {
+		if (env === 'local' && getAppConfiguration().disableAuth) {
+			setAppState(prevState => ({
+				...prevState,
+				auth: {
+					authToken: undefined,
+					user: 10
+				}	
+			}))
+			return;
+		}
+
 		setAppState(prevState => ({
 			...prevState,
 			auth
@@ -39,6 +51,10 @@ function App() {
 	}
 
 	const isAuthenticated = () => {
+		if (env === 'local' && getAppConfiguration().disableAuth) {
+			return true;
+		}
+
 		if (!appState.auth.authToken || appState.auth.user === undefined) {
 			return false;
 		}
@@ -111,7 +127,7 @@ function App() {
 	}
 
 	useEffect(() => {
-		if (isAuthenticated() || getAppConfiguration().disableAuth) {
+		if (isAuthenticated()) {
 			fetchExercises();
 			fetchClients();
 			fetchAssessmentTypes();

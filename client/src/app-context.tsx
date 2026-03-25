@@ -2,6 +2,7 @@ import React, { createContext } from "react";
 import type { ModalType } from "./types/types";
 import type { Auth } from "./auth/authorization";
 import type { AssessmentType, ClientContact, Exercise } from "../../shared/models";
+import { getAppConfiguration } from "./config/app.config";
 
 export type AppState = {
     clients: ClientContact[];
@@ -34,7 +35,7 @@ const initialContext: AppContext = {
         selectedModal: undefined,
         auth: {
             authToken: '',
-            user: 0
+            user: (import.meta.env.VITE_ENV === 'local' && getAppConfiguration().disableAuth) ? 10 : 0
         }
     },
     setState: () => {},
