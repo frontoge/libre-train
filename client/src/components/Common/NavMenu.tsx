@@ -6,9 +6,10 @@ import { getNavigationUrl } from "../../helpers/navigation-helpers";
 export function NavMenu() {
     const navigate = useNavigate();
 
-    const onClick = (item: { key: string; keyPath: string[] }) => {
+    const onClick = (item: { key: string }) => {
+        console.log('Menu item clicked:', item);
         // Navigate to the selected menu item
-        navigate(getNavigationUrl(item.keyPath));
+        navigate(getNavigationUrl(item.key));
     }
 
     return (

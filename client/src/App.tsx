@@ -17,6 +17,7 @@ import { getAppConfiguration } from "./config/app.config"
 import { Routes as ApiRoutes } from "../../shared/routes";
 import { AssessmentRouter } from "./pages/assessments/AssessmentRouter"
 import "./styles/app.css"
+import { DietRouter } from "./pages/diet/DietRouter"
 
 function App() {
 
@@ -115,7 +116,7 @@ function App() {
 			fetchClients();
 			fetchAssessmentTypes();
 		}
-	}, [])
+	}, [appState.auth])
 
   return (
 	<AppContext value={{ state: appState, setState: setAppState, setAuth, isAuthenticated, stateRefreshers }}>
@@ -146,6 +147,7 @@ function App() {
 							<Route path="exercises/*" element={<RequireAuth><ExerciseRouter /></RequireAuth>} />
 							<Route path="training/*" element={<RequireAuth><TrainingRouter /></RequireAuth>} />
 							<Route path="assessments/*" element={<RequireAuth><AssessmentRouter /></RequireAuth>} />
+							<Route path="diet/*" element={<RequireAuth><DietRouter /></RequireAuth>} />
 						</Route>
 						<Route path="/signup" element={<Signup />} />
 						<Route path="/login" element={<Login />} />

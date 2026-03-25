@@ -1,8 +1,10 @@
 //TODO Move all api helper functions to here
 
+import type { ClientDietPlan } from "../../../shared/models";
 import { Routes } from "../../../shared/routes";
 import { getAppConfiguration } from "../config/app.config";
 import type { WorkoutRoutineEdit } from "../types/types";
+import { createSearchParams } from "./fetch-helpers";
 
 const API_BASE_URL = getAppConfiguration().apiUrl;
 
@@ -57,6 +59,22 @@ export const deleteMacrocycle = async (macrocycleId: number): Promise<Response> 
         return await fetch(`${API_BASE_URL}${Routes.Macrocycle}/${macrocycleId}`, requestOptions);
     } catch (error) {
         console.error('Error deleting macrocycle:', error);
+        throw error;
+    }
+}
+
+export const fetchClientDietPlansForTrainer = async (trainerId: number): Promise<ClientDietPlan[]> => {
+    try {
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        };
+        const searchParams = createSearchParams({ trainerId: trainerId.toString()});
+        const response = await fetch(`${API_BASE_URL}${Routes.DietPlan}${Routes.Clients}?${searchParams}`, requestOptions);
+        const data = await response.json();
+        return data as ClientDietPlan[];
+    } catch (error) {
+        console.error('Error fetching client diet plans for trainer:', error);
         throw error;
     }
 }

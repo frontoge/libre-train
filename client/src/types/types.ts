@@ -5,7 +5,10 @@ import type { PlannedExercise, PlannedExerciseGroup, WorkoutRoutine } from "../.
 
 export type MenuItem = Required<MenuProps>['items'][number];
 
-export type NavMenuItem = MenuItem;
+export type NavMenuItem = MenuItem & {
+    urlPath?: string;
+    children?: NavMenuItem[];
+};
 
 export type ClientListMenuItem = MenuItem;
 
@@ -79,3 +82,13 @@ export interface WorkoutRoutineCategoryNode extends TreeDataNode {
 export type WorkoutRoutineTreeNode = WorkoutRoutineCategoryNode | WorkoutRoutineGroupNode | WorkoutRoutineExerciseNode;
 
 export type WorkoutRoutineEdit = Omit<WorkoutRoutine, 'id' | 'routine_index' | 'isActive'>
+
+export type ClientDietPlanTableData = {
+    planId?: number;
+    clientId?: number;
+    name: string;
+    calories?: number;
+    protein?: number;
+    carbs?: number;
+    fats?: number;
+}

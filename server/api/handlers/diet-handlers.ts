@@ -3,6 +3,7 @@ import { DietPlan, DietPlanLogEntry } from "../../../shared/models";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
 import { RowDataPacket } from "mysql2";
 import { GetDietPlanLogEntrySearchParams, GetDietPlanSearchParams } from "../../../shared/types";
+import { undefinedIfNull } from "../../../shared/utilities";
 
 export const handleGetDietPlan = async (req: Request<{ planId?: string }, {}, {}, GetDietPlanSearchParams>, res: Response) => {
     const connection = await getDatabaseConnection();
@@ -16,7 +17,7 @@ export const handleGetDietPlan = async (req: Request<{ planId?: string }, {}, {}
                 planId ?? null,
                 clientId ?? null,
                 trainerId ?? null,
-                isActive !== undefined ? (isActive === 'true' ? 1 : 0) : true
+                isActive !== undefined ? (isActive === 'true' ? 1 : 0) : planId !== undefined ? null : 1
             ]
         });
         if (results[0] === undefined || results[0][0] === undefined) {
@@ -30,6 +31,42 @@ export const handleGetDietPlan = async (req: Request<{ planId?: string }, {}, {}
         res.json(dietPlans);
     } catch (error) {
         console.error("Error fetching diet plans:", error);
+        res.status(500).json({ message: "Internal server error" });
+    } finally {
+        await closeDatabaseConnection(connection);
+    }
+}
+
+export const handleGetClientsDietPlans = async (req: Request<{}, {}, {}, { trainerId?: string}>, res: Response) => {
+    const connection = await getDatabaseConnection();
+    try {
+        const { trainerId } = req.query;
+        const results = await connection.query<RowDataPacket[]>({
+            sql: "CALL spGetClientDietPlans(?)",
+            values: [trainerId ?? null]
+        });
+
+        if (results[0] === undefined || results[0][0] === undefined) {
+            return res.status(404).json({ message: "No diet plans found for clients" });
+        }
+        
+        const dietPlans = results[0][0].map((plan: RowDataPacket) => ({
+            first_name: plan.first_name,
+            last_name: plan.last_name,
+            trainerId: plan.trainerId,
+            planName: undefinedIfNull(plan.planName),
+            targetCalories: undefinedIfNull(plan.targetCalories),
+            targetProtein: undefinedIfNull(plan.targetProtein),
+            targetCarbs: undefinedIfNull(plan.targetCarbs),
+            targetFats: undefinedIfNull(plan.targetFats),
+            notes: undefinedIfNull(plan.notes),
+            dietPlanId: undefinedIfNull(plan.dietPlanId),
+            clientId: undefinedIfNull(plan.clientId)
+        }));
+
+        res.json(dietPlans);
+    } catch (error) {
+        console.error("Error fetching clients' diet plans:", error);
         res.status(500).json({ message: "Internal server error" });
     } finally {
         await closeDatabaseConnection(connection);
@@ -63,7 +100,7 @@ export const handleCreateDietPlan = async (req: Request<{}, {}, Omit<DietPlan, "
         console.error("Error creating diet plan:", error);
         res.status(500).json({ message: "Internal server error" });
     } finally {
-        closeDatabaseConnection(connection);
+        await closeDatabaseConnection(connection);
     }
 }
 
