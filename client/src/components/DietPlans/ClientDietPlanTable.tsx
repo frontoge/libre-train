@@ -6,6 +6,8 @@ import { ClientDietPlanTableColumns, getClientDietPlanTableData } from "./Client
 import type { ClientDietPlanTableData } from "../../types/types";
 import { ClientDietPlanSearch } from "./ClientDietPlanSearch";
 import stringSimilarity from "string-similarity-js";
+import { ViewDietPlanModal } from "./ViewDietPlanModal";
+import type { ClientDietPlan } from "../../../../shared/models";
 
 export interface ClientDietPlanTableProps extends React.ComponentProps<typeof Table> {
 
@@ -14,7 +16,9 @@ export interface ClientDietPlanTableProps extends React.ComponentProps<typeof Ta
 export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
     const { state: { auth: { user } } } = useContext(AppContext);
     const { ...tableProps } = props;
-    const [clientPlans, setClientPlans] = useState<ClientDietPlanTableData[]>([]);
+    const [clientPlans, setClientPlans] = useState<ClientDietPlan[]>([]);
+    const [openModalType, setOpenModalType] = useState<'view' | 'edit' | 'create' | undefined>(undefined);
+    const [selectedPlanId, setSelectedPlanId] = useState<number | undefined>(undefined);
     const [searchParams, setSearchParams] = useState<ClientDietPlanSearch>({
         searchText: '',
         hasPlan: 'both',
@@ -27,7 +31,7 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
                 return;
             }
             const results = await fetchClientDietPlansForTrainer(user);
-            setClientPlans(getClientDietPlanTableData(results));
+            setClientPlans(results);
         } catch (error) {
             // show error notification
         }
@@ -51,10 +55,25 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 
     const handleRowClick = (record: ClientDietPlanTableData) => {
         // View Diet plan modal
+        console.log(record);
+        if (record.planId === undefined) {
+            return;
+        }
+        setSelectedPlanId(record.planId);
+        setOpenModalType('view');
     }
 
+    const handleCloseModal = () => {
+        setSelectedPlanId(undefined);
+        setOpenModalType(undefined);
+    }
+
+    const tablePlanData = useMemo(() => {
+        return getClientDietPlanTableData(clientPlans);
+    }, [clientPlans])
+
     const filteredPlans = useMemo(() => {
-        return clientPlans.filter(plan => {
+        return tablePlanData.filter(plan => {
             if (searchParams.searchText.trim() !== '' && stringSimilarity(plan.name, searchParams.searchText) < 0.3) {
                 return false;
             }
@@ -69,7 +88,14 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 
             return true;
         })
-    }, [clientPlans, searchParams]);
+    }, [tablePlanData, searchParams]);
+
+    const selectedPlan = useMemo(() => {
+        if (selectedPlanId === undefined) {
+            return undefined;
+        }
+        return clientPlans.find(plan => plan.dietPlanId === selectedPlanId);
+    }, [selectedPlanId, clientPlans])
 
     const tableColumns = [
         ...(ClientDietPlanTableColumns || []),
@@ -109,23 +135,32 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
     )
 
     return (
-        <Table
-            columns={tableColumns}
-            dataSource={filteredPlans}
-            bordered
-            title={() => tableHeader}
-            style={{
-                width: "100%",
-                flex: 1
-            }}
-            pagination={{ 
-                pageSize: 12,
-                showSizeChanger: false
-            }}
-            onRow={(record, index) => ({
-                onDoubleClick: (event) => handleRowClick(record),
-            })}
-            {...tableProps}
-        />
+        <>
+            <Table<ClientDietPlanTableData>
+                columns={tableColumns}
+                dataSource={filteredPlans}
+                bordered
+                title={() => tableHeader}
+                style={{
+                    width: "100%",
+                    flex: 1
+                }}
+                pagination={{ 
+                    pageSize: 12,
+                    showSizeChanger: false
+                }}
+                onRow={(record: ClientDietPlanTableData, index) => ({
+                    onDoubleClick: (event) => handleRowClick(record),
+                })}
+                {...tableProps}
+            />
+            { (openModalType === 'view' && selectedPlan !== undefined) && (
+                <ViewDietPlanModal 
+                    open={openModalType === 'view'}
+                    dietPlan={selectedPlan} 
+                    onCancel={handleCloseModal}
+                />
+            )}
+        </>
     )
 }

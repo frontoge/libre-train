@@ -6,6 +6,8 @@ export const getClientDietPlanTableData = (plans: ClientDietPlan[]): ClientDietP
     return plans.map(plan => ({
         planId: plan.dietPlanId,
         name: `${plan.first_name} ${plan.last_name}`,
+        planName: plan.planName,
+        notes: plan.notes,
         calories: plan.targetCalories ,
         protein: plan.targetProtein,
         carbs: plan.targetCarbs,
@@ -19,19 +21,32 @@ export const ClientDietPlanTableColumns: TableProps<ClientDietPlanTableData>['co
         title: 'Client',
         dataIndex: 'name',
         key: 'name',
+        width: "15%",
     },
     {
         title: 'Plan Name',
         dataIndex: 'planName',
         key: 'planName',
+        width: "15%",
         onCell: (record) => ({
             colSpan: record.planId === undefined ? 6 : 1,
         })
     },
     {
+        title: 'Plan Notes',
+        dataIndex: 'notes',
+        key: 'planNotes',
+        width: "30%",
+        onCell: (record) => ({
+            colSpan: record.planId === undefined ? 0 : 1,
+        }),
+        ellipsis: true,
+    },
+    {
         title: 'Calories',
         dataIndex: 'calories',
         key: 'calories',
+        width: "5%",
         onCell: (record) => ({
             colSpan: record.planId === undefined ? 0 : 1,
         })
@@ -40,6 +55,7 @@ export const ClientDietPlanTableColumns: TableProps<ClientDietPlanTableData>['co
         title: 'Protein (g)',
         dataIndex: 'protein',
         key: 'protein',
+        width: "5%",
         onCell: (record) => ({
             colSpan: record.planId === undefined ? 0 : 1,
         })
@@ -48,6 +64,7 @@ export const ClientDietPlanTableColumns: TableProps<ClientDietPlanTableData>['co
         title: 'Carbs (g)',
         dataIndex: 'carbs',
         key: 'carbs',
+        width: "5%",
         onCell: (record) => ({
             colSpan: record.planId === undefined ? 0 : 1,
         })
@@ -56,17 +73,10 @@ export const ClientDietPlanTableColumns: TableProps<ClientDietPlanTableData>['co
         title: 'Fats (g)',
         dataIndex: 'fats',
         key: 'fats',
+        width: "5%",
         onCell: (record) => ({
             colSpan: record.planId === undefined ? 0 : 1,
         })
     },
-    {
-        title: 'Plan Notes',
-        dataIndex: 'notes',
-        key: 'planNotes',
-        onCell: (record) => ({
-            colSpan: record.planId === undefined ? 0 : 1,
-        })
-    }
     
 ]

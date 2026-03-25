@@ -53,3 +53,9 @@ export function secondsToTimeString(seconds: number): string {
 
     return `${hrsStr}${minsStr}${secsStr}`;
 }
+
+export function getYearsSinceDate(date: string): number {
+    const now = dayjs();
+    const pastDate = dayjs(date);
+    return Math.floor(now.diff(pastDate, 'year'));
+}
