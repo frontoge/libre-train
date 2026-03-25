@@ -89,8 +89,9 @@ export const items: NavMenuItem[] = [
         children: [
             {
                 key: 'diet_plan_browse',
-                label: 'Client Plans',
+                label: 'Browse Plans',
                 icon: <FaListAlt />,
+                urlPath: '/diet/plans'
             }
         ]
     },

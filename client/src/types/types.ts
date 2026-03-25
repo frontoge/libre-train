@@ -82,3 +82,13 @@ export interface WorkoutRoutineCategoryNode extends TreeDataNode {
 export type WorkoutRoutineTreeNode = WorkoutRoutineCategoryNode | WorkoutRoutineGroupNode | WorkoutRoutineExerciseNode;
 
 export type WorkoutRoutineEdit = Omit<WorkoutRoutine, 'id' | 'routine_index' | 'isActive'>
+
+export type ClientDietPlanTableData = {
+    planId?: number;
+    clientId?: number;
+    name: string;
+    calories?: number;
+    protein?: number;
+    carbs?: number;
+    fats?: number;
+}

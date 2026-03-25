@@ -51,14 +51,17 @@ export const handleGetClientsDietPlans = async (req: Request<{}, {}, {}, { train
         }
         
         const dietPlans = results[0][0].map((plan: RowDataPacket) => ({
-            firstName: plan.first_name,
-            lastName: plan.last_name,
+            first_name: plan.first_name,
+            last_name: plan.last_name,
             trainerId: plan.trainerId,
+            planName: undefinedIfNull(plan.planName),
             targetCalories: undefinedIfNull(plan.targetCalories),
             targetProtein: undefinedIfNull(plan.targetProtein),
             targetCarbs: undefinedIfNull(plan.targetCarbs),
             targetFats: undefinedIfNull(plan.targetFats),
-            dietPlanId: undefinedIfNull(plan.dietPlanId)
+            notes: undefinedIfNull(plan.notes),
+            dietPlanId: undefinedIfNull(plan.dietPlanId),
+            clientId: undefinedIfNull(plan.clientId)
         }));
 
         res.json(dietPlans);

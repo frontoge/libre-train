@@ -207,9 +207,12 @@ export interface ClientDietPlan {
     first_name: string;
     last_name: string;
     trainerId: number;
+    planName?: string;
     targetCalories?: number;
     targetProtein?: number;
     targetCarbs?: number;
     targetFats?: number;
+    notes?: string;
     dietPlanId?: number;
+    clientId?: number;
 }
