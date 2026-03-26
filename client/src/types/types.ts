@@ -87,6 +87,8 @@ export type ClientDietPlanTableData = {
     planId?: number;
     clientId?: number;
     name: string;
+    planName?: string;
+    notes?: string;
     calories?: number;
     protein?: number;
     carbs?: number;

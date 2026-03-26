@@ -7,7 +7,6 @@ export function NavMenu() {
     const navigate = useNavigate();
 
     const onClick = (item: { key: string }) => {
-        console.log('Menu item clicked:', item);
         // Navigate to the selected menu item
         navigate(getNavigationUrl(item.key));
     }

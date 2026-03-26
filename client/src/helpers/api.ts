@@ -1,6 +1,6 @@
 //TODO Move all api helper functions to here
 
-import type { ClientDietPlan } from "../../../shared/models";
+import type { ClientDietPlan, DietPlan, DietPlanLogEntry } from "../../../shared/models";
 import { Routes } from "../../../shared/routes";
 import { getAppConfiguration } from "../config/app.config";
 import type { WorkoutRoutineEdit } from "../types/types";
@@ -75,6 +75,50 @@ export const fetchClientDietPlansForTrainer = async (trainerId: number): Promise
         return data as ClientDietPlan[];
     } catch (error) {
         console.error('Error fetching client diet plans for trainer:', error);
+        throw error;
+    }
+}
+
+export const fetchDietPlanLogEntries = async (dietPlanId: number): Promise<DietPlanLogEntry[]> => {
+    try {
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        };
+        const searchParams = createSearchParams({ dietPlanId: dietPlanId.toString()});
+        const response = await fetch(`${API_BASE_URL}${Routes.DietLog}?${searchParams}`, requestOptions);
+        const data = await response.json();
+        return data as DietPlanLogEntry[];
+    } catch (error) {
+        console.error('Error fetching diet plan log entries:', error);
+        throw error;
+    }
+}
+
+export const createDietPlan = async (dietPlan: Omit<DietPlan, 'id' | 'isActive'>): Promise<Response> => {
+    const body: string = JSON.stringify(dietPlan);
+
+    const requestOptions: RequestInit = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body
+    };
+    try {
+        return await fetch(`${API_BASE_URL}${Routes.DietPlan}`, requestOptions);
+    } catch (error) {
+        console.error('Error creating diet plan:', error);
+        throw error;
+    }
+}
+
+export const deleteDietPlan = async (dietPlanId: number): Promise<Response> => {
+    const requestOptions: RequestInit = {
+        method: 'DELETE',
+    };
+    try {
+        return await fetch(`${API_BASE_URL}${Routes.DietPlan}/${dietPlanId}`, requestOptions);
+    } catch (error) {
+        console.error('Error deleting diet plan:', error);
         throw error;
     }
 }

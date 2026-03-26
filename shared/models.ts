@@ -214,5 +214,5 @@ export interface ClientDietPlan {
     targetFats?: number;
     notes?: string;
     dietPlanId?: number;
-    clientId?: number;
+    clientId: number;
 }
