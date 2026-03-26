@@ -2,7 +2,7 @@ import { HomeFilled } from "@ant-design/icons";
 import { type NavMenuItem } from "../types/types";
 import { MdSpaceDashboard, MdAssessment } from "react-icons/md";
 import { IoMdPersonAdd, IoMdPerson } from "react-icons/io";
-import { FaListAlt } from "react-icons/fa";
+import { FaListAlt, FaPencilAlt } from "react-icons/fa";
 import { GiWeightLiftingUp } from "react-icons/gi";
 import { ImMap } from "react-icons/im";
 import { FaSquarePlus, FaMagnifyingGlass, FaCalendarXmark } from "react-icons/fa6";
@@ -92,6 +92,19 @@ export const items: NavMenuItem[] = [
                 label: 'Browse Plans',
                 icon: <FaListAlt />,
                 urlPath: '/diet/plans'
+            }
+        ]
+    },
+    {
+        key: 'logging',
+        label: 'Logging',
+        icon: <FaPencilAlt />,
+        children: [
+            {
+                key: 'log_diet',
+                label: 'New Diet Log',
+                icon: <SiMealie />,
+                urlPath: '/diet/log'
             }
         ]
     },
