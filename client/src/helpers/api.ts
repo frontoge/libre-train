@@ -95,6 +95,25 @@ export const fetchDietPlanLogEntries = async (dietPlanId: number): Promise<DietP
     }
 }
 
+export const fetchClientDietPlan = async (clientId: number): Promise<ClientDietPlan> => {
+    try {
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        };
+        const searchParams = createSearchParams({ clientId: clientId.toString()});
+        const response = await fetch(`${API_BASE_URL}${Routes.DietPlan}?${searchParams}`, requestOptions);
+        if (!response.ok) {
+            throw new Error(`Error fetching client diet plan: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data[0] as ClientDietPlan;
+    } catch (error) {
+        console.error('Error fetching client diet plan:', error);
+        return {} as ClientDietPlan; //Return empty plan if error occurs
+    }
+}
+
 export const createDietPlan = async (dietPlan: Omit<DietPlan, 'id' | 'isActive'>): Promise<Response> => {
     const body: string = JSON.stringify(dietPlan);
 
@@ -119,6 +138,22 @@ export const deleteDietPlan = async (dietPlanId: number): Promise<Response> => {
         return await fetch(`${API_BASE_URL}${Routes.DietPlan}/${dietPlanId}`, requestOptions);
     } catch (error) {
         console.error('Error deleting diet plan:', error);
+        throw error;
+    }
+}
+
+export const createDietLogEntry = async (dietLogEntry: Omit<DietPlanLogEntry, 'id' | 'dietPlanId'>): Promise<Response> => {
+    const body: string = JSON.stringify(dietLogEntry);
+
+    const requestOptions: RequestInit = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body
+    };
+    try {
+        return await fetch(`${API_BASE_URL}${Routes.DietLog}`, requestOptions);
+    } catch (error) {
+        console.error('Error creating diet log entry:', error);
         throw error;
     }
 }

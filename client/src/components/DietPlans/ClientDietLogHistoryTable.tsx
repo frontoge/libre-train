@@ -36,9 +36,9 @@ export function ClientDietLogHistoryTable(props: ClientDietLogHistoryTableProps)
             title: 'Date',
             dataIndex: 'logDate',
             key: 'date',
-            sorter: (a: string, b: string) => {
-                const dateA = dayjs(a);
-                const dateB = dayjs(b);
+            sorter: (a: DietPlanLogEntry, b: DietPlanLogEntry) => {
+                const dateA = dayjs(a.logDate);
+                const dateB = dayjs(b.logDate);
                 if (dateA.isBefore(dateB)) return -1;
                 if (dateA.isAfter(dateB)) return 1;
                 return 0;
