@@ -14,7 +14,6 @@ export function Login() {
     const { setAuth, isAuthenticated, state: { auth } } = React.useContext(AppContext);
 
     React.useEffect(() => {
-        console.log('Checking authentication status on Login page', { auth });
         if (isAuthenticated()) {
             // User is already authenticated, redirect to home
             navigate("/", { replace: true });

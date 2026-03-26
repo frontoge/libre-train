@@ -47,8 +47,6 @@ export function ClientCard(props: ClientCardProps) {
         }
     ]
 
-    console.log('Client in ClientCard:', clientDescriptions);
-
     return (
         <Card
             style={{

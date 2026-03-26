@@ -12,5 +12,4 @@ SELECT
     dp.id as dietPlanId,
     cc.clientId
 FROM ClientContact cc
-LEFT JOIN DietPlan dp ON cc.clientId = dp.clientId
-WHERE (dp.isActive = true OR dp.isActive IS NULL);
+LEFT JOIN DietPlan dp ON cc.clientId = dp.clientId AND dp.isActive = true;

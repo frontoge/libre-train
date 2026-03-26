@@ -1,17 +1,17 @@
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { AppContext } from "../../app-context";
 import { formatClientFullName } from "../../helpers/label-formatters";
 import { stringSimilarity } from 'string-similarity-js'
 import { Select } from "antd";
 
-export interface ClientSearchProps extends Omit<React.ComponentProps<typeof Select>, 'fetchOptions'> {
+export interface ClientSearchProps extends Omit<React.ComponentProps<typeof Select<string>>, 'fetchOptions'> {
     onClientSelect?: (clientId?: string) => void;
 }
 
 export function ClientSearch(props: ClientSearchProps) {
-    const { onClientSelect, ...otherProps} = props;
+    const { onClientSelect, value: initalValue, ...otherProps} = props;
     const { state: { clients }} = useContext(AppContext);
-    const [selectedClient, setSelectedClient] = useState<string | undefined>(undefined);
+    const [selectedClient, setSelectedClient] = useState<string | undefined>(initalValue ? initalValue.toString() : undefined);
 
     const handleChange = (value?: string) => {
         setSelectedClient(value);
@@ -30,12 +30,12 @@ export function ClientSearch(props: ClientSearchProps) {
         }))
     }
 
-    const initialOptions = clients
+    const initialOptions = useMemo(() => clients
         .map((client) => ({
             key: client.id.toString(),
             label: formatClientFullName(client.first_name, client.last_name),
             value: client.id.toString(),
-        }))
+        })), [clients]);
 
     return (
         <Select<string>
