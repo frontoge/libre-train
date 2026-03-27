@@ -18,6 +18,7 @@ import { AssessmentRouter } from "./pages/assessments/AssessmentRouter"
 import "./styles/app.css"
 import { DietRouter } from "./pages/diet/DietRouter"
 import { useAuth } from "./hooks/useAuth"
+import { Logout } from "./pages/Logout"
 
 function App() {
 	const env = import.meta.env.VITE_ENV || 'local';
@@ -149,6 +150,7 @@ function App() {
 						</Route>
 						<Route path="/signup" element={<Signup />} />
 						<Route path="/login" element={<Login />} />
+						<Route path="/logout" element={<Logout />} />
 						<Route path="*" element={<NoPage />} />
 					</Routes>
 				</BrowserRouter>
