@@ -1,6 +1,6 @@
 import { Modal } from "antd"
 import { WorkoutRoutineDisplay } from "./WorkoutRoutineDisplay"
-import type { WorkoutRoutine } from "../../../../shared/models"
+import type { WorkoutRoutine } from "@libre-train/shared"
 
 
 export interface RoutineDisplayModalProps extends React.ComponentProps<typeof Modal>{

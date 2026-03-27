@@ -1,5 +1,5 @@
-import { AssessmentGroup, ExerciseForm, ExerciseMovementPattern, MuscleGroup, WorkoutRoutineCategory } from "../../../shared/models";
-import { TrainingCycleType } from "../../../shared/types";
+import { AssessmentGroup, ExerciseForm, ExerciseMovementPattern, MuscleGroup, WorkoutRoutineCategory } from "@libre-train/shared";
+import { TrainingCycleType } from "@libre-train/shared";
 import { MuscleGroupLabels, TrainingCycleTypeLabels, WorkoutRoutineCategoryLabels } from "./label-formatters";
 
 export const assessmentGroupOptions = [

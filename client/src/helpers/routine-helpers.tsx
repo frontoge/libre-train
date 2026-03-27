@@ -1,4 +1,4 @@
-import { WorkoutRoutineCategory, type PlannedExerciseGroup, type WorkoutRoutine } from "../../../shared/models";
+import { WorkoutRoutineCategory, type PlannedExerciseGroup, type WorkoutRoutine } from "@libre-train/shared";
 import { WorkoutNodeType, type WorkoutRoutineCategoryNode, type WorkoutRoutineEdit, type WorkoutRoutineExerciseNode, type WorkoutRoutineGroupNode, type WorkoutRoutineTreeNode } from "../types/types";
 import { WorkoutRoutineCategoryLabels } from "./label-formatters";
 import { FaFire, FaDumbbell, FaBolt, FaBrain } from "react-icons/fa6";
@@ -9,7 +9,7 @@ import type { RoutineExerciseCreateEditFormProps } from "../components/Routines/
 import { secondsToTimeString } from "./date-helpers";
 import type { RoutineGroupEditFormValues } from "../components/Routines/RoutineGroupEditForm";
 import { getAppConfiguration } from "../config/app.config";
-import { Routes } from "../../../shared/routes";
+import { Routes } from "@libre-train/shared";
 
 // Builds a workout routine tree data structure from a workout routine
 export function getWorkoutRoutineTreeData(routine: WorkoutRoutineEdit): WorkoutRoutineCategoryNode[] {

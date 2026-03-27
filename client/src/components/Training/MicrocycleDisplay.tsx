@@ -1,6 +1,6 @@
 import { Card, Popconfirm, Result, Skeleton } from "antd";
 import { useEffect, useState } from "react";
-import type { Microcycle, WorkoutRoutine } from "../../../../shared/models";
+import type { Microcycle, WorkoutRoutine } from "@libre-train/shared";
 import { MdEdit } from "react-icons/md";
 import { FaTrash } from "react-icons/fa";
 import dayjs from "../../config/dayjs";

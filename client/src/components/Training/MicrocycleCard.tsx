@@ -1,5 +1,5 @@
 import { Badge, Card, Descriptions } from "antd";
-import type { Microcycle } from "../../../../shared/models";
+import type { Microcycle } from "@libre-train/shared";
 import dayjs from "../../config/dayjs";
 
 export interface MicrocycleCardProps extends React.ComponentProps<typeof Card> {

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { ResponseWithError } from '../../../shared/types';
-import { Contact } from '../../../shared/models';
+import { ResponseWithError } from '@libre-train/shared';
+import { Contact } from '@libre-train/shared';
 import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastructure/mysql-database';
 import { RowDataPacket } from 'mysql2';
 

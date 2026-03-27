@@ -1,7 +1,7 @@
 import React, { createContext } from "react";
 import type { ModalType } from "./types/types";
 import type { Auth } from "./auth/authorization";
-import type { AssessmentType, ClientContact, Exercise } from "../../shared/models";
+import type { AssessmentType, ClientContact, Exercise } from "@libre-train/shared";
 import { getAppConfiguration } from "./config/app.config";
 
 export type AppState = {

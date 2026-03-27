@@ -1,4 +1,4 @@
-import type { PlannedExerciseGroup } from "../../../../shared/models";
+import type { PlannedExerciseGroup } from "@libre-train/shared";
 
 export interface PlannedExerciseGroupProps {
     group: Omit<PlannedExerciseGroup, 'exercises' | 'routine_category'>;

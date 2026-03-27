@@ -1,6 +1,6 @@
 import { Table } from "antd";
 import { useEffect, useState } from "react";
-import type { DietPlanLogEntry } from "../../../../shared/models";
+import type { DietPlanLogEntry } from "@libre-train/shared";
 import { fetchDietPlanLogEntries } from "../../helpers/api";
 import dayjs from "dayjs";
 

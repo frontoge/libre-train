@@ -15,7 +15,16 @@ export function RouterLayout() {
             width: "100%",
         }}>
             {state.selectedModal !== undefined && Modals[state.selectedModal]}
-            <Sider>
+            <Sider collapsible>
+                <div style={{
+                    height: "5%",
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: "white"
+                }}>
+                    Logo
+                </div>
                 <NavMenu />
             </Sider>
             <Outlet />

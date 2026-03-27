@@ -1,4 +1,4 @@
-import type { ClientDietPlan } from "../../../../shared/models";
+import type { ClientDietPlan } from "@libre-train/shared";
 import type { ClientDietPlanTableData } from "../../types/types";
 import type { TableProps } from "antd/es/table";
 

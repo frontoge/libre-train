@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { AssessmentClientLog, AssessmentType } from "../../../shared/models";
-import { AssessmentClientLogCreateRequest, AssessmentClientLogSearchOptions, ResponseWithError } from "../../../shared/types";
+import { AssessmentClientLog, AssessmentType } from "@libre-train/shared";
+import { AssessmentClientLogCreateRequest, AssessmentClientLogSearchOptions, ResponseWithError } from "@libre-train/shared";
 
 
 export const handleGetAssessmentTypes = async (req: Request<{ id?: string }>, res: Response<ResponseWithError<AssessmentType[]>>) => {

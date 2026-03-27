@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { AppContext } from "../../app-context";
-import type { PlannedExercise, PlannedExerciseGroup } from "../../../../shared/models";
+import type { PlannedExercise, PlannedExerciseGroup } from "@libre-train/shared";
 import { WorkoutNodeType, type WorkoutRoutineEdit, type WorkoutRoutineGroupNode, type WorkoutRoutineTreeNode } from "../../types/types";
 import { RoutineExerciseCreateEditForm, type RoutineExerciseCreateEditFormValues } from "./RoutineExerciseCreateEditForm";
 import { timeStringToSeconds } from "../../helpers/date-helpers";

@@ -1,8 +1,8 @@
-import { TrainingCycleType } from "../../../shared/types";
+import { TrainingCycleType } from "@libre-train/shared";
 import type { CreateEditTrainingPlanFormValues } from "../components/Training/CreateEditTrainingPlan";
 import { getAppConfiguration } from "../config/app.config";
-import { Routes } from "../../../shared/routes";
-import type { Macrocycle, Mesocycle, Microcycle } from "../../../shared/models";
+import { Routes } from "@libre-train/shared";
+import type { Macrocycle, Mesocycle, Microcycle } from "@libre-train/shared";
 import { createSearchParams } from "./fetch-helpers";
 
 async function createMacrocycle(values: CreateEditTrainingPlanFormValues): Promise<number | undefined> {

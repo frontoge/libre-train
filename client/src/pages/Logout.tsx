@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { getAppConfiguration } from "../config/app.config";
-import { Routes } from "../../../shared/routes";
+import { Routes } from "@libre-train/shared";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 

@@ -1,5 +1,5 @@
 import { Button, Form, Input } from "antd";
-import type { PlannedExerciseGroup } from "../../../../shared/models";
+import type { PlannedExerciseGroup } from "@libre-train/shared";
 import { useEffect } from "react";
 
 export interface RoutineGroupEditFormProps extends React.HTMLAttributes<HTMLDivElement> {

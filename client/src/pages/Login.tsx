@@ -1,7 +1,7 @@
 import { Layout, Form, type FormProps, Input, Button } from "antd";
 import { Content } from "antd/es/layout/layout";
 import React from "react";
-import { Routes } from "../../../shared/routes";
+import { Routes } from "@libre-train/shared";
 import { getAppConfiguration } from "../config/app.config";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";

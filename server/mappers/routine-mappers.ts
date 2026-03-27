@@ -1,4 +1,4 @@
-import { PlannedExercise, PlannedExerciseGroup, WorkoutRoutine } from "../../shared/models";
+import { PlannedExercise, PlannedExerciseGroup, WorkoutRoutine } from "@libre-train/shared";
 import { WorkoutRoutineExerciseDTO } from "../types/dto";
 
 type WorkoutRoutineWithIndices = Omit<WorkoutRoutine, 'exercise_groups'> & { 

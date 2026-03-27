@@ -1,8 +1,8 @@
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database"
 import { Request, Response } from "express";
-import { ResponseWithError } from "../../../shared/types";
+import { ResponseWithError } from "@libre-train/shared";
 import { RowDataPacket } from "mysql2";
-import { Exercise } from "../../../shared/models";
+import { Exercise } from "@libre-train/shared";
 
 export const handleExerciseCreate = async (req: Request<{}, {}, Omit<Exercise, 'id'>>, res: Response) => { 
     const connection = await getDatabaseConnection();

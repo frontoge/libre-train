@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { DietPlan, DietPlanLogEntry } from "../../../shared/models";
+import { DietPlan, DietPlanLogEntry } from "@libre-train/shared";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
 import { RowDataPacket } from "mysql2";
-import { GetDietPlanLogEntrySearchParams, GetDietPlanSearchParams } from "../../../shared/types";
-import { undefinedIfNull } from "../../../shared/utilities";
+import { GetDietPlanLogEntrySearchParams, GetDietPlanSearchParams } from "@libre-train/shared";
+import { undefinedIfNull } from "@libre-train/shared";
 
 export const handleGetDietPlan = async (req: Request<{ planId?: string }, {}, {}, GetDietPlanSearchParams>, res: Response) => {
     const connection = await getDatabaseConnection();

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Routes } from "../../../../shared/routes";
+import { Routes } from "@libre-train/shared";
 import { AppContext } from "../../app-context";
 import { AssessmentHistoryFilters, type AssessmentHistorySearchQuery } from "../../components/Assessments/AssessmentHistoryFilters";
 import { AssessmentHistoryTable, type AssessmentHistoryTableEntry } from "../../components/Assessments/AssessmentHistoryTable";

@@ -1,7 +1,7 @@
 import type { TreeDataNode } from "antd";
 import type { MenuProps } from "antd/es/menu/menu";
 import type { Dayjs } from "dayjs";
-import type { PlannedExercise, PlannedExerciseGroup, WorkoutRoutine } from "../../../shared/models";
+import type { PlannedExercise, PlannedExerciseGroup, WorkoutRoutine } from "@libre-train/shared";
 
 export type MenuItem = Required<MenuProps>['items'][number];
 

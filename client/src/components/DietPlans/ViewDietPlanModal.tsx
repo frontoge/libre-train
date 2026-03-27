@@ -1,5 +1,5 @@
 import { Descriptions, Divider, Modal } from "antd";
-import type { ClientDietPlan } from "../../../../shared/models";
+import type { ClientDietPlan } from "@libre-train/shared";
 import { ClientCard } from "../clients/ClientCard";
 import { ClientDietLogHistoryTable } from "./ClientDietLogHistoryTable";
 

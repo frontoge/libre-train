@@ -4,7 +4,7 @@ import { ClientDataViewer } from "../../components/clients/ClientDataViewer";
 import { ClientLists } from "../../components/clients/ClientLists";
 import { getAppConfiguration } from "../../config/app.config";
 import { useContext, useEffect, useState } from "react";
-import { Routes } from "../../../../shared/routes";
+import { Routes } from "@libre-train/shared";
 import { AppContext } from "../../app-context";
 import { ClientDashboardContext, type DashboardState, defaultDashboardState } from "../../contexts/ClientDashboardContext";
 

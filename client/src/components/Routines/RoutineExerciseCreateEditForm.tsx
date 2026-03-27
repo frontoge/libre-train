@@ -1,5 +1,5 @@
 import { Button, Form, Input, Select } from "antd";
-import type { PlannedExercise } from "../../../../shared/models";
+import type { PlannedExercise } from "@libre-train/shared";
 import { routineCategoryOptions } from "../../helpers/enum-select-options";
 import { ExercisePicker } from "../Exercises/ExercisePicker";
 

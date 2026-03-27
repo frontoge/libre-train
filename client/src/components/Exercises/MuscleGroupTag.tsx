@@ -1,6 +1,6 @@
 import { Tag, type SelectProps } from "antd";
 import { muscleGroupColors } from "../../helpers/label-formatters";
-import type { MuscleGroup } from "../../../../shared/models";
+import type { MuscleGroup } from "@libre-train/shared";
 
 type TagRender = SelectProps['tagRender'];
 

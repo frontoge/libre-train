@@ -13,7 +13,7 @@ import { Login } from "./pages/Login"
 import { ExerciseRouter } from "./pages/exercises/ExerciseRouter"
 import { TrainingRouter } from "./pages/training/TrainingRouter"
 import { getAppConfiguration } from "./config/app.config"
-import { Routes as ApiRoutes } from "../../shared/routes";
+import { Routes as ApiRoutes } from "@libre-train/shared";
 import { AssessmentRouter } from "./pages/assessments/AssessmentRouter"
 import "./styles/app.css"
 import { DietRouter } from "./pages/diet/DietRouter"

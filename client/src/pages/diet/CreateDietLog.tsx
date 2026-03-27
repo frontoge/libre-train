@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";
 import { ClientSearch } from "../../components/clients/ClientSearch";
-import { Button, DatePicker, Descriptions, Form, Input, InputNumber } from "antd";
-import type { ClientDietPlan } from "../../../../shared/models";
+import { Button, DatePicker, Form, Input, InputNumber } from "antd";
+import type { ClientDietPlan } from "@libre-train/shared";
 import { createDietLogEntry, fetchClientDietPlan } from "../../helpers/api";
 import TextArea from "antd/es/input/TextArea";
 import type { Dayjs } from "dayjs";

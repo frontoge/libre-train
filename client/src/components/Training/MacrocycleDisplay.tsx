@@ -2,7 +2,7 @@ import { Card, Popconfirm, Result, Skeleton } from "antd";
 import { FaTrash } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { MesocycleCard } from "./MesocycleCard";
-import type { Macrocycle, Mesocycle } from "../../../../shared/models";
+import type { Macrocycle, Mesocycle } from "@libre-train/shared";
 import { useEffect, useState } from "react";
 import { fetchChildMesocycles } from "../../helpers/training-helpers";
 import dayjs from "../../config/dayjs";

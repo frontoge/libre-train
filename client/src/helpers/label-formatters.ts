@@ -1,5 +1,5 @@
-import { ExerciseForm, ExerciseMovementPattern, MuscleGroup, WorkoutRoutineCategory } from "../../../shared/models";
-import { TrainingCycleType } from "../../../shared/types";
+import { ExerciseForm, ExerciseMovementPattern, MuscleGroup, WorkoutRoutineCategory } from "@libre-train/shared";
+import { TrainingCycleType } from "@libre-train/shared";
 
 export const formatClientFullName = (firstName?: string, lastName?: string) => {
     return `${firstName ?? ""} ${lastName ?? ""}`.trim();

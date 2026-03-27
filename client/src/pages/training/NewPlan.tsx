@@ -3,7 +3,7 @@ import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";
 import { CreateEditTrainingPlan, type CreateEditTrainingPlanFormValues } from "../../components/Training/CreateEditTrainingPlan";
 import { cycleCreateHelpers } from "../../helpers/training-helpers";
-import { TrainingCycleType } from "../../../../shared/types";
+import { TrainingCycleType } from "@libre-train/shared";
 import { useNavigate } from "react-router";
 
 export function NewPlan() {

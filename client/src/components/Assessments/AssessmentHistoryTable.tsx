@@ -1,6 +1,6 @@
 import { Button, Popconfirm, Space, Table, type TableProps } from "antd";
 import { getAppConfiguration } from "../../config/app.config";
-import { Routes } from "../../../../shared/routes";
+import { Routes } from "@libre-train/shared";
 import { useState } from "react";
 import { AssessmentModal } from "./AssessmentModal";
 import type { AssessmentCreateEditInitialValues } from "./AssessmentCreateEditForm";

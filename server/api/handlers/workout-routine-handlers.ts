@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { ResponseWithError, UpdateWorkoutRoutineRequest } from "../../../shared/types";
-import { PlannedExercise, PlannedExerciseGroup, WorkoutRoutine } from "../../../shared/models";
+import { ResponseWithError, UpdateWorkoutRoutineRequest } from "@libre-train/shared";
+import { PlannedExercise, PlannedExerciseGroup, WorkoutRoutine } from "@libre-train/shared";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
 import { RowDataPacket } from "mysql2";
 import { WorkoutRoutineExerciseDTO } from "../../types/dto";

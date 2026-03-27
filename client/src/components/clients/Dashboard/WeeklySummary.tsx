@@ -16,12 +16,11 @@ import { Dayjs } from "dayjs";
 import React from "react";
 import { getWeekRange } from "../../../helpers/date-helpers";
 import { getAppConfiguration } from "../../../config/app.config";
-import { Routes } from "../../../../../shared/routes";
 import { useParams } from "react-router-dom";
-import type { DashboardWeeklySummaryResponse } from "../../../../../shared/types";
+import type { DashboardWeeklySummaryResponse, Routes } from "@libre-train/shared";
 import { type DashboardSummaryState } from "../../../types/types";
 import { mapDashboardSummaryResponse } from "../../../helpers/mappers";
-import { formatStatisticDiff, getStatisticPrefix } from "../../../helpers/client-formatters";
+import { formatStatisticDiff } from "../../../helpers/client-formatters";
 
 
 export function WeeklySummary() {

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { type DashboardData } from "../../../shared/types";
+import { type DashboardData } from "@libre-train/shared";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 

@@ -1,7 +1,7 @@
 {
-  "name": "client",
+  "name": "@libre-train/client",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@libre-train/shared": "workspace:*",
     "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^24.11.0",
     "antd": "^5.29.3",

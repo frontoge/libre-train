@@ -3,9 +3,8 @@ import { exerciseFormOptions, exerciseMovementPatternOptions } from "../../helpe
 import { MuscleGroupSearch } from "./MuscleGroupSearch";
 import { AppContext } from "../../app-context";
 import { useContext } from "react";
-import type { MuscleGroup } from "../../../../shared/models";
 import { getAppConfiguration } from "../../config/app.config";
-import { Routes } from "../../../../shared/routes";
+import { Routes, type MuscleGroup} from "@libre-train/shared";
 
 export interface CreateEditExerciseFormProps extends React.ComponentProps<typeof Form> {
     initialExerciseId?: number;

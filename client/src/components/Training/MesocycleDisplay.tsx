@@ -1,5 +1,5 @@
 import { Card, Popconfirm, Result, Skeleton } from "antd";
-import type { Mesocycle, Microcycle } from "../../../../shared/models";
+import type { Mesocycle, Microcycle } from "@libre-train/shared";
 import dayjs from "../../config/dayjs";
 import { MdEdit } from "react-icons/md";
 import { FaTrash } from "react-icons/fa6";

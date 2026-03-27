@@ -1,5 +1,5 @@
 import { Button, Card, Input, Tree } from "antd";
-import { type PlannedExerciseGroup } from "../../../../shared/models";
+import { type PlannedExerciseGroup } from "@libre-train/shared";
 
 import { useEffect, useState } from "react";
 import { PlannedExerciseDisplay } from "./PlannedExerciseDisplay";

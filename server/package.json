@@ -1,7 +1,8 @@
 {
-  "name": "server",
+  "name": "@libre-train/server",
   "module": "index.ts",
   "type": "module",
+  "version": "0.1.0",
   "private": true,
   "devDependencies": {
     "@types/bun": "latest",
@@ -16,6 +17,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@libre-train/shared": "workspace:*",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.10",

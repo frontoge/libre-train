@@ -2,11 +2,9 @@ import { Calendar, InputNumber, Divider, Card, Statistic, Button, message, Alert
 import { NutritionSummary } from "../../Nutrition/NutritionSummary";
 import { ClientDashboardContext } from "../../../contexts/ClientDashboardContext";
 import React from "react";
-import { type DailyUpdateData } from "../../../../../shared/types";
-import { undefinedIfNull } from "../../../../../shared/utilities";
+import { type DailyUpdateData, undefinedIfNull, Routes } from "@libre-train/shared";
 import { useParams } from "react-router-dom";
 import { getAppConfiguration } from "../../../config/app.config";
-import { Routes } from "../../../../../shared/routes";
 import dayjs from "dayjs";
 
 export function DailyUpdate() {

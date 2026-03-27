@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { Macrocycle, Mesocycle, Microcycle, WorkoutRoutine } from "../../../shared/models";
+import { Macrocycle, Mesocycle, Microcycle, WorkoutRoutine } from "@libre-train/shared";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { MacrocycleSearchParams, MesocycleSearchParams, MesocycleUpdateRequest, MicrocycleSearchParams, MicrocycleUpdateRequest, MicrocycleUpdateRoutinesRequest, ResponseWithError } from "../../../shared/types";
+import { MacrocycleSearchParams, MesocycleSearchParams, MesocycleUpdateRequest, MicrocycleSearchParams, MicrocycleUpdateRequest, MicrocycleUpdateRoutinesRequest, ResponseWithError } from "@libre-train/shared";
 import { RowDataPacket } from "mysql2";
 import { createWorkoutRoutine, deactivateCycleRoutines } from "./workout-routine-handlers";
 

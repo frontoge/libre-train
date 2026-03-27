@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 import { getAppConfiguration } from "../config/app.config";
 import { useCallback, useContext } from "react";
-import { Routes } from "../../../shared/routes";
+import { Routes } from "@libre-train/shared";
 import { AppContext } from "../app-context";
 
 

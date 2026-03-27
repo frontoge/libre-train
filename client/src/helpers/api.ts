@@ -1,7 +1,7 @@
 //TODO Move all api helper functions to here
 
-import type { ClientDietPlan, DietPlan, DietPlanLogEntry } from "../../../shared/models";
-import { Routes } from "../../../shared/routes";
+import type { ClientDietPlan, DietPlan, DietPlanLogEntry } from "@libre-train/shared";
+import { Routes } from "@libre-train/shared";
 import { getAppConfiguration } from "../config/app.config";
 import type { WorkoutRoutineEdit } from "../types/types";
 import { createSearchParams } from "./fetch-helpers";

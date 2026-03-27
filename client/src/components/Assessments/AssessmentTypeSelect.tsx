@@ -1,7 +1,7 @@
 import { Select } from "antd";
 import { AppContext } from "../../app-context";
 import { useContext, useState } from "react";
-import { AssessmentGroup } from "../../../../shared/models";
+import { AssessmentGroup } from "@libre-train/shared";
 import stringSimilarity from "string-similarity-js";
 import { type SelectProps } from "antd";
 

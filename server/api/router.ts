@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { handleHealthCheck } from "./handlers";
-import { Routes } from "../../shared/routes";
+import { Routes } from "@libre-train/shared";
 import { handleGetClients, handleCreateClient, handleDailyUpdate, handleGetDashboard, handleGetDashboardSummary, handleDeleteClient, handleGetClientContacts } from "./handlers/client-handlers";
 import { handleAuthSignup, handleAuthLogin, handleAuthRefresh, handleAuthLogout } from "./handlers/auth-handlers";
 import { handleDeleteExercise, handleExerciseCreate, handleGetAllExercises, handleUpdateExercise } from "./handlers/exercise-handlers";

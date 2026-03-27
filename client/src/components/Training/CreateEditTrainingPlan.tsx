@@ -2,7 +2,7 @@ import { Button, Checkbox, DatePicker, Form, Input, Select } from "antd"
 import { ClientSearch } from "../clients/ClientSearch";
 import { useEffect, useState } from "react";
 import { cycleTypeOptions } from "../../helpers/enum-select-options";
-import { TrainingCycleType } from "../../../../shared/types";
+import { TrainingCycleType } from "@libre-train/shared";
 import dayjs, { Dayjs } from "dayjs";
 import { fetchClientMacrocycles, fetchClientMesocycles } from "../../helpers/training-helpers";
 import { stringFormatDate } from "../../helpers/date-helpers";

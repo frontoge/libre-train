@@ -7,7 +7,7 @@ import type { ClientDietPlanTableData } from "../../types/types";
 import { ClientDietPlanSearch } from "./ClientDietPlanSearch";
 import stringSimilarity from "string-similarity-js";
 import { ViewDietPlanModal } from "./ViewDietPlanModal";
-import type { ClientDietPlan } from "../../../../shared/models";
+import type { ClientDietPlan } from "@libre-train/shared";
 import { CreateEditDietPlanModal } from "./CreateEditDietPlanModal";
 import type { CreateEditDietPlanFormValues } from "./CreateEditDietPlanForm";
 

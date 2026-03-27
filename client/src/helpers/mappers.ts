@@ -1,5 +1,5 @@
-import type { AssessmentClientLog, AssessmentType, ClientContact, PlannedExercise, PlannedExerciseGroup } from "../../../shared/models";
-import { type DashboardWeeklySummary } from "../../../shared/types";
+import type { AssessmentClientLog, AssessmentType, ClientContact, PlannedExercise, PlannedExerciseGroup } from "@libre-train/shared";
+import { type DashboardWeeklySummary } from "@libre-train/shared";
 import type { AssessmentHistoryTableEntry } from "../components/Assessments/AssessmentHistoryTable";
 import { WorkoutNodeType, type DashboardSummaryState, type WorkoutRoutineExerciseNode, type WorkoutRoutineGroupNode } from "../types/types";
 import { formatClientFullName } from "./label-formatters";

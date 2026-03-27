@@ -1,5 +1,5 @@
 import { Badge, Card, Descriptions, Tag } from "antd";
-import type { Mesocycle } from "../../../../shared/models";
+import type { Mesocycle } from "@libre-train/shared";
 import { stringFormatCondensedDate } from "../../helpers/date-helpers";
 import { cardioLevelTagColors, optLevelTagColors } from "../../helpers/training-helpers";
 import dayjs from "../../config/dayjs";

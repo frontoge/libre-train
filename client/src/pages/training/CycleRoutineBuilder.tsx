@@ -6,7 +6,7 @@ import { fetchMicrocycleById } from "../../helpers/training-helpers";
 import { fetchMicrocycleRoutines } from "../../helpers/routine-helpers";
 import { MicrocycleRoutinePicker } from "../../components/Training/MicrocycleRoutinePicker";
 import { RoutineEditor } from "../../components/Routines/RoutineEditor";
-import type { Microcycle } from "../../../../shared/models";
+import type { Microcycle } from "@libre-train/shared";
 import { Button, Popconfirm } from "antd";
 import type { WorkoutRoutineEdit } from "../../types/types";
 import { QuestionCircleOutlined } from '@ant-design/icons';

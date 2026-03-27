@@ -1,4 +1,4 @@
-import type { PlannedExercise } from "../../../../shared/models";
+import type { PlannedExercise } from "@libre-train/shared";
 
 export interface PlannedExerciseProps {
     exercise: PlannedExercise;

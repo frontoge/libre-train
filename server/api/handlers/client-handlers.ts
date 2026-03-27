@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { closeDatabaseConnection, getDatabaseConnection } from "../../infrastructure/mysql-database";
-import { AddClientFormValues, DailyUpdateRequest, DashboardData, DashboardResponse, DashboardSummaryQuery, DashboardWeeklySummaryResponse } from "../../../shared/types";
-import { Client, ClientContact } from "../../../shared/models";
+import { AddClientFormValues, DailyUpdateRequest, DashboardData, DashboardResponse, DashboardSummaryQuery, DashboardWeeklySummaryResponse } from "@libre-train/shared";
+import { Client, ClientContact } from "@libre-train/shared";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 export const handleGetClientContacts = async (req: Request<{ id?: string }>, res: Response) => {

@@ -3,7 +3,7 @@ import PageLayout from "../../components/PageLayout";
 import { Panel } from "../../components/Panel";
 import { message } from "antd";
 import { useContext, useState } from "react";
-import { Routes } from "../../../../shared/routes";
+import { Routes } from "@libre-train/shared";
 import { getAppConfiguration } from "../../config/app.config";
 import { AppContext } from "../../app-context";
 import { ContactEditCreateForm } from "../../components/Contacts/ContactEditCreateForm";

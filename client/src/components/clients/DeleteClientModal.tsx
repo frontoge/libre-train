@@ -1,7 +1,7 @@
 import { Modal } from "antd";
 import React from "react";
 import { getAppConfiguration } from "../../config/app.config";
-import { Routes } from "../../../../shared/routes";
+import { Routes } from "@libre-train/shared";
 import { AppContext } from "../../app-context";
 import { useNavigate } from "react-router";
 
