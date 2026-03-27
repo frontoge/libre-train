@@ -98,8 +98,6 @@ export const handleAuthLogin = async (req: Request, res: Response) => {
             { expiresIn: '7d' }
         )
 
-        console.log(process.env.NODE_ENV)
-
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -121,13 +119,9 @@ export const handleAuthLogin = async (req: Request, res: Response) => {
 }
 
 export const handleAuthRefresh = async (req: Request, res: Response) => {
-    console.log("Received request to refresh token...");
     const refreshToken = req.cookies?.refreshToken;
 
-    console.log(req.cookies);
-
     if (!refreshToken) {
-        console.log("No refresh token found in cookies");
         return res.status(401).json({ message: 'Refresh token missing' });
     }
 
