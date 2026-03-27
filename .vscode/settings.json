@@ -4,11 +4,11 @@
 	"editor.formatOnPaste": false,
 	"editor.formatOnType": false,
 
-	// Show Prettier issues as warnings in the Problems panel
+	// Prettier settings
 	"prettier.requireConfig": true,
 	"prettier.enable": true,
 
-	// Make formatting violations appear as warnings (not just errors)
+	// Language-specific formatting (Prettier as default)
 	"[typescript]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
 		"editor.codeActionsOnSave": {
@@ -28,8 +28,35 @@
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 
-	// Optional: Show all Prettier diagnostics as warnings
-	"prettier.problems": {
-		"level": "warning"
-	}
+	// === ESLint Configuration ===
+	"eslint.enable": true,
+	"eslint.useFlatConfig": true,
+
+	// Critical fix for multi-workspace monorepo with separate tsconfigs
+	"eslint.workingDirectories": [
+		{
+			"directory": "client",
+			"changeProcessCWD": true
+		},
+		{
+			"directory": "shared",
+			"changeProcessCWD": true
+		},
+		{
+			"directory": "server",
+			"changeProcessCWD": true
+		}
+	],
+
+	"eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
+
+	"eslint.statusBarItem": true,
+
+	// Let VS Code + ESLint use the TypeScript from node_modules (important for monorepos)
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.enablePromptUseWorkspaceTSdk": true,
+
+	// Extra settings to help the TS language service understand the workspace structure
+	"typescript.preferences.includePackageJsonAutoImports": "on",
+	"typescript.surveys.enabled": false
 }
