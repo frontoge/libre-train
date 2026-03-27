@@ -3,23 +3,27 @@ import { Content } from "antd/es/layout/layout";
 import React from "react";
 import { Routes } from "../../../shared/routes";
 import { getAppConfiguration } from "../config/app.config";
-import { AppContext } from "../app-context";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export function Login() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [error, setError] = React.useState<string | null>(null);
     const [loading, setLoading] = React.useState<boolean>(false);
-
-    const { setAuth, isAuthenticated, state: { auth } } = React.useContext(AppContext);
+    const { isAuthenticated, refreshAuthentication, auth, user, setAuth } = useAuth();
 
     React.useEffect(() => {
         if (isAuthenticated()) {
             // User is already authenticated, redirect to home
-            navigate("/", { replace: true });
+            const redirect = searchParams.get('redirect');
+            navigate(redirect ?? "/", { replace: true });
             return;
+        } else {
+            // Try to refresh authentication using refresh token
+            refreshAuthentication()
         }
-    }, [auth, isAuthenticated, navigate]);
+    }, [user]);
 
     type FieldType = {
         username?: string;
@@ -36,6 +40,7 @@ export function Login() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include' as RequestCredentials,
                 body: JSON.stringify({
                     username: values.username,
                     password: values.password,
@@ -48,7 +53,6 @@ export function Login() {
             }
 
             const { accessToken, user } = await res.json();
-
             setAuth({authToken: accessToken, user});
 
         } catch (e: any) {

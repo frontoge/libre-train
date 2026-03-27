@@ -88,9 +88,23 @@ export const handleAuthLogin = async (req: Request, res: Response) => {
 
         const accessToken = jwt.sign(
             { sub: user.id },
-            process.env.JWT_SECRET,
-            { expiresIn: '8h' }
+            process.env.JWT_SECRET!,
+            { expiresIn: '2h' }
         );
+
+        const refreshToken = jwt.sign(
+            { sub: user.id },
+            process.env.REFRESH_TOKEN_SECRET!,
+            { expiresIn: '7d' }
+        )
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days,
+            path: '/' // Only send cookie to refresh endpoint
+        })
 
         return res.status(200).json({
             accessToken,
@@ -101,6 +115,29 @@ export const handleAuthLogin = async (req: Request, res: Response) => {
         return res.status(500).json({ message: 'Internal server error during login' });
     } finally {
         if (connection) await connection.end();
+    }
+}
+
+export const handleAuthRefresh = async (req: Request, res: Response) => {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(401).json({ message: 'Refresh token missing' });
+    }
+
+    try {
+        const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!);
+
+        const newAccessToken = jwt.sign(
+            { sub: payload.sub },
+            process.env.JWT_SECRET!,
+            { expiresIn: '2h' }
+        );
+
+        return res.status(200).json({ accessToken: newAccessToken, user: payload.sub });
+    } catch (error) {
+        res.clearCookie('refreshToken')
+        return res.status(401).json({ message: 'Invalid refresh token' });
     }
 }
 
@@ -146,9 +183,23 @@ export const handleAuthSignup = async (req: Request, res: Response) => {
 
         const accessToken = jwt.sign(
             { sub: insertResult[0].id },
-            process.env.JWT_SECRET,
-            { expiresIn: '1d' }
+            process.env.JWT_SECRET!,
+            { expiresIn: '2h' }
         );
+
+        const refreshToken = jwt.sign(
+            { sub: insertResult[0].id },
+            process.env.REFRESH_TOKEN_SECRET!,
+            { expiresIn: '7d' }
+        )
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days,
+            path: '/api/auth/refresh' // Only send cookie to refresh endpoint
+        })
 
         return res.status(201).json({
             accessToken,
@@ -161,4 +212,9 @@ export const handleAuthSignup = async (req: Request, res: Response) => {
     } finally {
         await closeDatabaseConnection(connection);
     }
+}
+
+export const handleAuthLogout = async (req: Request, res: Response) => {
+    res.clearCookie('refreshToken')
+    return res.status(200).json({ message: 'Logged out successfully' });
 }

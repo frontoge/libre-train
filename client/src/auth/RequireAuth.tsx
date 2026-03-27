@@ -1,11 +1,22 @@
-import { useContext, type JSX } from "react";
-import { AppContext } from "../app-context";
-import { Navigate, useLocation } from "react-router";
+import { useEffect, useState, type JSX } from "react";
+import { useLocation, useNavigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 
 export function RequireAuth({ children }: { children: JSX.Element }) {
-    const { isAuthenticated } = useContext(AppContext);
+    const { isAuthenticated } = useAuth();
+    const locationObj = useLocation();
+    const navigate = useNavigate();
+    const [authenticated, setAuthenticated] = useState<boolean | undefined>(false);
 
-    const location = useLocation();
+    useEffect(() => {
+        if (isAuthenticated()) {
+            setAuthenticated(true);
+        } else {
+            navigate(`/login?redirect=${locationObj.pathname}`);
+        }
+    }, []);
 
-    return isAuthenticated() ? children : <Navigate to="/login" replace state={{ from: location }} />;
+    return (
+        <>{authenticated ? children : <></>}</>
+    )
 }

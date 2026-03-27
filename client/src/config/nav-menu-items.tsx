@@ -5,8 +5,10 @@ import { IoMdPersonAdd, IoMdPerson } from "react-icons/io";
 import { FaListAlt, FaPencilAlt } from "react-icons/fa";
 import { GiWeightLiftingUp } from "react-icons/gi";
 import { ImMap } from "react-icons/im";
-import { FaSquarePlus, FaMagnifyingGlass, FaCalendarXmark } from "react-icons/fa6";
+import { FaSquarePlus, FaMagnifyingGlass, FaCalendarXmark, FaGear } from "react-icons/fa6";
 import { SiMealie } from "react-icons/si";
+import { RiLogoutBoxRFill } from "react-icons/ri";
+
 
 
 export const items: NavMenuItem[] = [
@@ -118,6 +120,19 @@ export const items: NavMenuItem[] = [
                 label: 'Search',
                 icon: <FaMagnifyingGlass />,
                 urlPath: '/exercises/'
+            }
+        ]
+    },
+    {
+        key: 'settings',
+        label: 'Settings',
+        icon: <FaGear />,
+        children: [
+            {
+                key: 'logout',
+                label: 'Logout',
+                icon: <RiLogoutBoxRFill />,
+                urlPath: '/logout'
             }
         ]
     }

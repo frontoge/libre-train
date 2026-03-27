@@ -2,19 +2,18 @@ import { Layout, Form, type FormProps, Input, Button } from "antd";
 import { Content } from "antd/es/layout/layout";
 import React from "react";
 import { Routes } from "../../../shared/routes";
-import { AppContext } from "../app-context";
 import { getAppConfiguration } from "../config/app.config";
 import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export function Signup() {
-
     const [error, setError] = React.useState<string | null>(null);
     const [loading, setLoading] = React.useState<boolean>(false);
 
     const [shouldRedirect, setShouldRedirect] = React.useState<boolean>(false);
     const location = useLocation();
 
-    const { setAuth } = React.useContext(AppContext);
+    const { setAuth } = useAuth();
 
     type FieldType = {
         username?: string;

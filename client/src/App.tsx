@@ -7,7 +7,6 @@ import { ClientRouter } from "./pages/clients/ClientRouter"
 import { AppContext, type AppState } from "./app-context"
 import { useEffect, useState } from "react"
 import { Signup } from "./pages/Signup"
-import { jwtDecode } from "jwt-decode"
 import type { Auth } from "./auth/authorization"
 import { RequireAuth } from "./auth/RequireAuth"
 import { Login } from "./pages/Login"
@@ -18,9 +17,12 @@ import { Routes as ApiRoutes } from "../../shared/routes";
 import { AssessmentRouter } from "./pages/assessments/AssessmentRouter"
 import "./styles/app.css"
 import { DietRouter } from "./pages/diet/DietRouter"
+import { useAuth } from "./hooks/useAuth"
+import { Logout } from "./pages/Logout"
 
 function App() {
 	const env = import.meta.env.VITE_ENV || 'local';
+	const { isAuthenticated } = useAuth();
 
 	const [appState, setAppState] = useState<AppState>({
 		clients: [],
@@ -48,26 +50,7 @@ function App() {
 			...prevState,
 			auth
 		}));
-	}
-
-	const isAuthenticated = () => {
-		if (env === 'local' && getAppConfiguration().disableAuth) {
-			return true;
-		}
-
-		if (!appState.auth.authToken || appState.auth.user === undefined) {
-			return false;
-		}
-
-		const decodedToken = jwtDecode(appState.auth.authToken);
-		const currentDate = new Date();
-
-		if (decodedToken === undefined || (decodedToken?.exp ?? 0) * 1000 < currentDate.getTime()) {
-			return false;
-		}
-
-		return true;
-	}
+	}	
 
 	const fetchExercises = async () => {
 		try {
@@ -135,7 +118,7 @@ function App() {
 	}, [appState.auth])
 
   return (
-	<AppContext value={{ state: appState, setState: setAppState, setAuth, isAuthenticated, stateRefreshers }}>
+	<AppContext value={{ state: appState, setState: setAppState, setAuth, stateRefreshers }}>
 
 		<ConfigProvider
 			theme={{
@@ -167,6 +150,7 @@ function App() {
 						</Route>
 						<Route path="/signup" element={<Signup />} />
 						<Route path="/login" element={<Login />} />
+						<Route path="/logout" element={<Logout />} />
 						<Route path="*" element={<NoPage />} />
 					</Routes>
 				</BrowserRouter>

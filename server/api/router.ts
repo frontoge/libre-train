@@ -2,7 +2,7 @@ import { Router } from "express";
 import { handleHealthCheck } from "./handlers";
 import { Routes } from "../../shared/routes";
 import { handleGetClients, handleCreateClient, handleDailyUpdate, handleGetDashboard, handleGetDashboardSummary, handleDeleteClient, handleGetClientContacts } from "./handlers/client-handlers";
-import { handleAuthSignup, handleAuthLogin } from "./handlers/auth-handlers";
+import { handleAuthSignup, handleAuthLogin, handleAuthRefresh, handleAuthLogout } from "./handlers/auth-handlers";
 import { handleDeleteExercise, handleExerciseCreate, handleGetAllExercises, handleUpdateExercise } from "./handlers/exercise-handlers";
 import { handleCreateContact, handleDeleteContact, handleGetContactById, handleGetContacts, handleUpdateContact } from "./handlers/contact-handlers";
 import { handleCreateAssessmentLog, handleDeleteAssessmentLog, handleGetAssessmentGroupTypes, handleGetAssessmentLog, handleGetAssessmentTypes, handleUpdateAssessmentLog } from "./handlers/assessment-handlers";
@@ -32,6 +32,9 @@ router.put(`${Routes.Exercise}/:id`, handleUpdateExercise); // Using the same ha
 //Auth routes
 router.post(Routes.AuthSignup, handleAuthSignup);
 router.post(Routes.AuthLogin, handleAuthLogin);
+router.post(Routes.AuthRefresh, handleAuthRefresh);
+router.get(Routes.AuthLogout, handleAuthLogout);
+
 
 // Contact routes
 router.get(Routes.Contacts, handleGetContacts);
