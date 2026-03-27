@@ -11,8 +11,11 @@
 		"clean": "rm -rf node_modules dist",
 		"format": "prettier --write \"**/*.{js,ts,tsx,json,css}\"",
 		"format:check": "prettier --check \"**/*.{js,ts,tsx,json,css}\"",
-		"lint:all": "bun run --sequential --no-exit-on-error --workspaces lint",
-		"lint:all:fix": "bun run --sequential --no-exit-on-error --workspaces lint:fix"
+		"lint": "bun run --sequential --no-exit-on-error --workspaces lint",
+		"lint:fix": "bun run --sequential --no-exit-on-error --workspaces lint:fix",
+		"test": "bun run --sequential --no-exit-on-error --filter '!@libre-train/shared' test",
+		"test:run": "bun run --sequential --no-exit-on-error --filter '!@libre-train/shared' test:run",
+		"test:coverage": "bun run --sequential --no-exit-on-error --filter '!@libre-train/shared' test:coverage"
 	},
 	"devDependencies": {
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
