@@ -4,6 +4,8 @@ export const Routes = {
     AssessmentLog: "/assessment/log",
     AuthLogin: "/auth/login",
     AuthSignup: "/auth/signup",
+    AuthRefresh: "/auth/refresh",
+    AuthLogout: "/auth/logout",
     Clients: "/clients",
     ClientContact: "/clientcontact",
     ClientPlan: "/plan/client",

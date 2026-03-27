@@ -23,7 +23,6 @@ export type AppContext = {
     state: AppState;
     setState: React.Dispatch<React.SetStateAction<AppState>>;
     setAuth: (auth: Auth) => void;
-    isAuthenticated: () => boolean;
     stateRefreshers?: StateRefreshers;
 }
 
@@ -35,12 +34,11 @@ const initialContext: AppContext = {
         selectedModal: undefined,
         auth: {
             authToken: '',
-            user: (import.meta.env.VITE_ENV === 'local' && getAppConfiguration().disableAuth) ? 10 : 0
+            user: (import.meta.env.VITE_ENV === 'local' && getAppConfiguration().disableAuth) ? 10 : undefined
         }
     },
     setState: () => {},
     setAuth: (auth: Auth) => { },
-    isAuthenticated: () => false,
 };
 
 export const AppContext = createContext<AppContext>(initialContext);

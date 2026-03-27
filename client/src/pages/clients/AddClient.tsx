@@ -9,11 +9,12 @@ import { AppContext } from "../../app-context";
 import { ContactEditCreateForm } from "../../components/Contacts/ContactEditCreateForm";
 import { ClientEditCreateForm } from "../../components/clients/ClientEditCreateForm";
 import type { ClientEditCreateFormValues, ContactEditCreateFormValues } from "../../types/types";
+import { useAuth } from "../../hooks/useAuth";
 
 export function AddClient() {
-
+    const { user } = useAuth();
     const [messageApi, contextHolder] = message.useMessage();
-    const { stateRefreshers, state } = useContext(AppContext);
+    const { stateRefreshers } = useContext(AppContext);
     const [contactFormValues, setContactFormValues] = useState<ContactEditCreateFormValues | undefined>(undefined);
     const [clientFormValues, setClientFormValues] = useState<ClientEditCreateFormValues | undefined>(undefined);
     const [formStage, setFormStage] = useState(0);
@@ -60,7 +61,7 @@ export function AddClient() {
                     dob: contactFormValues?.dob?.format('YYYY-MM-DD'),
                     height: clientFormValues?.height,
                     notes: clientFormValues?.notes,
-                    trainerId: state.auth.user
+                    trainerId: user
                 }),
             }
             const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}`, requestOptions);

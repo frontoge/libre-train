@@ -1,9 +1,15 @@
-import express, { NextFunction } from "express";
+import express from "express";
 import apiRouter from "./api/router";
 import { Request, Response } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 console.log("Starting server...");
+
+if (!process.env.JWT_SECRET || !process.env.REFRESH_TOKEN_SECRET) {
+    console.error("JWT_SECRET and REFRESH_TOKEN_SECRET environment variables must be set");
+    process.exit(1);
+}
 
 const app = express();
 const port = 3000;
@@ -20,6 +26,8 @@ app.use(express.json({ limit: '5mb' }));
 
 // Increase the limit for URL-encoded payloads (if applicable)
 app.use(express.urlencoded({ limit: '5mb', extended: true }));
+
+app.use(cookieParser());
 
 app.use("/api", apiRouter);
 
