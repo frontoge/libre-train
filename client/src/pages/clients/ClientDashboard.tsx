@@ -1,74 +1,77 @@
-import PageLayout from "../../components/PageLayout";
-import { ClientOverview } from "../../components/clients/ClientOverview";
-import { ClientDataViewer } from "../../components/clients/ClientDataViewer";
-import { ClientLists } from "../../components/clients/ClientLists";
-import { getAppConfiguration } from "../../config/app.config";
-import { useContext, useEffect, useState } from "react";
-import { Routes } from "@libre-train/shared";
-import { AppContext } from "../../app-context";
-import { ClientDashboardContext, type DashboardState, defaultDashboardState } from "../../contexts/ClientDashboardContext";
+import { Routes } from '@libre-train/shared';
+import { useContext, useEffect, useState } from 'react';
+import { AppContext } from '../../app-context';
+import { ClientDataViewer } from '../../components/clients/ClientDataViewer';
+import { ClientLists } from '../../components/clients/ClientLists';
+import { ClientOverview } from '../../components/clients/ClientOverview';
+import PageLayout from '../../components/PageLayout';
+import { getAppConfiguration } from '../../config/app.config';
+import { ClientDashboardContext, defaultDashboardState, type DashboardState } from '../../contexts/ClientDashboardContext';
 
 export function ClientDashboard() {
+	const { state, stateRefreshers } = useContext(AppContext);
+	const [dashboardState, setDashboardState] = useState<DashboardState>(defaultDashboardState);
 
-    const { state, stateRefreshers } = useContext(AppContext);
-    const [dashboardState, setDashboardState] = useState<DashboardState>(defaultDashboardState);
+	useEffect(() => {
+		const fetchDashboardData = async () => {
+			try {
+				if (state.selectedClient == undefined) {
+					return;
+				}
 
-    useEffect(() => {
-        
+				const requestOptions = {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				};
+				const response = await fetch(
+					`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard?clientId=${state.selectedClient.id}&date=${dashboardState.selectedDate.format('YYYY-MM-DD')}`,
+					requestOptions
+				);
+				const data = await response.json();
+				setDashboardState((prev) => ({
+					...prev,
+					data,
+				}));
+			} catch (error) {
+				console.error('Error fetching dashboard data:', error);
+			}
+		};
+		if (state.clients.length === 0 || state.selectedClient === undefined) {
+			stateRefreshers?.refreshClients();
+			return;
+		}
 
-        const fetchDashboardData = async () => {
-            try {
-                if (state.selectedClient == undefined) {
-                    return;
-                }
+		fetchDashboardData();
+	}, [state.selectedClient, dashboardState.selectedDate]);
 
-                const requestOptions = {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-                const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard?clientId=${state.selectedClient.id}&date=${dashboardState.selectedDate.format("YYYY-MM-DD")}`, requestOptions);
-                const data = await response.json();
-                setDashboardState(prev => ({
-                    ...prev,
-                    data
-                }));
-
-            } catch (error) {
-                console.error("Error fetching dashboard data:", error);
-            }
-        }
-        if (state.clients.length === 0 || state.selectedClient === undefined) {
-            stateRefreshers?.refreshClients();
-            return;
-        }
-
-        fetchDashboardData();
-
-    }, [state.selectedClient, dashboardState.selectedDate])
-
-    return (
-        <ClientDashboardContext value={{dashboardState, setDashboardState}}>
-            <PageLayout title="Client Dashboard" style={{ display: 'flex', flexDirection: 'row', overflow: 'hidden'}}>
-
-                <div id='client-dash-left' style={{
-                    display: 'flex',
-                    gap: '2rem',
-                    flexDirection: 'column',
-                    width: '70%',
-                    padding: '2rem 2rem'
-                }}>
-                    <ClientOverview />
-                    <ClientDataViewer />
-                </div>
-                <div id='client-dash-right' style={{
-                    width: '30%',
-                    padding: '2rem 2rem 2rem 1rem',
-                }}>
-                    <ClientLists />
-                </div>
-            </PageLayout>
-        </ClientDashboardContext>
-    );
+	return (
+		<ClientDashboardContext value={{ dashboardState, setDashboardState }}>
+			<PageLayout title="Client Dashboard" style={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+				<div
+					id="client-dash-left"
+					style={{
+						display: 'flex',
+						gap: '2rem',
+						flexDirection: 'column',
+						width: '70%',
+						padding: '2rem 2rem',
+					}}
+				>
+					<ClientOverview />
+					<ClientDataViewer />
+				</div>
+				<div
+					id="client-dash-right"
+					style={{
+						width: '30%',
+						padding: '2rem 2rem 2rem 1rem',
+					}}
+				>
+					<ClientLists />
+				</div>
+			</PageLayout>
+		</ClientDashboardContext>
+	);
 }

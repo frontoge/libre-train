@@ -1,13 +1,19 @@
 {
-    "name": "libre-train",
-    "private": true,
-    "version": "0.0.0",
-    "workspaces": [
-        "client",
-        "server",
-        "shared"
-    ],
-    "scripts": {
-        "clean": "rm -rf node_modules dist"
-    }
+	"name": "libre-train",
+	"private": true,
+	"version": "0.0.0",
+	"workspaces": [
+		"client",
+		"server",
+		"shared"
+	],
+	"scripts": {
+		"clean": "rm -rf node_modules dist",
+		"format": "prettier --write \"**/*.{js,ts,tsx,json,css}\"",
+		"format:check": "prettier --check \"**/*.{js,ts,tsx,json,css}\""
+	},
+	"devDependencies": {
+		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+		"prettier": "^3.8.1"
+	}
 }

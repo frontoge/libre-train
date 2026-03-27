@@ -1,22 +1,22 @@
 body {
-    margin: 0;
+	margin: 0;
 }
 
 * {
-    scrollbar-width: thin;
-    scrollbar-color: #cacaca87 transparent;
+	scrollbar-width: thin;
+	scrollbar-color: #cacaca87 transparent;
 }
 
 /* For Webkit browsers */
 *::-webkit-scrollbar {
-    width: 8px;
-    background: transparent;
+	width: 8px;
+	background: transparent;
 }
 
 *::-webkit-scrollbar-thumb {
-    background: transparent;
+	background: transparent;
 }
 
 *::-webkit-scrollbar-track {
-    background: transparent;
+	background: transparent;
 }

@@ -1,6 +1,6 @@
-import { ModalType } from "../types/types";
-import { DeleteClientModal } from "./clients/DeleteClientModal";
+import { ModalType } from '../types/types';
+import { DeleteClientModal } from './clients/DeleteClientModal';
 
 export const Modals = {
-    [ModalType.DeleteClient]: <DeleteClientModal />
-}
+	[ModalType.DeleteClient]: <DeleteClientModal />,
+};

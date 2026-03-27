@@ -4,21 +4,21 @@ import { getConfiguration } from '../config/server.config';
 const config = getConfiguration();
 
 export const getDatabaseConnection = async () => {
-    try {
-        return await mysql.createConnection({
-            host: config.database.host,
-            port: config.database.port,
-            user: process.env.DBUSER,
-            password: process.env.DBPASSWORD,
-            database: config.database.database,
-            dateStrings: true
-        });
-    } catch (error) {
-        console.error('Error connecting to the database:', error);
-        throw error;
-    }
+	try {
+		return await mysql.createConnection({
+			host: config.database.host,
+			port: config.database.port,
+			user: process.env.DBUSER,
+			password: process.env.DBPASSWORD,
+			database: config.database.database,
+			dateStrings: true,
+		});
+	} catch (error) {
+		console.error('Error connecting to the database:', error);
+		throw error;
+	}
 };
 
 export async function closeDatabaseConnection(connection: mysql.Connection) {
-    if (connection) await connection.end();
+	if (connection) await connection.end();
 }

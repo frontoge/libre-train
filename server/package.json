@@ -1,32 +1,32 @@
 {
-  "name": "@libre-train/server",
-  "module": "index.ts",
-  "type": "module",
-  "version": "0.1.0",
-  "private": true,
-  "devDependencies": {
-    "@types/bun": "latest",
-    "@types/express": "^5.0.6",
-    "express": "^5.2.1"
-  },
-  "scripts": {
-    "start": "bun run index.ts",
-    "dev": "bun --watch index.ts"
-  },
-  "peerDependencies": {
-    "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "@libre-train/shared": "workspace:*",
-    "@types/cookie-parser": "^1.4.10",
-    "@types/cors": "^2.8.19",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^24.11.0",
-    "argon2": "^0.44.0",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.6",
-    "express-validator": "^7.3.1",
-    "jsonwebtoken": "^9.0.3",
-    "mysql2": "^3.18.2"
-  }
+	"name": "@libre-train/server",
+	"module": "index.ts",
+	"type": "module",
+	"version": "0.1.0",
+	"private": true,
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@types/express": "^5.0.6",
+		"express": "^5.2.1"
+	},
+	"scripts": {
+		"start": "bun run index.ts",
+		"dev": "bun --watch index.ts"
+	},
+	"peerDependencies": {
+		"typescript": "^5.8.3"
+	},
+	"dependencies": {
+		"@libre-train/shared": "workspace:*",
+		"@types/cookie-parser": "^1.4.10",
+		"@types/cors": "^2.8.19",
+		"@types/jsonwebtoken": "^9.0.10",
+		"@types/node": "^24.11.0",
+		"argon2": "^0.44.0",
+		"cookie-parser": "^1.4.7",
+		"cors": "^2.8.6",
+		"express-validator": "^7.3.1",
+		"jsonwebtoken": "^9.0.3",
+		"mysql2": "^3.18.2"
+	}
 }

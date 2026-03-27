@@ -1,0 +1,35 @@
+{
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": false,
+	"editor.formatOnType": false,
+
+	// Show Prettier issues as warnings in the Problems panel
+	"prettier.requireConfig": true,
+	"prettier.enable": true,
+
+	// Make formatting violations appear as warnings (not just errors)
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.codeActionsOnSave": {
+			"source.fixAll": "explicit"
+		}
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.codeActionsOnSave": {
+			"source.fixAll": "explicit"
+		}
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+
+	// Optional: Show all Prettier diagnostics as warnings
+	"prettier.problems": {
+		"level": "warning"
+	}
+}

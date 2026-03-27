@@ -1,146 +1,146 @@
-import type { AssessmentClientLog, Mesocycle, Microcycle, WorkoutRoutine } from "./models";
+import type { AssessmentClientLog, Mesocycle, Microcycle, WorkoutRoutine } from './models';
 
 export type Goal = {
-    id: number;
-    goal: string;
-}
+	id: number;
+	goal: string;
+};
 
-export type ResponseWithError<T> = T | {hasError: true; errorMessage: string};
+export type ResponseWithError<T> = T | { hasError: true; errorMessage: string };
 
 export type AddClientFormValues = {
-    firstName?: string;
-    lastName?: string;
-    phoneNumber?: string;
-    email?: string;
-    height?: number;
-    dob?: string;
-    img64?: string;
-    notes?: string;
-    trainerId: number;
-}
+	firstName?: string;
+	lastName?: string;
+	phoneNumber?: string;
+	email?: string;
+	height?: number;
+	dob?: string;
+	img64?: string;
+	notes?: string;
+	trainerId: number;
+};
 
 export type DailyUpdateData = {
-    weight?: number;
-    body_fat?: number;
-    calories?: number;
-    target_calories?: number;
-    protein?: number;
-    target_protein?: number;
-    carbs?: number;
-    target_carbs?: number;
-    fats?: number;
-    target_fats?: number;
-}
+	weight?: number;
+	body_fat?: number;
+	calories?: number;
+	target_calories?: number;
+	protein?: number;
+	target_protein?: number;
+	carbs?: number;
+	target_carbs?: number;
+	fats?: number;
+	target_fats?: number;
+};
 
 export type DailyUpdateRequest = {
-    clientId: number;
-    date: string; // ISO string
-    data: DailyUpdateData;
-}
+	clientId: number;
+	date: string; // ISO string
+	data: DailyUpdateData;
+};
 
 export type DashboardData = {
-    clientId: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone: string;
-    height?: number;
-    img?: string;
-    logged_weight: number;
-    logged_calories?: number;
-    logged_body_fat?: number;
-    logged_protein?: number;
-    logged_carbs?: number;
-    logged_fats?: number;
-    target_calories?: number;
-    target_protein?: number;
-    target_carbs?: number;
-    target_fats?: number;
-    goal?: string;
-    goal_weight?: number;
-    goal_bodyFat?: number;
-}
+	clientId: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+	phone: string;
+	height?: number;
+	img?: string;
+	logged_weight: number;
+	logged_calories?: number;
+	logged_body_fat?: number;
+	logged_protein?: number;
+	logged_carbs?: number;
+	logged_fats?: number;
+	target_calories?: number;
+	target_protein?: number;
+	target_carbs?: number;
+	target_fats?: number;
+	goal?: string;
+	goal_weight?: number;
+	goal_bodyFat?: number;
+};
 
 export type ErrorResponse = {
-    message: string;
-}
+	message: string;
+};
 
 export type DashboardResponse = DashboardData | ErrorResponse;
 
 export type DashboardSummaryQuery = {
-    clientId: string;
-    startDate: string; 
-    endDate: string; 
-}
+	clientId: string;
+	startDate: string;
+	endDate: string;
+};
 
 export type DashboardWeeklySummary = {
-    avg_weight: number;
-    avg_bodyfat: number;
-    avg_calories: number;
-    total_macros: number;
-    target_macros: number;
-}
+	avg_weight: number;
+	avg_bodyfat: number;
+	avg_calories: number;
+	total_macros: number;
+	target_macros: number;
+};
 
 export type DashboardWeeklySummaryResponse = DashboardWeeklySummary[] | ErrorResponse;
 
 export type AssessmentClientLogCreateRequest = {
-    clientId: number;
-    assessments: Omit<AssessmentClientLog, "id" | "clientId">[];
-}
+	clientId: number;
+	assessments: Omit<AssessmentClientLog, 'id' | 'clientId'>[];
+};
 
 export type AssessmentClientLogSearchOptions = {
-    group?: string;
-    type?: string;
-    start?: string;
-    end?: string;
-    page?: number;
-    pageSize?: number;
-}
+	group?: string;
+	type?: string;
+	start?: string;
+	end?: string;
+	page?: number;
+	pageSize?: number;
+};
 
 export type MacrocycleSearchParams = {
-    active?: string;
-    date?: string;
-}
+	active?: string;
+	date?: string;
+};
 
 export type MesocycleUpdateRequest = Partial<Omit<Mesocycle, 'id' | 'client_id' | 'macrocycle_id'>>;
 
 export type MesocycleSearchParams = {
-    active?: string;
-    macrocycleId?: string;
-    date?: string;
-}
+	active?: string;
+	macrocycleId?: string;
+	date?: string;
+};
 
 export type MicrocycleUpdateRequest = Partial<Omit<Microcycle, 'id' | 'client_id' | 'mesocycle_id'>>;
 
 export type MicrocycleUpdateRoutinesRequest = {
-    routines: Array<Omit<WorkoutRoutine, 'id' | 'microcycle_id' | 'routine_index' | 'isActive'>>
-}
+	routines: Array<Omit<WorkoutRoutine, 'id' | 'microcycle_id' | 'routine_index' | 'isActive'>>;
+};
 
 export type MicrocycleSearchParams = {
-    active?: string;
-    mesocycleId?: string;
-    clientId?: string;
-    date?: string;
-}
+	active?: string;
+	mesocycleId?: string;
+	clientId?: string;
+	date?: string;
+};
 
 export enum TrainingCycleType {
-    Macrocycle = 1,
-    Mesocycle = 2,
-    Microcycle = 3,
+	Macrocycle = 1,
+	Mesocycle = 2,
+	Microcycle = 3,
 }
 
-export type UpdateWorkoutRoutineRequest = Omit<WorkoutRoutine, "id" | 'microcycle_id' | 'routine_index' | 'isActive'>;
+export type UpdateWorkoutRoutineRequest = Omit<WorkoutRoutine, 'id' | 'microcycle_id' | 'routine_index' | 'isActive'>;
 
 export type GetDietPlanSearchParams = {
-    clientId?: string;
-    trainerId?: string;
-    isActive?: string;
-}
+	clientId?: string;
+	trainerId?: string;
+	isActive?: string;
+};
 
 export type GetDietPlanLogEntrySearchParams = {
-    clientId?: string;
-    dietPlanId?: string;
-    logDate?: string;
-    startDate?: string;
-    endDate?: string;
-}
+	clientId?: string;
+	dietPlanId?: string;
+	logDate?: string;
+	startDate?: string;
+	endDate?: string;
+};
