@@ -1,5 +1,4 @@
-
 export type Auth = {
-    authToken?: string;
-    user?: number;
-}
+	authToken?: string;
+	user?: number;
+};

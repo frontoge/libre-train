@@ -1,16 +1,15 @@
-import { Route, Routes } from "react-router-dom";
-import { ClientDashboard } from "./ClientDashboard";
-import { AddClient } from "./AddClient";
-import { NoPage } from "../NoPage";
+import { Route, Routes } from 'react-router-dom';
+import { NoPage } from '../NoPage';
+import { AddClient } from './AddClient';
+import { ClientDashboard } from './ClientDashboard';
 
 export function ClientRouter() {
-    return (
-        <Routes>
-            <Route index element={<ClientDashboard />} />
-            <Route path=":id" element={<ClientDashboard />} />
-            <Route path="create" element={<AddClient />} />
-            <Route path="*" element={<NoPage />} />
-        </Routes>
-        
-    )
+	return (
+		<Routes>
+			<Route index element={<ClientDashboard />} />
+			<Route path=":id" element={<ClientDashboard />} />
+			<Route path="create" element={<AddClient />} />
+			<Route path="*" element={<NoPage />} />
+		</Routes>
+	);
 }

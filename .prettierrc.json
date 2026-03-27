@@ -1,0 +1,14 @@
+{
+	"$schema": "https://www.schemastore.org/prettierrc.json",
+	"experimentalOperatorPosition": "start",
+	"printWidth": 130,
+	"useTabs": true,
+	"tabWidth": 4,
+	"semi": true,
+	"quoteProps": "consistent",
+	"singleQuote": true,
+	"trailingComma": "es5",
+	"bracketSpacing": true,
+	"bracketSameLine": false,
+	"plugins": ["@ianvs/prettier-plugin-sort-imports"]
+}

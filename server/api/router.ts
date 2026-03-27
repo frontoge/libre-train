@@ -1,14 +1,69 @@
-import { Router } from "express";
-import { handleHealthCheck } from "./handlers";
-import { Routes } from "../../shared/routes";
-import { handleGetClients, handleCreateClient, handleDailyUpdate, handleGetDashboard, handleGetDashboardSummary, handleDeleteClient, handleGetClientContacts } from "./handlers/client-handlers";
-import { handleAuthSignup, handleAuthLogin, handleAuthRefresh, handleAuthLogout } from "./handlers/auth-handlers";
-import { handleDeleteExercise, handleExerciseCreate, handleGetAllExercises, handleUpdateExercise } from "./handlers/exercise-handlers";
-import { handleCreateContact, handleDeleteContact, handleGetContactById, handleGetContacts, handleUpdateContact } from "./handlers/contact-handlers";
-import { handleCreateAssessmentLog, handleDeleteAssessmentLog, handleGetAssessmentGroupTypes, handleGetAssessmentLog, handleGetAssessmentTypes, handleUpdateAssessmentLog } from "./handlers/assessment-handlers";
-import { handleCreateMacrocycle, handleCreateMesocycle, handleCreateMicrocycle, handleDeleteMacrocycle, handleDeleteMesocycle, handleDeleteMicrocycle, handleGetMacrocycle, handleGetMesocycle, handleGetMicrocycle, handleUpdateMacrocycle, handleUpdateMesocycle, handleUpdateMicrocycle, handleUpdateMicrocycleRoutines } from "./handlers/cycle-handlers";
-import { handleCreateWorkoutRoutine, handleDeleteWorkoutRoutine, handleGetCycleWorkoutRoutines, handleUpdateWorkoutRoutine } from "./handlers/workout-routine-handlers";
-import { handleCreateDietLog, handleCreateDietPlan, handleDeleteDietLog, handleDeleteDietPlan, handleGetClientsDietPlans, handleGetDietLog, handleGetDietPlan, handleUpdateDietLog, handleUpdateDietPlan } from "./handlers/diet-handlers";
+import { Routes } from '@libre-train/shared';
+import { Router } from 'express';
+import { handleHealthCheck } from './handlers';
+import {
+	handleCreateAssessmentLog,
+	handleDeleteAssessmentLog,
+	handleGetAssessmentGroupTypes,
+	handleGetAssessmentLog,
+	handleGetAssessmentTypes,
+	handleUpdateAssessmentLog,
+} from './handlers/assessment-handlers';
+import { handleAuthLogin, handleAuthLogout, handleAuthRefresh, handleAuthSignup } from './handlers/auth-handlers';
+import {
+	handleCreateClient,
+	handleDailyUpdate,
+	handleDeleteClient,
+	handleGetClientContacts,
+	handleGetClients,
+	handleGetDashboard,
+	handleGetDashboardSummary,
+} from './handlers/client-handlers';
+import {
+	handleCreateContact,
+	handleDeleteContact,
+	handleGetContactById,
+	handleGetContacts,
+	handleUpdateContact,
+} from './handlers/contact-handlers';
+import {
+	handleCreateMacrocycle,
+	handleCreateMesocycle,
+	handleCreateMicrocycle,
+	handleDeleteMacrocycle,
+	handleDeleteMesocycle,
+	handleDeleteMicrocycle,
+	handleGetMacrocycle,
+	handleGetMesocycle,
+	handleGetMicrocycle,
+	handleUpdateMacrocycle,
+	handleUpdateMesocycle,
+	handleUpdateMicrocycle,
+	handleUpdateMicrocycleRoutines,
+} from './handlers/cycle-handlers';
+import {
+	handleCreateDietLog,
+	handleCreateDietPlan,
+	handleDeleteDietLog,
+	handleDeleteDietPlan,
+	handleGetClientsDietPlans,
+	handleGetDietLog,
+	handleGetDietPlan,
+	handleUpdateDietLog,
+	handleUpdateDietPlan,
+} from './handlers/diet-handlers';
+import {
+	handleDeleteExercise,
+	handleExerciseCreate,
+	handleGetAllExercises,
+	handleUpdateExercise,
+} from './handlers/exercise-handlers';
+import {
+	handleCreateWorkoutRoutine,
+	handleDeleteWorkoutRoutine,
+	handleGetCycleWorkoutRoutines,
+	handleUpdateWorkoutRoutine,
+} from './handlers/workout-routine-handlers';
 
 const router = Router();
 
@@ -34,7 +89,6 @@ router.post(Routes.AuthSignup, handleAuthSignup);
 router.post(Routes.AuthLogin, handleAuthLogin);
 router.post(Routes.AuthRefresh, handleAuthRefresh);
 router.get(Routes.AuthLogout, handleAuthLogout);
-
 
 // Contact routes
 router.get(Routes.Contacts, handleGetContacts);

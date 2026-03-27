@@ -1,161 +1,174 @@
-import { useContext, useState } from "react";
-import { AppContext } from "../../app-context";
-import type { PlannedExercise, PlannedExerciseGroup } from "../../../../shared/models";
-import { WorkoutNodeType, type WorkoutRoutineEdit, type WorkoutRoutineGroupNode, type WorkoutRoutineTreeNode } from "../../types/types";
-import { RoutineExerciseCreateEditForm, type RoutineExerciseCreateEditFormValues } from "./RoutineExerciseCreateEditForm";
-import { timeStringToSeconds } from "../../helpers/date-helpers";
-import { RoutineGroupEditForm, type RoutineGroupEditFormValues } from "./RoutineGroupEditForm";
-import { WorkoutRoutineDisplay } from "./WorkoutRoutineDisplay";
-import { getExerciseFormValuesFromNode, getGroupFormValuesFromNode } from "../../helpers/routine-helpers";
-
+import type { PlannedExercise, PlannedExerciseGroup } from '@libre-train/shared';
+import { useContext, useState } from 'react';
+import { AppContext } from '../../app-context';
+import { timeStringToSeconds } from '../../helpers/date-helpers';
+import { getExerciseFormValuesFromNode, getGroupFormValuesFromNode } from '../../helpers/routine-helpers';
+import {
+	WorkoutNodeType,
+	type WorkoutRoutineEdit,
+	type WorkoutRoutineGroupNode,
+	type WorkoutRoutineTreeNode,
+} from '../../types/types';
+import { RoutineExerciseCreateEditForm, type RoutineExerciseCreateEditFormValues } from './RoutineExerciseCreateEditForm';
+import { RoutineGroupEditForm, type RoutineGroupEditFormValues } from './RoutineGroupEditForm';
+import { WorkoutRoutineDisplay } from './WorkoutRoutineDisplay';
 
 export interface RoutineEditorProps extends React.HTMLAttributes<HTMLDivElement> {
-    routine: WorkoutRoutineEdit;
-    onRoutineChange: (updatedRoutine: WorkoutRoutineEdit) => void;
+	routine: WorkoutRoutineEdit;
+	onRoutineChange: (updatedRoutine: WorkoutRoutineEdit) => void;
 }
 
 export function RoutineEditor(props: RoutineEditorProps) {
-    const {routine: routine, onRoutineChange, ...divProps} = props;
-    const {state: {exerciseData}} = useContext(AppContext);
-    const [selectedNode, setSelectedNode] = useState<WorkoutRoutineTreeNode | undefined>(undefined);
+	const { routine: routine, onRoutineChange, ...divProps } = props;
+	const {
+		state: { exerciseData },
+	} = useContext(AppContext);
+	const [selectedNode, setSelectedNode] = useState<WorkoutRoutineTreeNode | undefined>(undefined);
 
-    const handleEditRoutine = (updatedGroups: PlannedExerciseGroup[]) => {
-        onRoutineChange({
-            ...routine,
-            exercise_groups: updatedGroups
-        });
-    }
-    
-    const handleExerciseSubmit = (values: RoutineExerciseCreateEditFormValues) => {
-        if (selectedNode === undefined) {
-            // Adding new exercise
-            const newExercise: PlannedExercise = {
-                exercise_id: values.exercise_id,
-                exerciseName: exerciseData?.find(ex => ex.id === values.exercise_id)?.exercise_name || "",
-                repetitions: values.repetitions,
-                sets: values.sets,
-                weight: values.weight,
-                duration: values.duration ? timeStringToSeconds(values.duration) : undefined,
-                distance: values.distance,
-                target_heart_rate: values.target_heart_rate,
-                pace: values.pace,
-                rpe: values.rpe,
-                target_calories: values.target_calories,
-                target_mets: values.target_mets,
-            }
+	const handleEditRoutine = (updatedGroups: PlannedExerciseGroup[]) => {
+		onRoutineChange({
+			...routine,
+			exercise_groups: updatedGroups,
+		});
+	};
 
-            const newGroup: PlannedExerciseGroup = {
-                routine_category: values.category,
-                rest_after: values.rest_after,
-                exercises: [newExercise]
-            }
+	const handleExerciseSubmit = (values: RoutineExerciseCreateEditFormValues) => {
+		if (selectedNode === undefined) {
+			// Adding new exercise
+			const newExercise: PlannedExercise = {
+				exercise_id: values.exercise_id,
+				exerciseName: exerciseData?.find((ex) => ex.id === values.exercise_id)?.exercise_name || '',
+				repetitions: values.repetitions,
+				sets: values.sets,
+				weight: values.weight,
+				duration: values.duration ? timeStringToSeconds(values.duration) : undefined,
+				distance: values.distance,
+				target_heart_rate: values.target_heart_rate,
+				pace: values.pace,
+				rpe: values.rpe,
+				target_calories: values.target_calories,
+				target_mets: values.target_mets,
+			};
 
-            onRoutineChange({
-                ...routine,
-                exercise_groups: [...routine.exercise_groups, newGroup].sort((a, b) => a.routine_category - b.routine_category)
-            });
-        } else {
-            // Editing existing exercise
-            if (selectedNode.nodeType === WorkoutNodeType.Exercise) {
-                const nodePos = selectedNode.key.toString().split("-").map(Number);
-                const nodeDepth = nodePos.length;
-                const updatedExercise: PlannedExercise = {
-                    exercise_id: values.exercise_id,
-                    exerciseName: exerciseData?.find(ex => ex.id === values.exercise_id)?.exercise_name || "",
-                    repetitions: values.repetitions,
-                    sets: values.sets,
-                    weight: values.weight,
-                    duration: values.duration ? timeStringToSeconds(values.duration) : undefined,
-                    distance: values.distance,
-                    target_heart_rate: values.target_heart_rate,
-                    pace: values.pace,
-                    rpe: values.rpe,
-                    target_calories: values.target_calories,
-                    target_mets: values.target_mets,
-                }
+			const newGroup: PlannedExerciseGroup = {
+				routine_category: values.category,
+				rest_after: values.rest_after,
+				exercises: [newExercise],
+			};
 
-                const updatedRoutine = {...routine};
-                const existingGroup = updatedRoutine.exercise_groups.filter((group) => group.routine_category === nodePos[0] + 1)[nodePos[1]];
-                existingGroup.rest_after = values?.rest_after ?? existingGroup.rest_after;
-                existingGroup.exercises = nodeDepth !== 3
-                    ? [updatedExercise] 
-                    : existingGroup.exercises.map((exercise, index) => {
-                        if (index === nodePos[2]) {
-                            return updatedExercise;
-                        }
-                        return exercise;
-                    })
-                onRoutineChange(updatedRoutine);
-            }
-        }
-    }
-    
-    const handleGroupSubmit = (values: RoutineGroupEditFormValues) => {
-        if (!selectedNode) return;
-        
-        const updatedRoutine = {...routine};
-        const nodePos = selectedNode.key.toString().split("-").map(Number);
-        const existingGroup = updatedRoutine.exercise_groups.filter((group) => group.routine_category === nodePos[0] + 1)[nodePos[1]];
-        existingGroup.rest_after = values?.rest_after ?? existingGroup.rest_after;
-        existingGroup.rest_between = values?.rest_between ?? existingGroup.rest_between;
-        onRoutineChange(updatedRoutine);
-    }
+			onRoutineChange({
+				...routine,
+				exercise_groups: [...routine.exercise_groups, newGroup].sort((a, b) => a.routine_category - b.routine_category),
+			});
+		} else {
+			// Editing existing exercise
+			if (selectedNode.nodeType === WorkoutNodeType.Exercise) {
+				const nodePos = selectedNode.key.toString().split('-').map(Number);
+				const nodeDepth = nodePos.length;
+				const updatedExercise: PlannedExercise = {
+					exercise_id: values.exercise_id,
+					exerciseName: exerciseData?.find((ex) => ex.id === values.exercise_id)?.exercise_name || '',
+					repetitions: values.repetitions,
+					sets: values.sets,
+					weight: values.weight,
+					duration: values.duration ? timeStringToSeconds(values.duration) : undefined,
+					distance: values.distance,
+					target_heart_rate: values.target_heart_rate,
+					pace: values.pace,
+					rpe: values.rpe,
+					target_calories: values.target_calories,
+					target_mets: values.target_mets,
+				};
 
-    const handleRoutineRename = (newName: string) => {
-        onRoutineChange({
-            ...routine,
-            routine_name: newName
-        });
-    }
+				const updatedRoutine = { ...routine };
+				const existingGroup = updatedRoutine.exercise_groups.filter((group) => group.routine_category === nodePos[0] + 1)[
+					nodePos[1]
+				];
+				existingGroup.rest_after = values?.rest_after ?? existingGroup.rest_after;
+				existingGroup.exercises =
+					nodeDepth !== 3
+						? [updatedExercise]
+						: existingGroup.exercises.map((exercise, index) => {
+								if (index === nodePos[2]) {
+									return updatedExercise;
+								}
+								return exercise;
+							});
+				onRoutineChange(updatedRoutine);
+			}
+		}
+	};
 
-    return (
-        <div
-            {...divProps}  
-            style={{
-                width: '100%',
-                height: "100%",
-                display: 'flex',
-                gap: '2rem',
-                ...divProps.style
-            }}
-        >
-            <WorkoutRoutineDisplay 
-                routine={routine} 
-                isEdit={true}
-                onEdit={handleEditRoutine}
-                style={{
-                    width: "35%",
-                    height: "100%",
-                }}
-                onRename={handleRoutineRename}
-                onSelectNode={setSelectedNode}
-            />
-            { (selectedNode === undefined || selectedNode.nodeType === WorkoutNodeType.Exercise) ?
-                <RoutineExerciseCreateEditForm 
-                    style={{
-                        width: "50%",
-                        height: "100%",
-                        marginLeft: 'auto',
-                        marginRight: 'auto',
-                        paddingRight: "10px",
-                        overflow: 'auto',
-                        scrollbarGutter: 'stable'
-                    }}
-                    onSubmitForm={handleExerciseSubmit}
-                    initialValues={selectedNode !== undefined ? getExerciseFormValuesFromNode(selectedNode) : undefined}
-                />
-            : (selectedNode !== undefined) &&
-                <RoutineGroupEditForm
-                    style={{
-                        width: "50%",
-                        height: "100%",
-                        marginLeft: 'auto',
-                        marginRight: 'auto'
-                    }}
-                    initialValues={getGroupFormValuesFromNode(selectedNode as WorkoutRoutineGroupNode)}
-                    onSubmitForm={handleGroupSubmit}
-                />
-            }
-        </div>
-    )
+	const handleGroupSubmit = (values: RoutineGroupEditFormValues) => {
+		if (!selectedNode) return;
+
+		const updatedRoutine = { ...routine };
+		const nodePos = selectedNode.key.toString().split('-').map(Number);
+		const existingGroup = updatedRoutine.exercise_groups.filter((group) => group.routine_category === nodePos[0] + 1)[
+			nodePos[1]
+		];
+		existingGroup.rest_after = values?.rest_after ?? existingGroup.rest_after;
+		existingGroup.rest_between = values?.rest_between ?? existingGroup.rest_between;
+		onRoutineChange(updatedRoutine);
+	};
+
+	const handleRoutineRename = (newName: string) => {
+		onRoutineChange({
+			...routine,
+			routine_name: newName,
+		});
+	};
+
+	return (
+		<div
+			{...divProps}
+			style={{
+				width: '100%',
+				height: '100%',
+				display: 'flex',
+				gap: '2rem',
+				...divProps.style,
+			}}
+		>
+			<WorkoutRoutineDisplay
+				routine={routine}
+				isEdit={true}
+				onEdit={handleEditRoutine}
+				style={{
+					width: '35%',
+					height: '100%',
+				}}
+				onRename={handleRoutineRename}
+				onSelectNode={setSelectedNode}
+			/>
+			{selectedNode === undefined || selectedNode.nodeType === WorkoutNodeType.Exercise ? (
+				<RoutineExerciseCreateEditForm
+					style={{
+						width: '50%',
+						height: '100%',
+						marginLeft: 'auto',
+						marginRight: 'auto',
+						paddingRight: '10px',
+						overflow: 'auto',
+						scrollbarGutter: 'stable',
+					}}
+					onSubmitForm={handleExerciseSubmit}
+					initialValues={selectedNode !== undefined ? getExerciseFormValuesFromNode(selectedNode) : undefined}
+				/>
+			) : (
+				selectedNode !== undefined && (
+					<RoutineGroupEditForm
+						style={{
+							width: '50%',
+							height: '100%',
+							marginLeft: 'auto',
+							marginRight: 'auto',
+						}}
+						initialValues={getGroupFormValuesFromNode(selectedNode as WorkoutRoutineGroupNode)}
+						onSubmitForm={handleGroupSubmit}
+					/>
+				)
+			)}
+		</div>
+	);
 }

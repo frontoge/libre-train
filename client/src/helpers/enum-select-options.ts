@@ -1,47 +1,59 @@
-import { AssessmentGroup, ExerciseForm, ExerciseMovementPattern, MuscleGroup, WorkoutRoutineCategory } from "../../../shared/models";
-import { TrainingCycleType } from "../../../shared/types";
-import { MuscleGroupLabels, TrainingCycleTypeLabels, WorkoutRoutineCategoryLabels } from "./label-formatters";
+import {
+	AssessmentGroup,
+	ExerciseForm,
+	ExerciseMovementPattern,
+	MuscleGroup,
+	TrainingCycleType,
+	WorkoutRoutineCategory,
+} from '@libre-train/shared';
+import { MuscleGroupLabels, TrainingCycleTypeLabels, WorkoutRoutineCategoryLabels } from './label-formatters';
 
 export const assessmentGroupOptions = [
-    { label: "Posture Assessment", value: AssessmentGroup.Posture},
-    { label: "Composition Assessment", value: AssessmentGroup.Composition},
-    { label: "Performance Assessment", value: AssessmentGroup.Performance},
-]
+	{ label: 'Posture Assessment', value: AssessmentGroup.Posture },
+	{ label: 'Composition Assessment', value: AssessmentGroup.Composition },
+	{ label: 'Performance Assessment', value: AssessmentGroup.Performance },
+];
 
 export const exerciseFormOptions = [
-    { label: "Flexibility", value: ExerciseForm.Flexibility },
-    { label: "Cardio", value: ExerciseForm.Cardio },
-    { label: "Core", value: ExerciseForm.Core },
-    { label: "Balance", value: ExerciseForm.Balance },
-    { label: "Plyometric", value: ExerciseForm.Plyometric },
-    { label: "SAQ", value: ExerciseForm.SAQ },
-    { label: "Resistance", value: ExerciseForm.Resistance },
-]
+	{ label: 'Flexibility', value: ExerciseForm.Flexibility },
+	{ label: 'Cardio', value: ExerciseForm.Cardio },
+	{ label: 'Core', value: ExerciseForm.Core },
+	{ label: 'Balance', value: ExerciseForm.Balance },
+	{ label: 'Plyometric', value: ExerciseForm.Plyometric },
+	{ label: 'SAQ', value: ExerciseForm.SAQ },
+	{ label: 'Resistance', value: ExerciseForm.Resistance },
+];
 
 export const exerciseMovementPatternOptions = [
-    { label: "Squat", value: ExerciseMovementPattern.Squat },
-    { label: "Hip Hinge", value: ExerciseMovementPattern.HipHinge },
-    { label: "Push", value: ExerciseMovementPattern.Push },
-    { label: "Pull", value: ExerciseMovementPattern.Pull },
-    { label: "Vertical Press", value: ExerciseMovementPattern.VerticalPress }
-]
+	{ label: 'Squat', value: ExerciseMovementPattern.Squat },
+	{ label: 'Hip Hinge', value: ExerciseMovementPattern.HipHinge },
+	{ label: 'Push', value: ExerciseMovementPattern.Push },
+	{ label: 'Pull', value: ExerciseMovementPattern.Pull },
+	{ label: 'Vertical Press', value: ExerciseMovementPattern.VerticalPress },
+];
 
 export const muscleGroupOptions = Object.entries(MuscleGroupLabels).map(([value, label]) => ({
-    label,
-    value: Number(value) as MuscleGroup
+	label,
+	value: Number(value) as MuscleGroup,
 }));
 
 export const cycleTypeOptions = [
-    { label: TrainingCycleTypeLabels.Macrocycle, value: TrainingCycleType.Macrocycle },
-    { label: TrainingCycleTypeLabels.Mesocycle, value: TrainingCycleType.Mesocycle },
-    { label: TrainingCycleTypeLabels.Microcycle, value: TrainingCycleType.Microcycle },
-]
+	{ label: TrainingCycleTypeLabels.Macrocycle, value: TrainingCycleType.Macrocycle },
+	{ label: TrainingCycleTypeLabels.Mesocycle, value: TrainingCycleType.Mesocycle },
+	{ label: TrainingCycleTypeLabels.Microcycle, value: TrainingCycleType.Microcycle },
+];
 
 export const routineCategoryOptions = [
-    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.Warmup], value: WorkoutRoutineCategory.Warmup },
-    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.Activation], value: WorkoutRoutineCategory.Activation },
-    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.SkillDevelopment], value: WorkoutRoutineCategory.SkillDevelopment },
-    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.ResistanceTraining], value: WorkoutRoutineCategory.ResistanceTraining },
-    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.ClientsChoice], value: WorkoutRoutineCategory.ClientsChoice },
-    { label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.Cooldown], value: WorkoutRoutineCategory.Cooldown },
-]
+	{ label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.Warmup], value: WorkoutRoutineCategory.Warmup },
+	{ label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.Activation], value: WorkoutRoutineCategory.Activation },
+	{
+		label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.SkillDevelopment],
+		value: WorkoutRoutineCategory.SkillDevelopment,
+	},
+	{
+		label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.ResistanceTraining],
+		value: WorkoutRoutineCategory.ResistanceTraining,
+	},
+	{ label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.ClientsChoice], value: WorkoutRoutineCategory.ClientsChoice },
+	{ label: WorkoutRoutineCategoryLabels[WorkoutRoutineCategory.Cooldown], value: WorkoutRoutineCategory.Cooldown },
+];
