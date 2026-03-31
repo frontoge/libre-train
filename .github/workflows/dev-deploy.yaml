@@ -28,25 +28,25 @@ jobs:
       - name: Build Server container
         run: |
           cat > server/.env << EOF
-          NODE_ENV=${{ env.ENVIRONMENT }}
-          DB_HOST=${{ env.DB_HOST }}
-          DB_PORT=${{ env.DB_PORT }}
-          DB_USER=${{ env.DB_USER }}
+          NODE_ENV=${{ vars.ENVIRONMENT }}
+          DB_HOST=${{ vars.DB_HOST }}
+          DB_PORT=${{ vars.DB_PORT }}
+          DB_USER=${{ vars.DB_USER }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DB_NAME=${{ env.DB_NAME }}
+          DB_NAME=${{ vars.DB_NAME }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}
           EOF
 
-          docker compose down
+          docker compose down --remove-orphans
           docker compose up --build -d --remove-orphans
 
           docker compose ps
 
       - name: Deploy Frontend app
         run: |
-          echo "Deploying frontend app to /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}"
-          sudo mkdir -p /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}
-          sudo chown -R www-data:www-data /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}
-          sudo chmod -R 755 /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}
-          sudo rsync -av --delete client/dist/ /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}/
+          echo "Deploying frontend app to /var/www/${{ vars.FRONTEND_DOMAIN }}/html/${{ vars.FRONTEND_APP_NAME }}"
+          sudo mkdir -p /var/www/${{ vars.FRONTEND_DOMAIN }}/html/${{ vars.FRONTEND_APP_NAME }}
+          sudo chown -R www-data:www-data /var/www/${{ vars.FRONTEND_DOMAIN }}/html/${{ vars.FRONTEND_APP_NAME }}
+          sudo chmod -R 755 /var/www/${{ vars.FRONTEND_DOMAIN }}/html/${{ vars.FRONTEND_APP_NAME }}
+          sudo rsync -av --delete client/dist/ /var/www/${{ vars.FRONTEND_DOMAIN }}/html/${{ vars.FRONTEND_APP_NAME }}/
