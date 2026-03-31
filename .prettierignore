@@ -6,3 +6,4 @@ coverage
 bun.lock
 *.md
 database
+.github
