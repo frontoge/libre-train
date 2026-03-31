@@ -1,0 +1,51 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - release
+
+jobs: 
+  deploy:
+    runs-on: self-hosted
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bun setup
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Client
+        run: bun run build --filter @libre-train/client
+
+      - name: Build Server container
+        run: |
+          cat > server/.env << EOF
+          NODE_ENV=${{ env.ENVIRONMENT }}
+          DB_HOST=${{ env.DB_HOST }}
+          DB_PORT=${{ env.DB_PORT }}
+          DB_USER=${{ env.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_NAME=${{ env.DB_NAME }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}
+          EOF
+
+          docker compose down
+          docker compose up --build -d --remove-orphans
+
+          docker compose ps
+
+      - name: Deploy Frontend app
+        run: |
+          sudo apt-get update && sudo apt-get install -y rsync
+          sudo mkdir -p /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}
+          sudo chown -R www-data:www-data /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}
+          sudo chmod -R 755 /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}
+          sudo rsync -av --delete client/dist/ /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}/

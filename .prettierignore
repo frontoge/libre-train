@@ -7,3 +7,6 @@ bun.lock
 *.md
 database
 .github
+*.yaml
+*.yml
+Dockerfile
