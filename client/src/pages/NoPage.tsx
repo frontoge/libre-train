@@ -1,7 +1,10 @@
 import { Button, Layout } from 'antd';
 import { Content } from 'antd/es/layout/layout';
+import { Link, useNavigate } from 'react-router-dom';
 
 export function NoPage() {
+	const navigate = useNavigate();
+
 	return (
 		<Layout
 			style={{
@@ -19,7 +22,7 @@ export function NoPage() {
 				}}
 			>
 				<h1>404 - Page Not Found</h1>
-				<Button type="primary" href="/">
+				<Button type="primary" onClick={() => navigate('/')}>
 					Go to Home
 				</Button>
 			</Content>
