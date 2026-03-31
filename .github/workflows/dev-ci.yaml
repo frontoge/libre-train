@@ -1,10 +1,8 @@
 name: CI - Build, Test, and Lint
 
 on:
-  pull_request_target:
-    branches:
-      - main
-      - release
+  pull_request:
+    branches: [main]
 
 jobs:
   build-test-lint:
