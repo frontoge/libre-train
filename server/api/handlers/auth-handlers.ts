@@ -50,7 +50,7 @@ export const handleAuthLogin = async (req: Request, res: Response) => {
 	const { username, password } = req.body;
 	const connection = await getDatabaseConnection();
 	try {
-		const [results, fields] = await connection.query<RowDataPacket[]>({
+		const [results] = await connection.query<RowDataPacket[]>({
 			sql: 'SELECT * FROM User WHERE username = ?',
 			values: [username],
 		});
@@ -104,6 +104,7 @@ export const handleAuthRefresh = async (req: Request, res: Response) => {
 		const newAccessToken = jwt.sign({ sub: payload.sub }, process.env.JWT_SECRET!, { expiresIn: '2h' });
 
 		return res.status(200).json({ accessToken: newAccessToken, user: payload.sub });
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	} catch (error) {
 		res.clearCookie('refreshToken');
 		return res.status(401).json({ message: 'Invalid refresh token' });
@@ -119,7 +120,7 @@ export const handleAuthSignup = async (req: Request, res: Response) => {
 	const { username, password } = req.body;
 	const connection = await getDatabaseConnection();
 	try {
-		const [results, fields] = await connection.query<RowDataPacket[][]>({
+		const [results] = await connection.query<RowDataPacket[][]>({
 			sql: 'SELECT * FROM User WHERE username = ?',
 			values: [username],
 		});

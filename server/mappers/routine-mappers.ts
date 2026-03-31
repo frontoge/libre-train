@@ -65,9 +65,10 @@ export function mapWorkoutRoutineExerciseDTOToWorkoutRoutine(rows: WorkoutRoutin
 
 	return Array.from(routineMap.values()).map((routine) => ({
 		...routine,
-		// @ts-ignore @typescript-eslint/no-unused-vars
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		exercise_groups: routine.exercise_groups.map(({ group_index, exercises, ...rest }) => ({
 			...rest,
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			exercises: exercises.map(({ exercise_group_index, ...ex }) => ex),
 		})),
 	}));

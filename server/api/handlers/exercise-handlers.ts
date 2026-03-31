@@ -16,7 +16,7 @@ export const handleExerciseCreate = async (req: Request<{}, {}, Omit<Exercise, '
 			movement_pattern,
 			progression_level,
 		} = req.body;
-		const [results, fields] = await connection.execute({
+		await connection.query({
 			sql: 'CALL spCreateExercise(?, ?, ?, ?, ?, ?, ?, ?)',
 			values: [
 				exercise_name,
@@ -41,7 +41,7 @@ export const handleExerciseCreate = async (req: Request<{}, {}, Omit<Exercise, '
 export const handleGetAllExercises = async (req: Request, res: Response<ResponseWithError<Exercise[]>>) => {
 	const connection = await getDatabaseConnection();
 	try {
-		const [results, fields] = await connection.query<RowDataPacket[]>({ sql: 'SELECT * FROM Exercise' });
+		const [results] = await connection.query<RowDataPacket[]>({ sql: 'SELECT * FROM Exercise' });
 
 		const formattedResults: Exercise[] = results.map((row) => ({
 			id: row.id,
@@ -110,7 +110,7 @@ export const handleUpdateExercise = async (req: Request<{ id: string }, {}, Omit
 			return res.status(400).json({ message: 'Exercise ID is required' });
 		}
 
-		const [results, fields] = await connection.query<RowDataPacket[]>({
+		await connection.query<RowDataPacket[]>({
 			sql: 'CALL spUpdateExercise(?, ?, ?, ?, ?, ?, ?, ?, ?)',
 			values: [
 				id,

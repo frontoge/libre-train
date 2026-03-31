@@ -32,7 +32,7 @@ export const handleGetAssessmentTypes = async (
 
 		const rows = results[0][0];
 		const assessmentType: AssessmentType[] =
-			rows?.map((row: any) => ({
+			rows?.map((row) => ({
 				id: row.id,
 				name: row.name,
 				assessmentUnit: row.assessmentUnit,

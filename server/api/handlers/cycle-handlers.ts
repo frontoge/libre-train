@@ -39,7 +39,7 @@ export const handleGetMacrocycle = async (
 			return res.status(500).json({ hasError: true, errorMessage: 'Error when fetching macrocycles' });
 		}
 
-		const macrocycles: Macrocycle[] = rows[0].map((row: any) => ({
+		const macrocycles: Macrocycle[] = rows[0].map((row) => ({
 			id: row.id,
 			client_id: row.client_id,
 			cycle_name: row.cycle_name,
@@ -107,7 +107,7 @@ export const handleUpdateMacrocycle = async (req: Request<{ id: string }, {}, Pa
 
 		const reqBody = req.body;
 
-		const [results] = await connection.execute({
+		await connection.execute({
 			sql: 'CALL spUpdateMacrocycle(?, ?, ?, ?, ?, ?)',
 			values: [
 				macrocycleId,
@@ -174,7 +174,7 @@ export const handleGetMesocycle = async (
 			return res.status(500).json({ hasError: true, errorMessage: 'Error when fetching mesocycles' });
 		}
 
-		const mesocycles: Mesocycle[] = rows[0].map((row: any) => ({
+		const mesocycles: Mesocycle[] = rows[0].map((row) => ({
 			id: row.id,
 			client_id: row.client_id,
 			cycle_name: row.cycle_name,
@@ -255,7 +255,7 @@ export const handleUpdateMesocycle = async (req: Request<{ id: string }, {}, Mes
 		}
 
 		const reqBody = req.body;
-		const [results] = await connection.execute({
+		await connection.execute({
 			sql: 'CALL spUpdateMesocycle(?, ?, ?, ?, ?, ?, ?, ?)',
 			values: [
 				mesocycleId,
@@ -330,7 +330,7 @@ export const handleGetMicrocycle = async (req: Request<{ id: string }, {}, {}, M
 			return res.status(500).json({ error: 'Error when fetching microcycles' });
 		}
 
-		const microcycles: Microcycle[] = rows[0].map((row: any) => ({
+		const microcycles: Microcycle[] = rows[0].map((row) => ({
 			id: row.id,
 			mesocycle_id: row.mesocycle_id,
 			cycle_name: row.cycle_name,
@@ -405,7 +405,7 @@ export const handleUpdateMicrocycle = async (req: Request<{ id: string }, {}, Mi
 		}
 
 		const reqBody = req.body;
-		const [results] = await connection.execute({
+		await connection.execute({
 			sql: 'CALL spUpdateMicrocycle(?, ?, ?, ?, ?, ?)',
 			values: [
 				microcycleId,
@@ -488,7 +488,7 @@ export const handleDeleteMicrocycle = async (req: Request<{ id: string }>, res: 
 			return res.status(400).json({ error: 'Invalid microcycle ID' });
 		}
 
-		const [result] = await connection.execute({
+		await connection.execute({
 			sql: 'DELETE FROM Microcycle WHERE id = ?',
 			values: [microcycleId],
 		});
