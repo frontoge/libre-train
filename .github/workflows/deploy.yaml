@@ -44,7 +44,7 @@ jobs:
 
       - name: Deploy Frontend app
         run: |
-          sudo apt-get update && sudo apt-get install -y rsync
+          echo "Deploying frontend app to /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}"
           sudo mkdir -p /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}
           sudo chown -R www-data:www-data /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}
           sudo chmod -R 755 /var/www/${{ env.FRONTEND_DOMAIN }}/html/${{ env.FRONTEND_APP_NAME }}
