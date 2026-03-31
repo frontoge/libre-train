@@ -1,7 +1,7 @@
 import { Routes as ApiRoutes } from '@libre-train/shared';
 import { ConfigProvider, theme } from 'antd';
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { AppContext, type AppState } from './app-context';
 import type { Auth } from './auth/authorization';
 import { RequireAuth } from './auth/RequireAuth';
@@ -137,64 +137,62 @@ function App() {
 						width: '100%',
 					}}
 				>
-					<BrowserRouter>
-						<Routes>
-							<Route path="/" element={<RouterLayout />}>
-								<Route
-									index
-									element={
-										<RequireAuth>
-											<Dashboard />
-										</RequireAuth>
-									}
-								/>
-								<Route
-									path="clients/*"
-									element={
-										<RequireAuth>
-											<ClientRouter />
-										</RequireAuth>
-									}
-								/>
-								<Route
-									path="exercises/*"
-									element={
-										<RequireAuth>
-											<ExerciseRouter />
-										</RequireAuth>
-									}
-								/>
-								<Route
-									path="training/*"
-									element={
-										<RequireAuth>
-											<TrainingRouter />
-										</RequireAuth>
-									}
-								/>
-								<Route
-									path="assessments/*"
-									element={
-										<RequireAuth>
-											<AssessmentRouter />
-										</RequireAuth>
-									}
-								/>
-								<Route
-									path="diet/*"
-									element={
-										<RequireAuth>
-											<DietRouter />
-										</RequireAuth>
-									}
-								/>
-							</Route>
-							<Route path="/signup" element={<Signup />} />
-							<Route path="/login" element={<Login />} />
-							<Route path="/logout" element={<Logout />} />
-							<Route path="*" element={<NoPage />} />
-						</Routes>
-					</BrowserRouter>
+					<Routes>
+						<Route path="/" element={<RouterLayout />}>
+							<Route
+								index
+								element={
+									<RequireAuth>
+										<Dashboard />
+									</RequireAuth>
+								}
+							/>
+							<Route
+								path="clients/*"
+								element={
+									<RequireAuth>
+										<ClientRouter />
+									</RequireAuth>
+								}
+							/>
+							<Route
+								path="exercises/*"
+								element={
+									<RequireAuth>
+										<ExerciseRouter />
+									</RequireAuth>
+								}
+							/>
+							<Route
+								path="training/*"
+								element={
+									<RequireAuth>
+										<TrainingRouter />
+									</RequireAuth>
+								}
+							/>
+							<Route
+								path="assessments/*"
+								element={
+									<RequireAuth>
+										<AssessmentRouter />
+									</RequireAuth>
+								}
+							/>
+							<Route
+								path="diet/*"
+								element={
+									<RequireAuth>
+										<DietRouter />
+									</RequireAuth>
+								}
+							/>
+						</Route>
+						<Route path="/signup" element={<Signup />} />
+						<Route path="/login" element={<Login />} />
+						<Route path="/logout" element={<Logout />} />
+						<Route path="*" element={<NoPage />} />
+					</Routes>
 				</div>
 			</ConfigProvider>
 		</AppContext>

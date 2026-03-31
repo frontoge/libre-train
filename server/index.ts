@@ -16,7 +16,7 @@ const port = 3000;
 app.use(
 	cors({
 		// TODO change this to fill with frontend Deployment URL
-		origin: 'http://localhost:5173', // Adjust as necessary for CORS
+		origin: process.env.FRONTEND_URL, // Adjust as necessary for CORS
 		methods: ['GET', 'POST', 'PUT', 'DELETE'],
 		allowedHeaders: ['Content-Type', 'Authorization'],
 		credentials: true,

@@ -1,0 +1,13 @@
+<svg width="320" height="170" viewBox="0 0 320 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  
+  <circle cx="78" cy="85" r="48" fill="#1E3A5F"></circle>
+  <circle cx="78" cy="85" r="35" fill="#0F2A3F"></circle>
+  <circle cx="78" cy="85" r="22" fill="#49aa19"></circle>
+  <path d="M78 35 Q63 55 58 75 Q73 95 78 110 Q83 95 98 75 Q93 55 78 35" fill="#F8FAFC"></path>
+
+  
+  <text x="165" y="95" text-anchor="left" font-family="Arial Black, sans-serif" font-size="29" font-weight="900" fill="#F8FAFC">LIBRE</text>
+  <text x="165" y="125" text-anchor="left" font-family="Arial Black, sans-serif" font-size="23" font-weight="700" fill="#49aa19">TRAIN</text>
+
+</svg>

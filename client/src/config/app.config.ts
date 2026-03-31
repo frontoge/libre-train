@@ -3,17 +3,21 @@ export type AppConfig = {
 	disableAuth: boolean;
 };
 
+const injectedConfig = {
+	apiUrl: `${import.meta.env.VITE_API_URL}/api`,
+};
+
 const config: { [key: string]: AppConfig } = {
 	local: {
-		apiUrl: 'http://localhost:3000/api',
+		...injectedConfig,
 		disableAuth: false,
 	},
 	dev: {
-		apiUrl: 'https://dev-api.example.com/api',
+		...injectedConfig,
 		disableAuth: false,
 	},
 	prod: {
-		apiUrl: 'https://api.example.com/api',
+		...injectedConfig,
 		disableAuth: false,
 	},
 };
