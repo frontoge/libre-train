@@ -67,7 +67,7 @@ export function CreateEditExerciseForm(props: CreateEditExerciseFormProps) {
 			}
 
 			stateRefreshers?.refreshExerciseData();
-			props.onComplete && props.onComplete();
+			props.onComplete?.();
 		} catch (error) {
 			console.error('Error creating exercise:', error);
 		}
@@ -98,7 +98,7 @@ export function CreateEditExerciseForm(props: CreateEditExerciseFormProps) {
 				throw new Error(`Error updating exercise: ${response.statusText}`);
 			}
 			stateRefreshers?.refreshExerciseData();
-			props.onComplete && props.onComplete();
+			props.onComplete?.();
 		} catch (error) {
 			console.error('Error creating exercise:', error);
 		}
@@ -113,7 +113,7 @@ export function CreateEditExerciseForm(props: CreateEditExerciseFormProps) {
 	};
 
 	return (
-		<Form
+		<Form<CreateEditExerciseFormValues>
 			labelCol={{ span: 7 }}
 			form={form}
 			layout="horizontal"

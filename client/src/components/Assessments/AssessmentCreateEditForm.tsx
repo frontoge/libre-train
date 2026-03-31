@@ -142,7 +142,7 @@ export function AssessmentCreateEditForm(props: AssessmentCreateEditFormProps) {
 				<ClientSearch
 					style={{ width: '40%', marginBottom: '2rem' }}
 					onClientSelect={(clientId) => setSelectedClient(clientId ? Number(clientId) : null)}
-					defaultValue={props.initialValues?.client ?? undefined}
+					defaultValue={props.initialValues?.client.value ?? undefined}
 				/>
 				<AssessmentTypeSelect
 					style={{ width: '40%', marginBottom: '2rem' }}

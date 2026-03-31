@@ -35,6 +35,6 @@ const config: { [key: string]: ServerConfig } = {
 };
 
 export const getConfiguration = (): ServerConfig => {
-	const env = process.env.ENVIRONMENT || 'local';
+	const env = process.env.NODE_ENV || 'local';
 	return (config[env] ?? config.local) as ServerConfig;
 };

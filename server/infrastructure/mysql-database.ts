@@ -1,16 +1,16 @@
 import mysql from 'mysql2/promise';
-import { getConfiguration } from '../config/server.config';
-
-const config = getConfiguration();
 
 export const getDatabaseConnection = async () => {
 	try {
+		if (!process.env.DB_HOST || !process.env.DB_PORT || !process.env.DB_USER || !process.env.DB_PASSWORD) {
+			throw new Error('Database connection details are not fully defined in environment variables');
+		}
 		return await mysql.createConnection({
-			host: config.database.host,
-			port: config.database.port,
-			user: process.env.DBUSER,
-			password: process.env.DBPASSWORD,
-			database: config.database.database,
+			host: process.env.DB_HOST,
+			port: Number(process.env.DB_PORT),
+			user: process.env.DB_USER,
+			password: process.env.DB_PASSWORD,
+			database: process.env.DB_NAME,
 			dateStrings: true,
 		});
 	} catch (error) {

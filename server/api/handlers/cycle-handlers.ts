@@ -191,7 +191,7 @@ export const handleGetMesocycle = async (
 
 		res.status(200).json(mesocycles);
 	} catch (error: Error | unknown) {
-		var errorMessage = 'Internal server error';
+		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
 		}
@@ -235,7 +235,7 @@ export const handleCreateMesocycle = async (req: Request<{}, {}, Omit<Mesocycle,
 		const mesocycleId = insertResult[0].mesocycle_id;
 		res.status(201).json({ mesocycleId });
 	} catch (error: Error | unknown) {
-		var errorMessage = 'Internal server error';
+		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
 		}
@@ -271,7 +271,7 @@ export const handleUpdateMesocycle = async (req: Request<{ id: string }, {}, Mes
 
 		res.status(204).send();
 	} catch (error: Error | unknown) {
-		var errorMessage = 'Internal server error';
+		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
 		}
@@ -342,7 +342,7 @@ export const handleGetMicrocycle = async (req: Request<{ id: string }, {}, {}, M
 
 		res.status(200).json(microcycles);
 	} catch (error: Error | unknown) {
-		var errorMessage = 'Internal server error';
+		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
 		}
@@ -385,7 +385,7 @@ export const handleCreateMicrocycle = async (req: Request<{}, {}, Omit<Microcycl
 		const microcycleId = insertResult[0].microcycle_id;
 		res.status(201).json({ microcycleId });
 	} catch (error: Error | unknown) {
-		var errorMessage = 'Internal server error';
+		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
 		}
@@ -419,7 +419,7 @@ export const handleUpdateMicrocycle = async (req: Request<{ id: string }, {}, Mi
 
 		res.status(204).send();
 	} catch (error: Error | unknown) {
-		var errorMessage = 'Internal server error';
+		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
 		}
@@ -469,7 +469,7 @@ export const handleUpdateMicrocycleRoutines = async (
 		await connection.commit();
 		res.status(204).send();
 	} catch (error: Error | unknown) {
-		var errorMessage = 'Internal server error';
+		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
 		}
@@ -495,7 +495,7 @@ export const handleDeleteMicrocycle = async (req: Request<{ id: string }>, res: 
 
 		res.status(200).json({ message: 'Microcycle deleted successfully' });
 	} catch (error: Error | unknown) {
-		var errorMessage = 'Internal server error';
+		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
 		}

@@ -12,7 +12,7 @@
 
 import { Alert, Card, DatePicker, Statistic } from 'antd';
 import '../../../styles/ClientDashboard/weekly-summary.css';
-import type { DashboardWeeklySummaryResponse, Routes } from '@libre-train/shared';
+import { Routes, type DashboardWeeklySummaryResponse } from '@libre-train/shared';
 import { Dayjs } from 'dayjs';
 import React from 'react';
 import { useParams } from 'react-router-dom';
