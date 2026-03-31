@@ -1,5 +1,5 @@
 import { useEffect, useState, type JSX } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 export function RequireAuth({ children }: { children: JSX.Element }) {
