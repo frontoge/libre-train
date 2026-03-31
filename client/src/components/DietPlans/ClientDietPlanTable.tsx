@@ -1,5 +1,6 @@
 import type { ClientDietPlan } from '@libre-train/shared';
 import { Button, Popconfirm, Table } from 'antd';
+import type { TableProps } from 'antd/es/table';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import stringSimilarity from 'string-similarity-js';
 import { AppContext } from '../../app-context';
@@ -11,7 +12,7 @@ import type { CreateEditDietPlanFormValues } from './CreateEditDietPlanForm';
 import { CreateEditDietPlanModal } from './CreateEditDietPlanModal';
 import { ViewDietPlanModal } from './ViewDietPlanModal';
 
-export interface ClientDietPlanTableProps extends React.ComponentProps<typeof Table> {}
+export type ClientDietPlanTableProps = Omit<TableProps<ClientDietPlanTableData>, 'columns' | 'dataSource'>;
 
 export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 	const {
@@ -122,7 +123,7 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 		return getClientDietPlanTableData(clientPlans);
 	}, [clientPlans]);
 
-	const filteredPlans = useMemo(() => {
+	const filteredPlans = useMemo<ClientDietPlanTableData[]>(() => {
 		return tablePlanData.filter((plan) => {
 			if (searchParams.searchText.trim() !== '' && stringSimilarity(plan.name, searchParams.searchText) < 0.3) {
 				return false;
@@ -147,13 +148,13 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 		return clientPlans.find((plan) => plan.clientId === selectedClientId);
 	}, [selectedClientId, clientPlans]);
 
-	const tableColumns = [
-		...(ClientDietPlanTableColumns || []),
+	const tableColumns: NonNullable<TableProps<ClientDietPlanTableData>['columns']> = [
+		...ClientDietPlanTableColumns,
 		{
 			title: 'Actions',
 			key: 'actions',
 			width: '10%',
-			render: (_: any, record: ClientDietPlanTableData) => {
+			render: (_value, record: ClientDietPlanTableData) => {
 				const hasPlan = record.calories !== undefined;
 				return (
 					<div

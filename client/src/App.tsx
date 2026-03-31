@@ -16,13 +16,11 @@ import { NoPage } from './pages/NoPage';
 import { Signup } from './pages/Signup';
 import { TrainingRouter } from './pages/training/TrainingRouter';
 import './styles/app.css';
-import { useAuth } from './hooks/useAuth';
 import { DietRouter } from './pages/diet/DietRouter';
 import { Logout } from './pages/Logout';
 
 function App() {
 	const env = import.meta.env.VITE_ENV || 'local';
-	const { isAuthenticated } = useAuth();
 
 	const [appState, setAppState] = useState<AppState>({
 		clients: [],
@@ -110,7 +108,7 @@ function App() {
 	};
 
 	useEffect(() => {
-		if (isAuthenticated()) {
+		if (appState.auth.user !== undefined) {
 			fetchExercises();
 			fetchClients();
 			fetchAssessmentTypes();

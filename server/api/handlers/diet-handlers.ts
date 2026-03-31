@@ -98,7 +98,12 @@ export const handleCreateDietPlan = async (req: Request<{}, {}, Omit<DietPlan, '
 				notes ?? null,
 			],
 		});
-		const insertId = (result as any)[0].new_plan_id;
+
+		if (result === undefined || result[0] === undefined) {
+			return res.status(500).json({ message: 'Failed to create diet plan' });
+		}
+
+		const insertId = result[0].new_plan_id;
 		res.status(201).json({
 			id: insertId,
 			clientId,

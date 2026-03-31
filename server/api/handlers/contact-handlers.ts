@@ -6,7 +6,7 @@ import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastruc
 export const handleGetContacts = async (req: Request, res: Response<ResponseWithError<Contact[]>>) => {
 	const connection = await getDatabaseConnection();
 	try {
-		const [results, fields] = await connection.query<RowDataPacket[]>({ sql: 'SELECT * FROM Contact' });
+		const [results] = await connection.query<RowDataPacket[]>({ sql: 'SELECT * FROM Contact' });
 
 		const contacts: Contact[] = results.map((row) => ({
 			id: row.id,
@@ -33,7 +33,7 @@ export const handleGetContactById = async (req: Request<{ id: string }>, res: Re
 	const connection = await getDatabaseConnection();
 	const { id } = req.params;
 	try {
-		const [results, fields] = await connection.query<RowDataPacket[]>({
+		const [results] = await connection.query<RowDataPacket[]>({
 			sql: 'SELECT * FROM Contact WHERE id = ?',
 			values: [parseInt(id)],
 		});
@@ -122,7 +122,7 @@ export const handleUpdateContact = async (req: Request<{ id: string }, {}, Omit<
 	const { id } = req.params;
 	const { first_name, last_name, email, phone, img, date_of_birth } = req.body;
 	try {
-		const [result, fields] = await connection.execute({
+		await connection.execute({
 			sql: 'CALL spUpdateContact(?, ?, ?, ?, ?, ?, ?)',
 			values: [
 				parseInt(id),

@@ -9,8 +9,6 @@ import { useAuth } from '../hooks/useAuth';
 export function Login() {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
-	const [error, setError] = React.useState<string | null>(null);
-	const [loading, setLoading] = React.useState<boolean>(false);
 	const { isAuthenticated, refreshAuthentication, auth, user, setAuth } = useAuth();
 
 	React.useEffect(() => {
@@ -31,9 +29,6 @@ export function Login() {
 	};
 
 	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
-		setError('');
-		setLoading(true);
-
 		try {
 			const res = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthLogin}`, {
 				method: 'POST',
@@ -55,9 +50,7 @@ export function Login() {
 			const { accessToken, user } = await res.json();
 			setAuth({ authToken: accessToken, user });
 		} catch (e: any) {
-			setError(e.message);
-		} finally {
-			setLoading(false);
+			console.log('Login error:', e);
 		}
 	};
 

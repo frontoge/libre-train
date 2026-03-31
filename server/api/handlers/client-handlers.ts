@@ -45,7 +45,7 @@ export const handleGetClientContacts = async (req: Request<{ id?: string }>, res
 export const handleGetClients = async (req: Request, res: Response<Client[] | { message: string }>) => {
 	const connection = await getDatabaseConnection();
 	try {
-		const [results, fields] = await connection.query<RowDataPacket[]>({ sql: 'SELECT * FROM Client' });
+		const [results] = await connection.query<RowDataPacket[]>({ sql: 'SELECT * FROM Client' });
 
 		const clients: Client[] = results.map((row) => ({
 			id: row.id,
@@ -150,7 +150,7 @@ export const handleDailyUpdate = async (req: Request<{}, {}, DailyUpdateRequest>
 	const { date, data } = req.body;
 	const connection = await getDatabaseConnection();
 	try {
-		const [result] = await connection.execute<ResultSetHeader>({
+		await connection.execute<ResultSetHeader>({
 			sql: 'CALL spCreateClientDailyLog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
 			values: [
 				req.body.clientId, // Assuming clientId is part of the request body

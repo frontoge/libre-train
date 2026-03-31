@@ -4,15 +4,15 @@ import { muscleGroupColors } from '../../helpers/label-formatters';
 
 type TagRender = SelectProps['tagRender'];
 
-export type MuscleGroupTagProps = {
+export interface MuscleGroupTagProps extends React.ComponentProps<typeof Tag> {
 	label: React.ReactNode;
 	value: MuscleGroup;
 	closable?: boolean;
 	onClose?: () => void;
-};
+}
 
-export const MuscleGroupTag: TagRender = (props: MuscleGroupTagProps) => {
-	const { label, value, closable, onClose } = props;
+export const MuscleGroupTag = (props: MuscleGroupTagProps) => {
+	const { label, value, closable, onClose, ...tagProps } = props;
 
 	const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
 		event.preventDefault();
@@ -22,7 +22,14 @@ export const MuscleGroupTag: TagRender = (props: MuscleGroupTagProps) => {
 	const color = muscleGroupColors[value] || 'default';
 
 	return (
-		<Tag color={color} onMouseDown={onPreventMouseDown} closable={closable} onClose={onClose} style={{ marginInlineEnd: 4 }}>
+		<Tag
+			color={color}
+			onMouseDown={onPreventMouseDown}
+			closable={closable}
+			onClose={onClose}
+			style={{ marginInlineEnd: 4 }}
+			{...tagProps}
+		>
 			{label}
 		</Tag>
 	);

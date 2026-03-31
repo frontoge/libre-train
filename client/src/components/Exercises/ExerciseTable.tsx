@@ -21,7 +21,7 @@ export function ExerciseTable(props: any) {
 	const [isCreateEditModalOpen, setIsCreateEditModalOpen] = useState(false);
 	const [exerciseIdToEdit, setExerciseIdToEdit] = useState<number | undefined>(undefined);
 
-	const handleDelete = async (key: string) => {
+	const handleDelete = async (key: string | number) => {
 		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Exercise}/${key}`, {
 			method: 'DELETE',
 		});
@@ -78,7 +78,7 @@ export function ExerciseTable(props: any) {
 			render: (_, { muscle_groups }) => (
 				<Flex style={{ overflow: 'hidden' }}>
 					{muscle_groups.map((tag: MuscleGroup) => {
-						return <MuscleGroupTag value={tag} label={MuscleGroupLabels[tag]} />;
+						return <MuscleGroupTag key={1} value={tag} label={MuscleGroupLabels[tag]} />;
 					})}
 				</Flex>
 			),
@@ -98,14 +98,13 @@ export function ExerciseTable(props: any) {
 			key: 'actions',
 			render: (_, record) => (
 				<Space size="middle">
-					<Link
-						to={record.video_link ?? '#'}
-						disabled={!record.video_link}
-						target={record.video_link ? '_blank' : undefined}
-						rel="noopener noreferrer"
-					>
-						Video
-					</Link>
+					{record.video_link ? (
+						<Link to={record.video_link} target="_blank" rel="noopener noreferrer">
+							Video
+						</Link>
+					) : (
+						<span style={{ color: '#bfbfbf', cursor: 'not-allowed' }}>Video</span>
+					)}
 					<Button onClick={() => handleOpenEditModal(record.id)}>Edit</Button>
 					<Button onClick={() => handleDelete(record.id)} type="primary">
 						Delete

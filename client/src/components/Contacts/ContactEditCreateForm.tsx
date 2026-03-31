@@ -19,7 +19,7 @@ export function ContactEditCreateForm(props: ContactEditCreateFormProps) {
 	const [validationStatuses, setValidationStatuses] = useState<{ [key: string]: FormItemValidationStatus }>({});
 
 	const validateFormValues = (values: ContactEditCreateFormValues): boolean => {
-		var returnValue = true;
+		let returnValue = true;
 
 		if (!values.firstName || values.firstName.trim() === '') {
 			setValidationStatuses((prev) => ({

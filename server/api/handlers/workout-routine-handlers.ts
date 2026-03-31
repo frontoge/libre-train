@@ -74,8 +74,6 @@ export async function handleDeleteWorkoutRoutine(req: Request<{ id: string }>, r
 	}
 }
 
-export async function handleGetWorkoutRoutine(req: Request, res: Response<ResponseWithError<WorkoutRoutine[]>>) {}
-
 export async function handleGetCycleWorkoutRoutines(
 	req: Request<{ microcycleId: string }>,
 	res: Response<ResponseWithError<WorkoutRoutine[]>>
@@ -139,24 +137,35 @@ export async function createWorkoutRoutine(routine: Omit<WorkoutRoutine, 'id'>):
 	const connection = await getDatabaseConnection();
 	try {
 		const { microcycle_id, routine_index, routine_name, isActive, exercise_groups } = routine;
-		const [result] = await connection.execute({
+		const [result] = await connection.query<RowDataPacket[]>({
 			sql: 'CALL spCreateWorkoutRoutine(?, ?, ?, ?)',
 			values: [microcycle_id, routine_index, routine_name, isActive],
 		});
-		const workoutRoutineId = (result as any)[0][0].workout_routine_id;
+		if (!result || result[0] === undefined) {
+			throw new Error('Failed to create workout routine');
+		}
+		const workoutRoutineId = result[0][0].workout_routine_id;
 
 		// Create the exercise groups for the routine
 		await Promise.all(
 			exercise_groups.map(async (group: PlannedExerciseGroup, index: number) => {
 				const { rest_between, rest_after, routine_category, exercises } = group;
-				const [groupResult] = await connection.execute('CALL spCreatePlannedExerciseGroup(?, ?, ?, ?, ?)', [
-					workoutRoutineId,
-					index, // group index
-					rest_between ?? null,
-					rest_after ?? null,
-					routine_category,
-				]);
-				const groupId = (groupResult as any)[0][0].planned_exercise_group_id;
+				const [groupResult] = await connection.query<RowDataPacket[]>(
+					'CALL spCreatePlannedExerciseGroup(?, ?, ?, ?, ?)',
+					[
+						workoutRoutineId,
+						index, // group index
+						rest_between ?? null,
+						rest_after ?? null,
+						routine_category,
+					]
+				);
+
+				if (!groupResult || groupResult[0] === undefined) {
+					throw new Error('Failed to create planned exercise group');
+				}
+
+				const groupId = groupResult[0][0].planned_exercise_group_id;
 
 				// Create the exercises for the group
 				await Promise.all(

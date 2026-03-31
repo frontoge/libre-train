@@ -17,8 +17,8 @@ export function ClientSearch(props: ClientSearchProps) {
 
 	const handleChange = (value?: string) => {
 		setSelectedClient(value);
-		if (props.onClientSelect) {
-			props.onClientSelect(value);
+		if (onClientSelect) {
+			onClientSelect(value);
 		}
 	};
 

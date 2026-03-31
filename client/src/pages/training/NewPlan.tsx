@@ -1,6 +1,6 @@
 import { TrainingCycleType } from '@libre-train/shared';
 import useMessage from 'antd/es/message/useMessage';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import PageLayout from '../../components/PageLayout';
 import { Panel } from '../../components/Panel';
 import { CreateEditTrainingPlan, type CreateEditTrainingPlanFormValues } from '../../components/Training/CreateEditTrainingPlan';

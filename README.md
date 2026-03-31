@@ -13,3 +13,6 @@ An open source CRM for personal training.
 - Weight Monitoring
 - Workout plans
 - Client Forms/Documents
+
+# Test env deployment
+[![Deploy](https://github.com/frontoge/libre-train/actions/workflows/deploy.yaml/badge.svg?branch=main)](https://github.com/frontoge/libre-train/actions/workflows/deploy.yaml)

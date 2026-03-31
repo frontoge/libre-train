@@ -76,11 +76,11 @@ export function CycleBrowser(props: CycleBrowserProps) {
 			>
 				{cycleData[selectedCycleType]?.map((cycle) => {
 					if (selectedCycleType === 0) {
-						return <MacrocycleDisplay onChange={handleChange} macrocycle={cycle} />;
+						return <MacrocycleDisplay key={1} onChange={handleChange} macrocycle={cycle} />;
 					} else if (selectedCycleType === 1) {
-						return <MesocycleDisplay onChange={handleChange} mesocycle={cycle} />;
+						return <MesocycleDisplay key={1} onChange={handleChange} mesocycle={cycle} />;
 					} else if (selectedCycleType === 2) {
-						return <MicrocycleDisplay onChange={handleChange} microcycle={cycle} />;
+						return <MicrocycleDisplay key={1} onChange={handleChange} microcycle={cycle} />;
 					}
 				})}
 			</div>

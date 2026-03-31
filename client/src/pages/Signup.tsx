@@ -7,9 +7,6 @@ import { getAppConfiguration } from '../config/app.config';
 import { useAuth } from '../hooks/useAuth';
 
 export function Signup() {
-	const [error, setError] = React.useState<string | null>(null);
-	const [loading, setLoading] = React.useState<boolean>(false);
-
 	const [shouldRedirect, setShouldRedirect] = React.useState<boolean>(false);
 	const location = useLocation();
 
@@ -21,9 +18,6 @@ export function Signup() {
 	};
 
 	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
-		setError('');
-		setLoading(true);
-
 		try {
 			const res = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthSignup}`, {
 				method: 'POST',
@@ -48,9 +42,7 @@ export function Signup() {
 			setShouldRedirect(true);
 			// window.location.href = "/"; // Redirect to home page after signup
 		} catch (e: any) {
-			setError(e.message);
-		} finally {
-			setLoading(false);
+			console.log('Signup error:', e);
 		}
 	};
 

@@ -6,7 +6,7 @@ import { getAppConfiguration } from '../../config/app.config';
 import type { AssessmentCreateEditInitialValues } from './AssessmentCreateEditForm';
 import { AssessmentModal } from './AssessmentModal';
 
-export interface AssessmentHistoryTableProps extends React.ComponentProps<typeof Table> {
+export interface AssessmentHistoryTableProps extends Omit<TableProps<AssessmentHistoryTableEntry>, 'columns'> {
 	onAction?: () => void;
 }
 
@@ -130,7 +130,7 @@ export function AssessmentHistoryTable(props: AssessmentHistoryTableProps) {
 
 	return (
 		<>
-			<Table
+			<Table<AssessmentHistoryTableEntry>
 				pagination={{
 					pageSize: 9,
 					showSizeChanger: false,

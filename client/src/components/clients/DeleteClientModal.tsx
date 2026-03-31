@@ -1,13 +1,11 @@
 import { Routes } from '@libre-train/shared';
 import { Modal } from 'antd';
 import React from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../../app-context';
 import { getAppConfiguration } from '../../config/app.config';
 
-export type DeleteClientModalProps = {};
-
-export function DeleteClientModal(props: DeleteClientModalProps) {
+export function DeleteClientModal() {
 	const [confirmLoading, setConfirmLoading] = React.useState<boolean>(false);
 	const { state, setState } = React.useContext(AppContext);
 	const navigate = useNavigate();

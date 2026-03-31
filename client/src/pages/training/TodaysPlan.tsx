@@ -1,6 +1,6 @@
 import PageLayout from '../../components/PageLayout';
 
-export function TodaysPlan(props: any) {
+export function TodaysPlan() {
 	return (
 		<PageLayout
 			title="Training Plan Snapshot"

@@ -6,6 +6,7 @@ import { getExerciseFormValuesFromNode, getGroupFormValuesFromNode } from '../..
 import {
 	WorkoutNodeType,
 	type WorkoutRoutineEdit,
+	type WorkoutRoutineExerciseNode,
 	type WorkoutRoutineGroupNode,
 	type WorkoutRoutineTreeNode,
 } from '../../types/types';
@@ -153,7 +154,11 @@ export function RoutineEditor(props: RoutineEditorProps) {
 						scrollbarGutter: 'stable',
 					}}
 					onSubmitForm={handleExerciseSubmit}
-					initialValues={selectedNode !== undefined ? getExerciseFormValuesFromNode(selectedNode) : undefined}
+					initialValues={
+						selectedNode !== undefined
+							? getExerciseFormValuesFromNode(selectedNode as WorkoutRoutineExerciseNode)
+							: undefined
+					}
 				/>
 			) : (
 				selectedNode !== undefined && (

@@ -36,8 +36,9 @@ export function AddClient() {
 	};
 
 	const formStages = [
-		<ContactEditCreateForm onSubmit={handleContactFormSubmit} initialValues={contactFormValues} />,
+		<ContactEditCreateForm key={1} onSubmit={handleContactFormSubmit} initialValues={contactFormValues} />,
 		<ClientEditCreateForm
+			key={2}
 			onSubmit={handleClientFormSubmit}
 			initialValues={clientFormValues}
 			onCancel={handleClientFormCancel}
