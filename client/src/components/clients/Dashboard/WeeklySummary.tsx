@@ -57,7 +57,7 @@ export function WeeklySummary() {
 		getSummaryData();
 	}, [selectedWeek, id]);
 
-	const handleWeekChange = (date: Dayjs | null, dateString: string | string[]) => {
+	const handleWeekChange = (date: Dayjs | null) => {
 		setSelectedWeek(date ?? undefined);
 	};
 

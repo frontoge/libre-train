@@ -22,6 +22,7 @@ export function AssessmentHistory() {
 	const getNewClientLogData = async () => {
 		try {
 			if (!searchQuery) return;
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { clientId, ...parameters } = searchQuery;
 			const requestOptions = {
 				method: 'GET',

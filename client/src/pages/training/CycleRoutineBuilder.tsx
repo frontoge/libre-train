@@ -12,7 +12,7 @@ import { fetchMicrocycleRoutines } from '../../helpers/routine-helpers';
 import { fetchMicrocycleById } from '../../helpers/training-helpers';
 import type { WorkoutRoutineEdit } from '../../types/types';
 
-export function CycleRoutineBuilder(props: any) {
+export function CycleRoutineBuilder() {
 	const navigate = useNavigate();
 	const { cycleId } = useParams<{ cycleId: string }>();
 

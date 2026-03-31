@@ -12,7 +12,7 @@ import type { CreateEditDietPlanFormValues } from './CreateEditDietPlanForm';
 import { CreateEditDietPlanModal } from './CreateEditDietPlanModal';
 import { ViewDietPlanModal } from './ViewDietPlanModal';
 
-export interface ClientDietPlanTableProps extends Omit<TableProps<ClientDietPlanTableData>, 'columns' | 'dataSource'> {}
+export type ClientDietPlanTableProps = Omit<TableProps<ClientDietPlanTableData>, 'columns' | 'dataSource'>;
 
 export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 	const {

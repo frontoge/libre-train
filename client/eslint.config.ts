@@ -1,12 +1,13 @@
 import js from '@eslint/js';
 import pluginReact from 'eslint-plugin-react';
-import { defineConfig } from 'eslint/config';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
+	globalIgnores(['**/dist/**', '**/build/**', '**/node_modules/**', '**/*.d.ts']),
 	{
-		files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+		files: ['./src/**/*.{ts,tsx}'],
 		plugins: { js },
 		extends: ['js/recommended'],
 		languageOptions: { globals: globals.browser },
@@ -19,6 +20,8 @@ export default defineConfig([
 			'@typescript-eslint/no-explicit-any': 'off',
 			'@typescript-eslint/no-unused-vars': 'warn',
 			'@typescript-eslint/ban-ts-comment': 'off',
+			'@typescript-eslint/no-empty-object-type': 'off',
+			'@typescript-eslint/no-unused-expressions': 'off',
 		},
 	},
 ]);

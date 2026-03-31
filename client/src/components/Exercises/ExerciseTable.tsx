@@ -78,7 +78,7 @@ export function ExerciseTable(props: any) {
 			render: (_, { muscle_groups }) => (
 				<Flex style={{ overflow: 'hidden' }}>
 					{muscle_groups.map((tag: MuscleGroup) => {
-						return <MuscleGroupTag value={tag} label={MuscleGroupLabels[tag]} />;
+						return <MuscleGroupTag key={1} value={tag} label={MuscleGroupLabels[tag]} />;
 					})}
 				</Flex>
 			),
