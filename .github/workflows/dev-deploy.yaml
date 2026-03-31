@@ -44,7 +44,7 @@ jobs:
           DB_NAME=${{ vars.DB_NAME }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}
-          FRONTEND_URL=http://${{ vars.FRONTEND_DOMAIN }}/${{ vars.FRONTEND_APP_NAME }}
+          FRONTEND_URL=https://${{ vars.FRONTEND_DOMAIN }}/${{ vars.FRONTEND_APP_NAME }}
           EOF
 
           docker compose down --remove-orphans

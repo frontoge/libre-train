@@ -15,4 +15,4 @@ An open source CRM for personal training.
 - Client Forms/Documents
 
 # Test env deployment
-[![Deploy](https://github.com/frontoge/libre-train/actions/workflows/deploy.yaml/badge.svg?branch=main)](https://github.com/frontoge/libre-train/actions/workflows/deploy.yaml)
+[![Deploy](https://github.com/frontoge/libre-train/actions/workflows/dev-deploy.yaml/badge.svg)](https://github.com/frontoge/libre-train/actions/workflows/dev-deploy.yaml)
