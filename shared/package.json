@@ -3,17 +3,18 @@
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"main": "./index.ts",
+	"types": "./index.ts",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"default": "./dist/index.js"
+			"types": "./index.ts",
+			"default": "./index.ts"
 		}
 	},
 	"scripts": {
 		"build": "tsc",
-		"dev": "tsc --watch",
+		"clean": "rimraf dist",
+		"clean:all": "rimraf dist node_modules",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix"
 	},
@@ -21,6 +22,7 @@
 		"@eslint/js": "^9.39.3",
 		"eslint": "^9.39.3",
 		"globals": "^16.5.0",
+		"rimraf": "^6.1.3",
 		"typescript": "latest",
 		"typescript-eslint": "^8.56.1"
 	}

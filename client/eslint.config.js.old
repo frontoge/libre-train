@@ -1,6 +1,8 @@
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import js from '@eslint/js';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
 import { globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -9,16 +11,25 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default tseslint.config([
 	globalIgnores(['dist']),
+	tseslint.configs.recommended,
 	{
-		files: ['**/*.ts'],
-		extends: [js.configs.recommended, tseslint.configs.recommended],
+		files: ['**/*.ts', '**/*.tsx'],
+		ignores: ['**/*.config.ts', '**/*.d.ts'],
+		extends: [reactHooks.configs['recommended-latest'], reactRefresh.configs.vite],
 		languageOptions: {
 			ecmaVersion: 2020,
-			globals: globals.node,
+			globals: globals.browser,
 			parserOptions: {
 				project: true,
 				tsconfigRootDir: __dirname,
 			},
+		},
+		parserOptions: {
+			project: true,
+			tsconfigRootDir: __dirname,
+		},
+		rules: {
+			'@typescript-eslint/no-explicit-any': 'warn',
 		},
 	},
 ]);

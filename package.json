@@ -8,7 +8,12 @@
 		"shared"
 	],
 	"scripts": {
-		"clean": "rm -rf node_modules dist",
+		"clean": "bun run --parallel --no-exit-on-error --workspaces clean",
+		"clean:all": "rimraf node_modules bun.lock && bun run --parallel --no-exit-on-error --workspaces clean:all",
+		"build": "bun run --filter @libre-train/shared build && bun run --sequential --filter '!@libre-train/shared' build",
+		"build:clean": "bun run clean && bun run build",
+		"start:client": "bun run --filter @libre-train/client dev",
+		"start:server": "bun run --filter @libre-train/server dev",
 		"format": "prettier --write \"**/*.{js,ts,tsx,json,css}\"",
 		"format:check": "prettier --check \"**/*.{js,ts,tsx,json,css}\"",
 		"lint": "bun run --sequential --no-exit-on-error --workspaces lint",
@@ -19,6 +24,7 @@
 	},
 	"devDependencies": {
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-		"prettier": "^3.8.1"
+		"prettier": "^3.8.1",
+		"rimraf": "^6.1.3"
 	}
 }

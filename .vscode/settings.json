@@ -8,55 +8,34 @@
 	"prettier.requireConfig": true,
 	"prettier.enable": true,
 
-	// Language-specific formatting (Prettier as default)
-	"[typescript]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
-		"editor.codeActionsOnSave": {
-			"source.fixAll": "explicit"
-		}
-	},
-	"[typescriptreact]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
-		"editor.codeActionsOnSave": {
-			"source.fixAll": "explicit"
-		}
-	},
-	"[javascript]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"[json]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-
-	// === ESLint Configuration ===
-	"eslint.enable": true,
-	"eslint.useFlatConfig": true,
-
-	// Critical fix for multi-workspace monorepo with separate tsconfigs
+	// This is the most reliable combo for monorepos with per-package configs
 	"eslint.workingDirectories": [
+		{ "mode": "auto" }, // Let it auto-detect first
 		{
-			"directory": "client",
+			"directory": "./client",
 			"changeProcessCWD": true
 		},
 		{
-			"directory": "shared",
+			"directory": "./server",
 			"changeProcessCWD": true
 		},
 		{
-			"directory": "server",
+			"directory": "./shared",
 			"changeProcessCWD": true
 		}
 	],
 
 	"eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
 
-	"eslint.statusBarItem": true,
-
-	// Let VS Code + ESLint use the TypeScript from node_modules (important for monorepos)
+	// Important for monorepos (especially if root has a node_modules)
 	"typescript.tsdk": "node_modules/typescript/lib",
-	"typescript.enablePromptUseWorkspaceTSdk": true,
 
-	// Extra settings to help the TS language service understand the workspace structure
-	"typescript.preferences.includePackageJsonAutoImports": "on",
-	"typescript.surveys.enabled": false
+	// Extra helpful settings
+	"eslint.ignoreUntitled": true,
+	"eslint.lintTask.enable": false,
+	"eslint.run": "onType",
+
+	// Force the extension to use the local ESLint from each package
+	"eslint.nodePath": null, // usually leave as null, but try removing if issues persist
+	"eslint.packageManager": "bun" // ← Add this if you're using Bun
 }
