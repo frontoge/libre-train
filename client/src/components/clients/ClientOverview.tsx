@@ -1,4 +1,4 @@
-import AntDesignOutlined from '@ant-design/icons/AntDesignOutlined';
+import { AntDesignOutlined } from '@ant-design/icons';
 import { Avatar, Progress } from 'antd';
 import { useContext } from 'react';
 import { AppContext } from '../../app-context';
