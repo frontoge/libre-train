@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { Layout } from 'antd';
 import Sider from 'antd/es/layout/Sider';
 import { useContext, useState } from 'react';
@@ -9,6 +10,8 @@ import { Modals } from '../components/Modals';
 export function RouterLayout() {
 	const { state } = useContext(AppContext);
 	const [collapsed, setCollapsed] = useState(false);
+	const baseUrl = import.meta.env.BASE_URL;
+	const brandImageSrc = `${baseUrl}${collapsed ? 'icon.svg' : 'logo.svg'}`;
 
 	return (
 		<Layout
@@ -29,7 +32,7 @@ export function RouterLayout() {
 					}}
 				>
 					<img
-						src={collapsed ? '/libre-train/icon.svg' : '/libre-train/logo.svg'}
+						src={brandImageSrc}
 						alt="Logo"
 						style={{
 							maxHeight: '125%',
