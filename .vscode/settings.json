@@ -10,7 +10,6 @@
 
 	// This is the most reliable combo for monorepos with per-package configs
 	"eslint.workingDirectories": [
-		{ "mode": "auto" }, // Let it auto-detect first
 		{
 			"directory": "./client",
 			"changeProcessCWD": true
@@ -28,7 +27,7 @@
 	"eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
 
 	// Important for monorepos (especially if root has a node_modules)
-	"typescript.tsdk": "node_modules/typescript/lib",
+	"js/ts.tsdk.path": "node_modules/typescript/lib",
 
 	// Extra helpful settings
 	"eslint.ignoreUntitled": true,
@@ -36,6 +35,5 @@
 	"eslint.run": "onType",
 
 	// Force the extension to use the local ESLint from each package
-	"eslint.nodePath": null, // usually leave as null, but try removing if issues persist
-	"eslint.packageManager": "bun" // ← Add this if you're using Bun
+	"eslint.nodePath": null // usually leave as null, but try removing if issues persist
 }
