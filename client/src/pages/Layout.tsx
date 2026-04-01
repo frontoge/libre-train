@@ -3,6 +3,8 @@ import Sider from 'antd/es/layout/Sider';
 import { useContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AppContext } from '../app-context';
+import icon from '../assets/icon.svg';
+import logo from '../assets/logo.svg';
 import { NavMenu } from '../components/Common/NavMenu';
 import { Modals } from '../components/Modals';
 
@@ -29,7 +31,7 @@ export function RouterLayout() {
 					}}
 				>
 					<img
-						src={collapsed ? '/libre-train/icon.svg' : '/libre-train/logo.svg'}
+						src={collapsed ? icon : logo}
 						alt="Logo"
 						style={{
 							maxHeight: '125%',
