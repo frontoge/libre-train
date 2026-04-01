@@ -16,13 +16,17 @@ export type Contact = {
 
 export type Client = {
 	id: number;
+	trainer_id?: number;
 	height?: number;
 	created_at: Date;
 	updated_at: Date;
 	notes?: string;
 };
 
-export type ClientContact = Client & Omit<Contact, 'id'>;
+export type ClientContact = Client
+	& Omit<Contact, 'id'> & {
+		contact_id: number;
+	};
 
 export type AssessmentType = {
 	id: number;
