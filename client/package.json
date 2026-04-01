@@ -16,11 +16,11 @@
 		"test:coverage": "vitest run --coverage"
 	},
 	"dependencies": {
-		"@ant-design/icons": "5.x",
+		"@ant-design/icons": "^6.1.1",
 		"@libre-train/shared": "workspace:*",
 		"@types/lodash.debounce": "^4.0.9",
 		"@types/node": "^24.11.0",
-		"antd": "^5.29.3",
+		"antd": "^6.3.5",
 		"dayjs": "^1.11.19",
 		"dotenv": "^17.3.1",
 		"jwt-decode": "^4.0.0",

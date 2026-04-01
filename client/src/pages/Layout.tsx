@@ -1,6 +1,6 @@
 import { Layout } from 'antd';
 import Sider from 'antd/es/layout/Sider';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AppContext } from '../app-context';
 import { NavMenu } from '../components/Common/NavMenu';
@@ -8,6 +8,7 @@ import { Modals } from '../components/Modals';
 
 export function RouterLayout() {
 	const { state } = useContext(AppContext);
+	const [collapsed, setCollapsed] = useState(false);
 
 	return (
 		<Layout
@@ -17,7 +18,7 @@ export function RouterLayout() {
 			}}
 		>
 			{state.selectedModal !== undefined && Modals[state.selectedModal]}
-			<Sider collapsible>
+			<Sider collapsible theme="light" collapsed={collapsed} onCollapse={setCollapsed}>
 				<div
 					style={{
 						height: '5%',
@@ -27,7 +28,13 @@ export function RouterLayout() {
 						color: 'white',
 					}}
 				>
-					Logo
+					<img
+						src={collapsed ? '/libre-train/icon.svg' : '/libre-train/logo.svg'}
+						alt="Logo"
+						style={{
+							maxHeight: '125%',
+						}}
+					/>
 				</div>
 				<NavMenu />
 			</Sider>

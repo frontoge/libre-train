@@ -1,5 +1,6 @@
+/// <reference types="vite/client" />
 import { Routes as ApiRoutes } from '@libre-train/shared';
-import { ConfigProvider, theme } from 'antd';
+import { ConfigProvider } from 'antd';
 import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { AppContext, type AppState } from './app-context';
@@ -16,6 +17,7 @@ import { NoPage } from './pages/NoPage';
 import { Signup } from './pages/Signup';
 import { TrainingRouter } from './pages/training/TrainingRouter';
 import './styles/app.css';
+import { darkTheme } from './config/themes';
 import { DietRouter } from './pages/diet/DietRouter';
 import { Logout } from './pages/Logout';
 
@@ -117,19 +119,7 @@ function App() {
 
 	return (
 		<AppContext value={{ state: appState, setState: setAppState, setAuth, stateRefreshers }}>
-			<ConfigProvider
-				theme={{
-					algorithm: theme.darkAlgorithm,
-					token: {
-						colorPrimary: '#49aa19',
-					},
-					components: {
-						Layout: {
-							headerBg: '#141414ff',
-						},
-					},
-				}}
-			>
+			<ConfigProvider theme={darkTheme}>
 				<div
 					style={{
 						position: 'absolute',

@@ -14,10 +14,11 @@ export function NavMenu() {
 	return (
 		<Menu
 			mode="inline"
-			defaultSelectedKeys={['1']}
-			defaultOpenKeys={['sub1']}
+			theme="light"
+			defaultSelectedKeys={['dashboard']}
 			style={{
 				height: '100%',
+				overflowY: 'auto',
 			}}
 			onClick={onClick}
 			items={items}
