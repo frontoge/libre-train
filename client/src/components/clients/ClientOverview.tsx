@@ -1,15 +1,12 @@
 import { AntDesignOutlined } from '@ant-design/icons';
 import { Avatar, Progress } from 'antd';
 import { useContext } from 'react';
-import { AppContext } from '../../app-context';
+import type { ClientContact } from '../../../../shared/models';
 import { ClientDashboardContext } from '../../contexts/ClientDashboardContext';
 import { Panel } from '../Panel';
 
-export function ClientOverview() {
-	const { state } = useContext(AppContext);
+export function ClientOverview({ selectedClient }: { selectedClient: ClientContact | undefined }) {
 	const { dashboardState } = useContext(ClientDashboardContext);
-
-	const selectedClient = state.selectedClient;
 
 	const loggedWeight = dashboardState.data.logged_weight ?? 0;
 	const targetWeight = dashboardState.data.goal_weight ?? 200;

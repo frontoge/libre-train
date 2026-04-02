@@ -80,7 +80,7 @@ export function WeeklySummary() {
 						height: '100%',
 					}}
 				>
-					<Alert message="Please select a week and client to view the summary." type="info" />
+					<Alert title="Please select a week and client to view the summary." type="info" />
 				</div>
 			) : (
 				<>
