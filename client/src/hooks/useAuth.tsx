@@ -24,6 +24,14 @@ export function useAuth() {
 		}
 	};
 
+	const clearAuth = useCallback(() => {
+		if (auth.authToken === undefined && auth.user === undefined) {
+			return;
+		}
+
+		setAuth({ authToken: undefined, user: undefined });
+	}, [auth.authToken, auth.user, setAuth]);
+
 	/**
 	 *
 	 * @returns {boolean} True or false if the user is currently authenticated
@@ -38,15 +46,15 @@ export function useAuth() {
 			return true;
 		}
 
-		setAuth({ authToken: undefined, user: undefined });
+		clearAuth();
 		return false;
-	}, [auth]);
+	}, [auth.authToken, auth.user, clearAuth]);
 
 	/**
 	 * Method to refresh the user access token.
 	 * @returns {boolean} Flag to indicate successful refresh of access token.
 	 */
-	const refreshAuthentication = async () => {
+	const refreshAuthentication = useCallback(async () => {
 		try {
 			const requestOptions = {
 				method: 'POST',
@@ -58,7 +66,7 @@ export function useAuth() {
 			const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthRefresh}`, requestOptions);
 
 			if (!response.ok) {
-				setAuth({ authToken: undefined, user: undefined });
+				clearAuth();
 				return false;
 			}
 
@@ -67,10 +75,10 @@ export function useAuth() {
 			return true;
 		} catch (error) {
 			console.error('Error refreshing authentication:', error);
-			setAuth({ authToken: undefined, user: undefined });
+			clearAuth();
 			return false;
 		}
-	};
+	}, [clearAuth, setAuth]);
 
 	return { auth, user: auth.user, isAuthenticated, refreshAuthentication, setAuth };
 }

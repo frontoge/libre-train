@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { Layout } from 'antd';
 import Sider from 'antd/es/layout/Sider';
 import { useContext, useState } from 'react';
