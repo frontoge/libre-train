@@ -6,7 +6,7 @@ import { getAppConfiguration } from '../../config/app.config';
 import { exerciseFormOptions, exerciseMovementPatternOptions } from '../../helpers/enum-select-options';
 import { MuscleGroupSearch } from './MuscleGroupSearch';
 
-export interface CreateEditExerciseFormProps extends React.ComponentProps<typeof Form> {
+export interface CreateEditExerciseFormProps extends React.ComponentProps<typeof Form<CreateEditExerciseFormValues>> {
 	initialExerciseId?: number;
 	onComplete?: () => void;
 }
@@ -23,7 +23,7 @@ export interface CreateEditExerciseFormValues {
 }
 
 export function CreateEditExerciseForm(props: CreateEditExerciseFormProps) {
-	const [form] = Form.useForm();
+	const [form] = Form.useForm<CreateEditExerciseFormValues>();
 	const {
 		state: { exerciseData },
 		stateRefreshers,

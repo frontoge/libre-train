@@ -123,7 +123,7 @@ export function WorkoutRoutineDisplay(props: WorkoutRoutineProps) {
 				onDrop={handleDrop}
 				draggable={{
 					icon: false,
-					nodeDraggable: (node) => isEdit ?? false,
+					nodeDraggable: () => isEdit ?? false,
 				}}
 				blockNode
 				{...treeProps}

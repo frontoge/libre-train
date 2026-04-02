@@ -12,7 +12,7 @@ import { CreateEditExerciseModal } from './CreateEditExerciseModal';
 import { ExerciseSearch, type ExerciseSearchParams } from './ExerciseSearch';
 import { MuscleGroupTag } from './MuscleGroupTag';
 
-export function ExerciseTable(props: any) {
+export function ExerciseTable() {
 	const {
 		state: { exerciseData },
 		stateRefreshers,

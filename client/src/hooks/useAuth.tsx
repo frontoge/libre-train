@@ -19,6 +19,7 @@ export function useAuth() {
 			const currentTime = Date.now();
 			return (decodedToken?.exp ?? 0) * 1000 >= currentTime;
 		} catch (error) {
+			console.error('Error decoding token:', error);
 			return false;
 		}
 	};
@@ -65,6 +66,7 @@ export function useAuth() {
 			setAuth({ authToken: data.accessToken, user: data.user });
 			return true;
 		} catch (error) {
+			console.error('Error refreshing authentication:', error);
 			setAuth({ authToken: undefined, user: undefined });
 			return false;
 		}

@@ -38,7 +38,7 @@ const initialContext: AppContext = {
 		},
 	},
 	setState: () => {},
-	setAuth: (auth: Auth) => {},
+	setAuth: () => {},
 };
 
 export const AppContext = createContext<AppContext>(initialContext);

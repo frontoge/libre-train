@@ -150,7 +150,7 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 	}, [selectedClientId, clientPlans]);
 
 	const tableColumns: NonNullable<TableProps<ClientDietPlanTableData>['columns']> = [
-		...ClientDietPlanTableColumns,
+		...(ClientDietPlanTableColumns ?? []),
 		{
 			title: 'Actions',
 			key: 'actions',

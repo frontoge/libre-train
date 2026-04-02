@@ -7,7 +7,7 @@ import { cycleTypeOptions } from '../../helpers/enum-select-options';
 import { fetchClientMacrocycles, fetchClientMesocycles } from '../../helpers/training-helpers';
 import { ClientSearch } from '../clients/ClientSearch';
 
-export interface CreateEditTrainingPlanProps extends React.ComponentProps<typeof Form> {
+export interface CreateEditTrainingPlanProps extends React.ComponentProps<typeof Form<CreateEditTrainingPlanFormValues>> {
 	initialValues?: Partial<CreateEditTrainingPlanFormValues>;
 	onSubmit?: (values: CreateEditTrainingPlanFormValues) => void;
 }
@@ -33,7 +33,7 @@ type ParentCycle = {
 };
 
 export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
-	const [form] = Form.useForm();
+	const [form] = Form.useForm<CreateEditTrainingPlanFormValues>();
 	const [selectedClient, setSelectedClient] = useState<number | undefined>(props.initialValues?.selectedClient);
 	const [selectedCycleType, setSelectedCycleType] = useState<TrainingCycleType | undefined>(props.initialValues?.cycleType);
 	const [selectedParentCycleId, setSelectedParentCycleId] = useState<number | undefined>(props.initialValues?.parentCycle);
@@ -117,7 +117,13 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
 	};
 
 	return (
-		<Form form={form} onFinish={onFinish} layout="vertical" initialValues={props.initialValues} {...props}>
+		<Form<CreateEditTrainingPlanFormValues>
+			form={form}
+			onFinish={onFinish}
+			layout="vertical"
+			initialValues={props.initialValues}
+			{...props}
+		>
 			<div
 				style={{
 					display: isEdit ? 'none' : 'flex',

@@ -9,13 +9,13 @@ export interface ExerciseFilterOptionsValues {
 	progressionLevel?: number;
 }
 
-export interface ExerciseFilterOptionsProps extends React.ComponentProps<typeof Form> {
+export interface ExerciseFilterOptionsProps extends React.ComponentProps<typeof Form<ExerciseFilterOptionsValues>> {
 	onApplyFilters?: (values: ExerciseFilterOptionsValues) => void;
 	onResetFilters?: () => void;
 }
 
 export function ExerciseFilterOptions(props: ExerciseFilterOptionsProps) {
-	const [form] = Form.useForm();
+	const [form] = Form.useForm<ExerciseFilterOptionsValues>();
 
 	const handleApplyFilters = (values: ExerciseFilterOptionsValues) => {
 		if (props.onApplyFilters) {
@@ -31,7 +31,7 @@ export function ExerciseFilterOptions(props: ExerciseFilterOptionsProps) {
 	};
 
 	return (
-		<Form
+		<Form<ExerciseFilterOptionsValues>
 			form={form}
 			layout="horizontal"
 			labelCol={{ span: 10 }}

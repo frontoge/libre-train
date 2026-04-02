@@ -24,6 +24,7 @@ export function Logout() {
 				navigate('/login');
 			}
 		} catch (error) {
+			console.error('Error during logout:', error);
 			navigate('/');
 		}
 	};

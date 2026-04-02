@@ -76,7 +76,7 @@ export function ClientList() {
 		}
 
 		setShowEditModal(false);
-		stateRefreshers.refreshClients();
+		stateRefreshers?.refreshClients();
 	};
 
 	const list = state.clients.map((client) => ({
