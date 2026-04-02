@@ -1,4 +1,4 @@
-import type { AssessmentClientLog, Mesocycle, Microcycle, WorkoutRoutine } from './models';
+import type { AssessmentClientLog, Client, Contact, Mesocycle, Microcycle, WorkoutRoutine } from './models';
 
 export type Goal = {
 	id: number;
@@ -144,3 +144,7 @@ export type GetDietPlanLogEntrySearchParams = {
 	startDate?: string;
 	endDate?: string;
 };
+
+export type UpdateContactRequest = Omit<Partial<Contact>, 'id'>;
+
+export type UpdateClientRequest = Omit<Partial<Client>, 'id' | 'updated_at' | 'created_at'>;

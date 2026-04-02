@@ -10,27 +10,27 @@ export type AssessmentFilterOptionsValues = {
 	assessmentType?: string;
 };
 
-export interface AssessmentFilterOptionsProps extends React.ComponentProps<typeof Form> {
+export interface AssessmentFilterOptionsProps extends React.ComponentProps<typeof Form<AssessmentFilterOptionsValues>> {
 	onApplyFilters?: (values: AssessmentFilterOptionsValues) => void;
 	onResetFilters?: () => void;
 }
 
 export function AssessmentFilterOptions(props: AssessmentFilterOptionsProps) {
-	const [form] = Form.useForm();
+	const [form] = Form.useForm<AssessmentFilterOptionsValues>();
 
 	const { onApplyFilters, onResetFilters, ...formProps } = props;
 
 	const handleApplyFilters = (values: Omit<AssessmentFilterOptionsValues, 'assessmentType'> & { assessmentType?: any }) => {
-		props.onApplyFilters?.(values);
+		onApplyFilters?.(values);
 	};
 
 	const handleClearFilters = () => {
 		form.resetFields();
-		props.onResetFilters?.();
+		onResetFilters?.();
 	};
 
 	return (
-		<Form
+		<Form<AssessmentFilterOptionsValues>
 			layout="horizontal"
 			form={form}
 			labelCol={{ span: 7 }}

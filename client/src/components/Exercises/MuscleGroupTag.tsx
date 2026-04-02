@@ -1,8 +1,6 @@
 import type { MuscleGroup } from '@libre-train/shared';
-import { Tag, type SelectProps } from 'antd';
+import { Tag } from 'antd';
 import { muscleGroupColors } from '../../helpers/label-formatters';
-
-type TagRender = SelectProps['tagRender'];
 
 export interface MuscleGroupTagProps extends React.ComponentProps<typeof Tag> {
 	label: React.ReactNode;

@@ -9,7 +9,7 @@ export function ClientDataViewer() {
 	const { dashboardState } = React.useContext(ClientDashboardContext);
 	const [selectedView, setSelectedView] = React.useState<string>('dailyUpdate');
 
-	const viewComponents = {
+	const viewComponents: { [key: string]: React.ReactNode } = {
 		dailyUpdate: <DailyUpdate />,
 		summaries: <WeeklySummary />,
 	};

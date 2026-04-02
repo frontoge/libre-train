@@ -1,8 +1,8 @@
 CREATE TABLE `Client` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `height` int(10) unsigned DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `contactId` int(10) unsigned NOT NULL,
   `trainerId` int(10) unsigned NOT NULL,
   `isActive` tinyint(1) NOT NULL DEFAULT 1,

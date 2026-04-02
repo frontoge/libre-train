@@ -45,7 +45,8 @@ export function AssessmentHistoryFilters(props: AssessmentHistoryFiltersProps) {
 		setSelectedFilters(undefined);
 	};
 
-	const handleClientSelect = (clientId: string) => {
+	const handleClientSelect = (clientId?: string) => {
+		if (!clientId) return;
 		setSelectedClientId(clientId);
 	};
 

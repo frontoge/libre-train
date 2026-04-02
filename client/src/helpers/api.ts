@@ -1,6 +1,13 @@
 //TODO Move all api helper functions to here
 
-import type { ClientDietPlan, DietPlan, DietPlanLogEntry } from '@libre-train/shared';
+import type {
+	ClientContact,
+	ClientDietPlan,
+	DietPlan,
+	DietPlanLogEntry,
+	UpdateClientRequest,
+	UpdateContactRequest,
+} from '@libre-train/shared';
 import { Routes } from '@libre-train/shared';
 import { getAppConfiguration } from '../config/app.config';
 import type { WorkoutRoutineEdit } from '../types/types';
@@ -157,5 +164,54 @@ export const createDietLogEntry = async (dietLogEntry: Omit<DietPlanLogEntry, 'i
 	} catch (error) {
 		console.error('Error creating diet log entry:', error);
 		throw error;
+	}
+};
+
+export const getClientContacts = async (clientId?: number): Promise<ClientContact[]> => {
+	const requestOptions = {
+		method: 'GET',
+		headers: { 'Content-Type': 'application/json' },
+	};
+	try {
+		const response = await fetch(`${API_BASE_URL}${Routes.ClientContact}/${clientId ?? ''}`, requestOptions);
+		const data = await response.json();
+		return data as ClientContact[];
+	} catch (error) {
+		console.error('Error fetching client contacts:', error);
+		return [];
+	}
+};
+
+export const updateContact = async (contactId: number, updateContactData: UpdateContactRequest) => {
+	const requestOptions: RequestInit = {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(updateContactData),
+	};
+	try {
+		const response = await fetch(`${API_BASE_URL}${Routes.Contacts}/${contactId}`, requestOptions);
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(`Error updating contact: ${errorData.errorMessage || response.statusText}`);
+		}
+	} catch (error) {
+		console.error('Error updating contact:', error);
+	}
+};
+
+export const updateClient = async (clientId: number, updateClientData: UpdateClientRequest) => {
+	const requestOptions: RequestInit = {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(updateClientData),
+	};
+	try {
+		const response = await fetch(`${API_BASE_URL}${Routes.Clients}/${clientId}`, requestOptions);
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(`Error updating client: ${errorData.errorMessage || response.statusText}`);
+		}
+	} catch (error) {
+		console.error('Error updating client:', error);
 	}
 };
