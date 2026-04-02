@@ -2,7 +2,7 @@ import type { ClientDietPlan } from '@libre-train/shared';
 import { Button, Popconfirm, Table } from 'antd';
 import type { TableProps } from 'antd/es/table';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import stringSimilarity from 'string-similarity-js';
+import { stringSimilarity } from 'string-similarity-js';
 import { AppContext } from '../../app-context';
 import { createDietPlan, deleteDietPlan, fetchClientDietPlansForTrainer } from '../../helpers/api';
 import type { ClientDietPlanTableData } from '../../types/types';
@@ -39,6 +39,7 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 			setClientPlans(results);
 		} catch (error) {
 			// show error notification
+			console.error('Failed to fetch client diet plans:', error);
 		}
 	};
 
@@ -216,8 +217,8 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 					pageSize: 12,
 					showSizeChanger: false,
 				}}
-				onRow={(record: ClientDietPlanTableData, index) => ({
-					onDoubleClick: (event) => handleRowClick(record),
+				onRow={(record: ClientDietPlanTableData) => ({
+					onDoubleClick: () => handleRowClick(record),
 				})}
 				{...tableProps}
 			/>
@@ -226,7 +227,9 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 					open={openModalType === 'view'}
 					okButtonProps={{ style: { display: 'none' } }}
 					closable={false}
-					maskClosable
+					mask={{
+						closable: true,
+					}}
 					dietPlan={selectedPlan}
 					onCancel={handleCloseModal}
 				/>
@@ -236,7 +239,9 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 					open={openModalType === 'edit' || openModalType === 'create'}
 					onCancel={handleCloseModal}
 					onFinish={handleCreatePlan}
-					maskClosable
+					mask={{
+						closable: true,
+					}}
 					initialValues={{ ...selectedPlan, clientId: selectedPlan.clientId.toString() }}
 					isEdit
 				/>

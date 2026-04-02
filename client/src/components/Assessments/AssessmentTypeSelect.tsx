@@ -1,7 +1,7 @@
 import { AssessmentGroup } from '@libre-train/shared';
 import { Select, type SelectProps } from 'antd';
 import { useContext, useState } from 'react';
-import stringSimilarity from 'string-similarity-js';
+import { stringSimilarity } from 'string-similarity-js';
 import { AppContext } from '../../app-context';
 
 export interface AssessmentTypeSelectProps extends Omit<SelectProps, 'options' | 'onChange'> {
@@ -77,17 +77,18 @@ export function AssessmentTypeSelect(props: AssessmentTypeSelectProps) {
 	};
 
 	const handleChange = (assessmentTypeId: string) => {
-		props.onAssessmentTypeSelect?.(assessmentTypeId);
+		onAssessmentTypeSelect?.(assessmentTypeId);
 	};
 
 	return (
 		<Select
-			filterOption={false}
 			placeholder="Select an assessment type"
 			style={{ width: '100%' }}
 			options={options}
-			showSearch
-			onSearch={handleOptionSearch}
+			showSearch={{
+				onSearch: handleOptionSearch,
+				filterOption: false,
+			}}
 			onChange={handleChange}
 			{...otherProps}
 		></Select>
