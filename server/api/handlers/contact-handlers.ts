@@ -1,4 +1,4 @@
-import { Contact, ResponseWithError } from '@libre-train/shared';
+import { Contact, ResponseWithError, UpdateContactRequest } from '@libre-train/shared';
 import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql2';
 import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastructure/mysql-database';
@@ -116,7 +116,7 @@ export const handleDeleteContact = async (req: Request<{ id: string }>, res: Res
 	}
 };
 
-export const handleUpdateContact = async (req: Request<{ id: string }, {}, Omit<Partial<Contact>, 'id'>>, res: Response) => {
+export const handleUpdateContact = async (req: Request<{ id: string }, {}, UpdateContactRequest>, res: Response) => {
 	const connection = await getDatabaseConnection();
 
 	const { id } = req.params;

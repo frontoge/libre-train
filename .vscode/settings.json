@@ -34,6 +34,16 @@
 	"eslint.lintTask.enable": false,
 	"eslint.run": "onType",
 
+	// Vitest (Testing tab): discover both client and server test projects.
+	"vitest.ignoreWorkspace": true,
+	"vitest.configSearchPatternInclude": "{client,server}/**/vitest.config.ts",
+	"vitest.shellType": "terminal",
+	"vitest.watchOnStartup": true,
+	"vitest.vitestPackagePath": "client/node_modules/vitest/package.json",
+
+	// Disable Bun Tests provider in Testing panel.
+	"bun.test.enable": false,
+
 	// Force the extension to use the local ESLint from each package
 	"eslint.nodePath": null // usually leave as null, but try removing if issues persist
 }

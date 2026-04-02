@@ -34,6 +34,17 @@ export type ContactEditCreateFormValues = {
 	dob?: Dayjs;
 };
 
+export type ClientContactEditFormValues = {
+	firstName?: string;
+	lastName?: string;
+	email?: string;
+	phoneNumber?: string;
+	dob?: Dayjs;
+	img?: string;
+	height?: number;
+	notes?: string;
+};
+
 export type ClientEditCreateFormValues = {
 	height?: number;
 	notes?: string;

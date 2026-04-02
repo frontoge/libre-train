@@ -7,6 +7,7 @@ import {
 	DashboardResponse,
 	DashboardSummaryQuery,
 	DashboardWeeklySummaryResponse,
+	UpdateClientRequest,
 } from '@libre-train/shared';
 import { Request, Response } from 'express';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
@@ -297,6 +298,36 @@ export const handleDeleteClient = async (req: Request<{ id: string }>, res: Resp
 			return;
 		}
 		console.error('Unexpected error deleting client:', error);
+		res.status(500).json({ message: 'An unexpected error occurred.' });
+	} finally {
+		await closeDatabaseConnection(connection);
+	}
+};
+
+export const handleUpdateClient = async (req: Request<{ id: string }, {}, UpdateClientRequest>, res: Response) => {
+	const connection = await getDatabaseConnection();
+	try {
+		const { id } = req.params;
+		const { height, notes, trainer_id } = req.body;
+
+		if (id === undefined) {
+			res.status(400).json({ message: 'Client ID is required.' });
+			return;
+		}
+
+		await connection.query({
+			sql: 'CALL spUpdateClient(?, ?, ?, ?)',
+			values: [parseInt(id, 10), height ?? null, notes ?? null, trainer_id ?? null],
+		});
+
+		res.status(204).send();
+	} catch (error) {
+		if (error instanceof Error) {
+			console.error('Error updating client:', error.message);
+			res.status(500).json({ message: error.message });
+			return;
+		}
+		console.error('Unexpected error updating client:', error);
 		res.status(500).json({ message: 'An unexpected error occurred.' });
 	} finally {
 		await closeDatabaseConnection(connection);
