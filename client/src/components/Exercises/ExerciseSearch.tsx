@@ -43,7 +43,7 @@ export function ExerciseSearch(props: ExerciseSearchProps) {
 	};
 
 	useEffect(() => {
-		props.onSearchChange?.(filterParams);
+		onSearchChange?.(filterParams);
 	}, [filterParams]);
 
 	return (

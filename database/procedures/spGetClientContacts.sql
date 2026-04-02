@@ -3,17 +3,17 @@ CREATE PROCEDURE spGetClientContacts(
 )
 BEGIN
     SELECT 
-        c.id,
-        ct.first_name,
-        ct.last_name,
-        ct.email,
-        ct.phone,
-        c.height,
-        ct.date_of_birth,
-        c.notes,
-        c.created_at,
-        c.updated_at
-    FROM Client c
-        JOIN Contact ct ON ct.id = c.contactId
-    WHERE p_client_id IS NULL OR c.id = p_client_id;
+        cc.ClientId as id,
+        cc.ContactId as contact_id,
+        cc.trainerId,
+        cc.first_name,
+        cc.last_name,
+        cc.email,
+        cc.phone,
+        cc.height,
+        cc.date_of_birth,
+        cc.notes,
+        cc.img
+    FROM ClientContact cc
+    WHERE p_client_id IS NULL OR cc.ClientId = p_client_id;
 END

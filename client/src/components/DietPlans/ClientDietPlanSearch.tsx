@@ -1,10 +1,9 @@
-import { Popover, Segmented, Switch } from 'antd';
+import { Segmented } from 'antd';
 import Search from 'antd/es/input/Search';
 import { useEffect, useState } from 'react';
 
 export interface ClientDietPlanSearchProps extends React.ComponentProps<'div'> {
 	searchProps?: React.ComponentProps<typeof Search>;
-	popoverProps?: React.ComponentProps<typeof Popover>;
 	onSearchChange?: (search: any) => void;
 }
 
@@ -14,7 +13,7 @@ export type ClientDietPlanSearch = {
 };
 
 export function ClientDietPlanSearch(props: ClientDietPlanSearchProps) {
-	const { searchProps, popoverProps, onSearchChange, style: divStyle, ...divProps } = props;
+	const { searchProps, onSearchChange, style: divStyle, ...divProps } = props;
 	const [searchValues, setSearchValues] = useState<ClientDietPlanSearch>({
 		searchText: '',
 		hasPlan: 'both',

@@ -4,14 +4,14 @@ import Sider from 'antd/es/layout/Sider';
 import { useContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AppContext } from '../app-context';
+import icon from '../assets/icon.svg';
+import logo from '../assets/logo.svg';
 import { NavMenu } from '../components/Common/NavMenu';
 import { Modals } from '../components/Modals';
 
 export function RouterLayout() {
 	const { state } = useContext(AppContext);
 	const [collapsed, setCollapsed] = useState(false);
-	const baseUrl = import.meta.env.BASE_URL;
-	const brandImageSrc = `${baseUrl}${collapsed ? 'icon.svg' : 'logo.svg'}`;
 
 	return (
 		<Layout
@@ -32,7 +32,7 @@ export function RouterLayout() {
 					}}
 				>
 					<img
-						src={brandImageSrc}
+						src={collapsed ? icon : logo}
 						alt="Logo"
 						style={{
 							maxHeight: '125%',

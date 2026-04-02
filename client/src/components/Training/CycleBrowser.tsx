@@ -1,3 +1,4 @@
+import type { Macrocycle, Mesocycle, Microcycle } from '@libre-train/shared';
 import { Segmented } from 'antd';
 import { useEffect, useState } from 'react';
 import { cycleTypeOptions } from '../../helpers/enum-select-options';
@@ -36,7 +37,7 @@ export function CycleBrowser(props: CycleBrowserProps) {
 	};
 
 	const segmentOptions = [
-		...cycleTypeOptions.map((option, index) => ({
+		...cycleTypeOptions.map((option) => ({
 			label: option.label + 's',
 			value: option.value - 1,
 			disabled: cycleData[option.value - 1] === undefined || cycleData[option.value - 1].length === 0,
@@ -74,13 +75,13 @@ export function CycleBrowser(props: CycleBrowserProps) {
 					paddingBottom: '1rem',
 				}}
 			>
-				{cycleData[selectedCycleType]?.map((cycle) => {
+				{cycleData[selectedCycleType]?.map((cycle: Macrocycle | Mesocycle | Microcycle) => {
 					if (selectedCycleType === 0) {
-						return <MacrocycleDisplay key={1} onChange={handleChange} macrocycle={cycle} />;
+						return <MacrocycleDisplay key={1} onChange={handleChange} macrocycle={cycle as Macrocycle} />;
 					} else if (selectedCycleType === 1) {
-						return <MesocycleDisplay key={1} onChange={handleChange} mesocycle={cycle} />;
+						return <MesocycleDisplay key={1} onChange={handleChange} mesocycle={cycle as Mesocycle} />;
 					} else if (selectedCycleType === 2) {
-						return <MicrocycleDisplay key={1} onChange={handleChange} microcycle={cycle} />;
+						return <MicrocycleDisplay key={1} onChange={handleChange} microcycle={cycle as Microcycle} />;
 					}
 				})}
 			</div>

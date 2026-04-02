@@ -1,11 +1,12 @@
 import type { DietPlanLogEntry } from '@libre-train/shared';
 import { Table } from 'antd';
+import type { ColumnsType, TableProps } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { fetchDietPlanLogEntries } from '../../helpers/api';
 
-export interface ClientDietLogHistoryTableProps extends React.ComponentProps<typeof Table> {
-	dietPlanId: number;
+export interface ClientDietLogHistoryTableProps extends TableProps<DietPlanLogEntry> {
+	dietPlanId?: number;
 }
 
 export function ClientDietLogHistoryTable(props: ClientDietLogHistoryTableProps) {
@@ -14,12 +15,14 @@ export function ClientDietLogHistoryTable(props: ClientDietLogHistoryTableProps)
 	const [logEntries, setLogEntries] = useState<DietPlanLogEntry[]>([]);
 
 	const fetchLogEntries = async () => {
+		if (!dietPlanId) return;
 		try {
 			setIsLoading(true);
 			const results = await fetchDietPlanLogEntries(dietPlanId);
 			setLogEntries(results);
 		} catch (error) {
 			// show error notification
+			console.error('Failed to fetch diet plan log entries:', error);
 		} finally {
 			setIsLoading(false);
 		}
@@ -31,7 +34,7 @@ export function ClientDietLogHistoryTable(props: ClientDietLogHistoryTableProps)
 		}
 	}, [dietPlanId]);
 
-	const columns = [
+	const columns: ColumnsType<DietPlanLogEntry> = [
 		{
 			title: 'Date',
 			dataIndex: 'logDate',
@@ -67,7 +70,7 @@ export function ClientDietLogHistoryTable(props: ClientDietLogHistoryTableProps)
 	];
 
 	return (
-		<Table
+		<Table<DietPlanLogEntry>
 			bordered
 			loading={isLoading}
 			columns={columns}

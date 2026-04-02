@@ -18,6 +18,7 @@ import {
 	handleGetClients,
 	handleGetDashboard,
 	handleGetDashboardSummary,
+	handleUpdateClient,
 } from './handlers/client-handlers';
 import {
 	handleCreateContact,
@@ -76,6 +77,7 @@ router.post(`${Routes.Clients}/daily-update`, handleDailyUpdate);
 router.get(`${Routes.Clients}/dashboard`, handleGetDashboard);
 router.get(`${Routes.Clients}/dashboard/summary`, handleGetDashboardSummary);
 router.delete(`${Routes.Clients}/:id`, handleDeleteClient);
+router.put(`${Routes.Clients}/:id`, handleUpdateClient);
 router.get(`${Routes.ClientContact}{/:id}`, handleGetClientContacts);
 
 // Exercise routes

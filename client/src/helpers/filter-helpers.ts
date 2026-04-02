@@ -1,5 +1,5 @@
 import type { Exercise } from '@libre-train/shared';
-import stringSimilarity from 'string-similarity-js';
+import { stringSimilarity } from 'string-similarity-js';
 import type { ExerciseSearchParams } from '../components/Exercises/ExerciseSearch';
 
 export const applyExerciseTableFilters = (exercises: Exercise[], filters: ExerciseSearchParams): Exercise[] => {

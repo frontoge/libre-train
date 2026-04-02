@@ -13,6 +13,18 @@ export default defineConfig([
 		languageOptions: { globals: globals.browser },
 	},
 	tseslint.configs.recommended,
+	{
+		files: ['**/*.{ts,tsx}'],
+		languageOptions: {
+			parserOptions: {
+				project: true,
+				tsconfigRootDir: import.meta.dirname,
+			},
+		},
+		linterOptions: {
+			reportUnusedDisableDirectives: true,
+		},
+	},
 	pluginReact.configs.flat.recommended,
 	{
 		rules: {
@@ -22,6 +34,7 @@ export default defineConfig([
 			'@typescript-eslint/ban-ts-comment': 'off',
 			'@typescript-eslint/no-empty-object-type': 'off',
 			'@typescript-eslint/no-unused-expressions': 'off',
+			'semi': ['warn', 'always'],
 		},
 	},
 ]);

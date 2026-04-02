@@ -10,7 +10,6 @@
 
 	// This is the most reliable combo for monorepos with per-package configs
 	"eslint.workingDirectories": [
-		{ "mode": "auto" }, // Let it auto-detect first
 		{
 			"directory": "./client",
 			"changeProcessCWD": true
@@ -27,15 +26,27 @@
 
 	"eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
 
-	// Important for monorepos (especially if root has a node_modules)
-	"typescript.tsdk": "node_modules/typescript/lib",
+	// Use one workspace-wide TypeScript SDK for all packages in this monorepo
+	"js/ts.tsdk.path": "node_modules/typescript/lib",
+	"js/ts.tsdk.promptToUseWorkspaceVersion": true,
+	"js/ts.validate.enabled": true,
+	"js/ts.tsserver.experimental.enableProjectDiagnostics": true,
 
 	// Extra helpful settings
 	"eslint.ignoreUntitled": true,
 	"eslint.lintTask.enable": false,
 	"eslint.run": "onType",
 
+	// Vitest (Testing tab): discover both client and server test projects.
+	"vitest.ignoreWorkspace": true,
+	"vitest.configSearchPatternInclude": "{client,server}/**/vitest.config.ts",
+	"vitest.shellType": "terminal",
+	"vitest.watchOnStartup": true,
+	"vitest.vitestPackagePath": "client/node_modules/vitest/package.json",
+
+	// Disable Bun Tests provider in Testing panel.
+	"bun.test.enable": false,
+
 	// Force the extension to use the local ESLint from each package
-	"eslint.nodePath": null, // usually leave as null, but try removing if issues persist
-	"eslint.packageManager": "bun" // ← Add this if you're using Bun
+	"eslint.nodePath": null // usually leave as null, but try removing if issues persist
 }

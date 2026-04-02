@@ -1,6 +1,6 @@
 import { Button, Layout } from 'antd';
 import { Content } from 'antd/es/layout/layout';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function NoPage() {
 	const navigate = useNavigate();

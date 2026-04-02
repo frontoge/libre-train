@@ -23,6 +23,7 @@ export function ContactEditCreateForm(props: ContactEditCreateFormProps) {
 
 		if (!values.firstName || values.firstName.trim() === '') {
 			setValidationStatuses((prev) => ({
+				...prev,
 				firstName: {
 					validateStatus: 'error',
 					help: 'First name is required.',
