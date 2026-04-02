@@ -1,32 +1,38 @@
-import { Avatar, Button, List, Modal, Skeleton } from 'antd';
-import { useContext, useState } from 'react';
+import { Avatar, Button, List, Modal, Popconfirm, Skeleton } from 'antd';
+import { useContext, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AppContext } from '../../app-context';
 import '../../styles/ClientDashboard/client-list.css';
-import { updateClient, updateContact } from '../../helpers/api';
-import { ModalType, type ClientContactEditFormValues } from '../../types/types';
+import { deleteClient, updateClient, updateContact } from '../../helpers/api';
+import { type ClientContactEditFormValues } from '../../types/types';
 import { ClientContactEditForm } from './ClientContactEditForm';
 
 export function ClientList() {
-	const { state, stateRefreshers, setState } = useContext(AppContext);
+	const { state, stateRefreshers } = useContext(AppContext);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const navigate = useNavigate();
 	const { id } = useParams();
 
+	const clientId = id ? parseInt(id, 10) : undefined;
+
+	const selectedClient = useMemo(() => state.clients.find((client) => client.id === clientId), [state.clients, id]);
+
 	const selectClient = (clientId: number) => {
-		setState((prev) => ({
-			...prev,
-			selectedClient: prev.clients.find((c) => c.id === clientId),
-		}));
 		navigate(`/clients/${clientId}`);
 	};
 
-	const openDeleteModal = (clientId: number) => {
-		setState((prev) => ({
-			...prev,
-			selectedModal: ModalType.DeleteClient,
-			selectedClient: prev.clients.find((c) => c.id === clientId),
-		}));
+	const handleDeleteClient = async (clientId: number) => {
+		const success = await deleteClient(clientId);
+		if (success) {
+			// If the deleted client is currently selected, navigate back to the main clients page
+			if (id && parseInt(id, 10) === clientId) {
+				navigate('/clients');
+			}
+			stateRefreshers?.refreshClients();
+		} else {
+			// Handle deletion error (e.g., show a notification)
+			console.error('Failed to delete client with id:', clientId);
+		}
 	};
 
 	const handleEditClient = () => {
@@ -36,7 +42,6 @@ export function ClientList() {
 	const handleEditClientFormSubmit = async (values: ClientContactEditFormValues) => {
 		// Two requests, one to update the contact and one to update the client.
 		// Check if they have changed before sending the request.
-		const { selectedClient } = state;
 		if (!selectedClient) return;
 
 		// TODO: Handle image changes
@@ -112,16 +117,15 @@ export function ClientList() {
 							>
 								Edit
 							</Button>,
-							<Button
-								type="link"
+							<Popconfirm
+								title="Are you sure you want to delete this client?"
 								key="list-loadmore-more"
-								style={actionButtonStyles}
-								onClick={() => {
-									openDeleteModal(item.id);
-								}}
+								onConfirm={() => handleDeleteClient(item.id)}
 							>
-								Remove
-							</Button>,
+								<Button type="link" style={actionButtonStyles}>
+									Remove
+								</Button>
+							</Popconfirm>,
 						]}
 					>
 						<Skeleton avatar title={false} loading={item.loading} active>
@@ -144,7 +148,7 @@ export function ClientList() {
 				<ClientContactEditForm
 					onSubmit={handleEditClientFormSubmit}
 					onCancel={() => setShowEditModal(false)}
-					initialValues={state.selectedClient}
+					initialValues={selectedClient}
 				/>
 			</Modal>
 		</>

@@ -50,10 +50,6 @@ export type ClientEditCreateFormValues = {
 	notes?: string;
 };
 
-export enum ModalType {
-	DeleteClient,
-}
-
 export interface AssessmentFormValues {
 	date?: Dayjs;
 	result: string;

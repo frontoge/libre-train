@@ -4,6 +4,7 @@ import { Routes } from '@libre-train/shared';
 import { Alert, Button, Card, Col, Divider, Form, Input, Layout, Row, Space, theme, Typography, type FormProps } from 'antd';
 import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import logo from '../assets/logo.svg';
 import { getAppConfiguration } from '../config/app.config';
 import { useAuth } from '../hooks/useAuth';
 
@@ -25,7 +26,6 @@ const FORGOT_PASSWORD_URL = '#';
 
 export function Login() {
 	const { token } = theme.useToken();
-	const logoSrc = `${import.meta.env.BASE_URL}logo.svg`;
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const { refreshAuthentication, auth, setAuth } = useAuth();
@@ -156,9 +156,9 @@ export function Login() {
 											}}
 										>
 											<img
-												src={logoSrc}
+												src={logo}
 												alt={`${BRANDING.productName} logo`}
-												style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+												style={{ width: '100%', height: '170%' }}
 											/>
 										</div>
 

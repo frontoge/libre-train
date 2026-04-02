@@ -35,6 +35,12 @@ export const items: NavMenuItem[] = [
 				icon: <IoMdPersonAdd />,
 				urlPath: '/clients/create',
 			},
+			{
+				key: 'client_browse',
+				label: 'Browse Clients',
+				icon: <FaListAlt />,
+				urlPath: '/clients/browse',
+			},
 		],
 	},
 	{

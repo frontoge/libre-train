@@ -114,7 +114,7 @@ export function DailyUpdate() {
 					paddingTop: '1rem',
 				}}
 			>
-				<Alert message="Please Select a client" type="info" />
+				<Alert title="Please Select a client" type="info" />
 			</div>
 		);
 	}

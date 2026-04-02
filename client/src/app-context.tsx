@@ -2,12 +2,9 @@ import type { AssessmentType, ClientContact, Exercise } from '@libre-train/share
 import React, { createContext } from 'react';
 import type { Auth } from './auth/authorization';
 import { getAppConfiguration } from './config/app.config';
-import type { ModalType } from './types/types';
 
 export type AppState = {
 	clients: ClientContact[];
-	selectedClient?: ClientContact;
-	selectedModal?: ModalType;
 	exerciseData?: Exercise[];
 	assessmentTypes: AssessmentType[];
 	auth: Auth;
@@ -28,10 +25,8 @@ export type AppContext = {
 
 const initialContext: AppContext = {
 	state: {
-		selectedClient: undefined,
 		assessmentTypes: [],
 		clients: [],
-		selectedModal: undefined,
 		auth: {
 			authToken: '',
 			user: import.meta.env.VITE_ENV === 'local' && getAppConfiguration().disableAuth ? 10 : undefined,

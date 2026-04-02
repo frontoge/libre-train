@@ -1,5 +1,6 @@
 import { Routes } from '@libre-train/shared';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { AppContext } from '../../app-context';
 import { ClientDataViewer } from '../../components/clients/ClientDataViewer';
 import { ClientLists } from '../../components/clients/ClientLists';
@@ -11,11 +12,16 @@ import { ClientDashboardContext, defaultDashboardState, type DashboardState } fr
 export function ClientDashboard() {
 	const { state, stateRefreshers } = useContext(AppContext);
 	const [dashboardState, setDashboardState] = useState<DashboardState>(defaultDashboardState);
+	const { id } = useParams();
+
+	const clientId = id ? parseInt(id, 10) : undefined;
+
+	const selectedClient = useMemo(() => state.clients.find((client) => client.id === clientId), [state.clients, id]);
 
 	useEffect(() => {
 		const fetchDashboardData = async () => {
 			try {
-				if (state.selectedClient == undefined) {
+				if (selectedClient == undefined) {
 					return;
 				}
 
@@ -26,7 +32,7 @@ export function ClientDashboard() {
 					},
 				};
 				const response = await fetch(
-					`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard?clientId=${state.selectedClient.id}&date=${dashboardState.selectedDate.format('YYYY-MM-DD')}`,
+					`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard?clientId=${selectedClient.id}&date=${dashboardState.selectedDate.format('YYYY-MM-DD')}`,
 					requestOptions
 				);
 				const data = await response.json();
@@ -38,13 +44,13 @@ export function ClientDashboard() {
 				console.error('Error fetching dashboard data:', error);
 			}
 		};
-		if (state.clients.length === 0 || state.selectedClient === undefined) {
+		if (state.clients.length === 0 || selectedClient === undefined) {
 			stateRefreshers?.refreshClients();
 			return;
 		}
 
 		fetchDashboardData();
-	}, [state.selectedClient, dashboardState.selectedDate]);
+	}, [selectedClient, dashboardState.selectedDate]);
 
 	return (
 		<ClientDashboardContext value={{ dashboardState, setDashboardState }}>
@@ -59,7 +65,7 @@ export function ClientDashboard() {
 						padding: '2rem 2rem',
 					}}
 				>
-					<ClientOverview />
+					<ClientOverview selectedClient={selectedClient} />
 					<ClientDataViewer />
 				</div>
 				<div

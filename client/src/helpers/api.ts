@@ -215,3 +215,21 @@ export const updateClient = async (clientId: number, updateClientData: UpdateCli
 		console.error('Error updating client:', error);
 	}
 };
+
+export const deleteClient = async (clientId: number): Promise<boolean> => {
+	try {
+		const requestOptions = {
+			method: 'DELETE',
+			headers: { 'Content-Type': 'application/json' },
+		};
+		const response = await fetch(`${API_BASE_URL}${Routes.Clients}/${clientId}`, requestOptions);
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(`Error deleting client: ${errorData.errorMessage || response.statusText}`);
+		}
+		return true;
+	} catch (error) {
+		console.error('Error deleting client:', error);
+		return false;
+	}
+};
