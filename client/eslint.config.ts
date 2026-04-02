@@ -21,6 +21,9 @@ export default defineConfig([
 				tsconfigRootDir: import.meta.dirname,
 			},
 		},
+		linterOptions: {
+			reportUnusedDisableDirectives: true,
+		},
 	},
 	pluginReact.configs.flat.recommended,
 	{
@@ -31,6 +34,7 @@ export default defineConfig([
 			'@typescript-eslint/ban-ts-comment': 'off',
 			'@typescript-eslint/no-empty-object-type': 'off',
 			'@typescript-eslint/no-unused-expressions': 'off',
+			'semi': ['warn', 'always'],
 		},
 	},
 ]);

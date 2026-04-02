@@ -26,8 +26,11 @@
 
 	"eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
 
-	// Important for monorepos (especially if root has a node_modules)
+	// Use one workspace-wide TypeScript SDK for all packages in this monorepo
 	"js/ts.tsdk.path": "node_modules/typescript/lib",
+	"js/ts.tsdk.promptToUseWorkspaceVersion": true,
+	"js/ts.validate.enabled": true,
+	"js/ts.tsserver.experimental.enableProjectDiagnostics": true,
 
 	// Extra helpful settings
 	"eslint.ignoreUntitled": true,
