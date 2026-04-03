@@ -1,15 +1,17 @@
 import { Routes, undefinedIfNull, type DailyUpdateData } from '@libre-train/shared';
-import { Alert, Button, Calendar, Card, Divider, InputNumber, message, Statistic } from 'antd';
+import { Alert, Button, Calendar, Card, Divider, InputNumber, Statistic } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { getAppConfiguration } from '../../../config/app.config';
 import { ClientDashboardContext } from '../../../contexts/ClientDashboardContext';
+import { useMessage } from '../../../hooks/useMessage';
 import { NutritionSummary } from '../../Nutrition/NutritionSummary';
 
 export function DailyUpdate() {
 	const { dashboardState, setDashboardState } = React.useContext(ClientDashboardContext);
 	const { id } = useParams();
+	const showMessage = useMessage();
 	const [dailyData, setDailyData] = React.useState<DailyUpdateData>({
 		weight: dashboardState.data.logged_weight,
 		body_fat: dashboardState.data.logged_body_fat,
@@ -22,7 +24,6 @@ export function DailyUpdate() {
 		fats: dashboardState.data.logged_fats,
 		target_fats: dashboardState.data.target_fats,
 	});
-	const [messageApi, contextHolder] = message.useMessage();
 
 	React.useEffect(() => {
 		setDailyData({
@@ -59,7 +60,7 @@ export function DailyUpdate() {
 			return;
 		}
 		if (!id) {
-			messageApi.error('Must select a client');
+			showMessage('error', 'Must select a client');
 			return;
 		}
 		dashboardState.setIsLoading(true);
@@ -77,7 +78,7 @@ export function DailyUpdate() {
 			};
 			const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}/daily-update`, requestOptions);
 			if (!response.ok) {
-				messageApi.error('Failed to submit daily update.');
+				showMessage('error', 'Failed to submit daily update.');
 				throw new Error('Failed to submit daily update');
 			}
 			setDashboardState((prev) => ({
@@ -98,7 +99,7 @@ export function DailyUpdate() {
 			}));
 			clearDailyValues();
 		} catch (error) {
-			messageApi.error('An error occurred while submitting daily update.');
+			showMessage('error', 'An error occurred while submitting daily update.');
 			console.error('Error submitting daily update:', error);
 		} finally {
 			dashboardState.setIsLoading(false);
@@ -121,7 +122,6 @@ export function DailyUpdate() {
 
 	return (
 		<>
-			{contextHolder}
 			<div
 				style={{
 					display: 'flex',

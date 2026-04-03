@@ -3,6 +3,7 @@ import { Button, Popconfirm, Space, Table, type TableProps } from 'antd';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { getAppConfiguration } from '../../config/app.config';
+import { useMessage } from '../../hooks/useMessage';
 import type { AssessmentCreateEditInitialValues } from './AssessmentCreateEditForm';
 import { AssessmentModal } from './AssessmentModal';
 
@@ -24,6 +25,7 @@ export type AssessmentHistoryTableEntry = {
 
 export function AssessmentHistoryTable(props: AssessmentHistoryTableProps) {
 	const [showEditModal, setShowEditModal] = useState(false);
+	const showMessage = useMessage();
 	const [initialFormValues, setInitialFormValues] = useState<AssessmentCreateEditInitialValues | undefined>(undefined);
 
 	const handleDeleteEntry = async (entryId: string) => {
@@ -37,11 +39,14 @@ export function AssessmentHistoryTable(props: AssessmentHistoryTableProps) {
 			const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AssessmentLog}/${entryId}`, requestOptions);
 
 			if (!response.ok) {
+				showMessage('error', 'Failed to delete assessment log entry');
 				throw new Error('Failed to delete assessment log entry');
 			}
 			props.onAction?.();
+			showMessage('success', 'Assessment log entry deleted successfully');
 		} catch (error) {
 			console.error('Error deleting assessment log entry:', error);
+			showMessage('error', 'An error occurred while deleting the assessment log entry');
 		}
 	};
 

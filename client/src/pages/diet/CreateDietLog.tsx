@@ -8,6 +8,7 @@ import { ClientSearch } from '../../components/clients/ClientSearch';
 import PageLayout from '../../components/PageLayout';
 import { Panel } from '../../components/Panel';
 import { createDietLogEntry, fetchClientDietPlan } from '../../helpers/api';
+import { useMessage } from '../../hooks/useMessage';
 
 interface CreateDietLogFormValues {
 	date?: Dayjs;
@@ -21,6 +22,7 @@ export function CreateDietLog() {
 	const [form] = Form.useForm();
 	const [selectedClient, setSelectedClient] = useState<string | undefined>(undefined);
 	const [clientPlan, setClientPlan] = useState<ClientDietPlan | undefined>(undefined);
+	const showMessage = useMessage();
 
 	const formItemStyle = {
 		width: '100%',
@@ -38,11 +40,13 @@ export function CreateDietLog() {
 	const handleFinish = async (values: CreateDietLogFormValues) => {
 		if (!selectedClient) {
 			console.error('No client selected');
+			showMessage('error', 'No client selected');
 			return;
 		}
 		const { date, calories, protein, carbs, fats } = values;
 		if (calories === undefined || protein === undefined || carbs === undefined || fats === undefined) {
 			console.error('Missing required fields');
+			showMessage('error', 'Please fill in all required fields');
 			return;
 		}
 
@@ -60,11 +64,14 @@ export function CreateDietLog() {
 				form.resetFields();
 				setClientPlan(undefined);
 				setSelectedClient(undefined);
+				showMessage('success', 'Diet log entry created successfully');
 			} else {
 				console.error('Failed to create diet log entry:', response.statusText);
+				showMessage('error', 'Failed to create diet log entry');
 			}
 		} catch (error) {
 			console.error('Error creating diet log entry:', error);
+			showMessage('error', 'Error creating diet log entry');
 		}
 	};
 

@@ -7,6 +7,7 @@ export type AppState = {
 	clients: ClientContact[];
 	exerciseData?: Exercise[];
 	assessmentTypes: AssessmentType[];
+	showMessage: (type: 'success' | 'error' | 'info' | 'warning', content: string, duration?: number) => void;
 	auth: Auth;
 };
 
@@ -27,6 +28,7 @@ const initialContext: AppContext = {
 	state: {
 		assessmentTypes: [],
 		clients: [],
+		showMessage: () => {},
 		auth: {
 			authToken: '',
 			user: import.meta.env.VITE_ENV === 'local' && getAppConfiguration().disableAuth ? 10 : undefined,
