@@ -1,8 +1,8 @@
 import { AssessmentGroup, Routes } from '@libre-train/shared';
-import message from 'antd/es/message';
 import { useContext, useState, type JSX } from 'react';
 import { AppContext } from '../../app-context';
 import { getAppConfiguration } from '../../config/app.config';
+import { useMessage } from '../../hooks/useMessage';
 import type { AssessmentFormValues } from '../../types/types';
 import { ClientSearch } from '../clients/ClientSearch';
 import { AssessmentTypeSelect } from './AssessmentTypeSelect';
@@ -27,10 +27,10 @@ export type AssessmentCreateEditFormProps = {
 };
 
 export function AssessmentCreateEditForm(props: AssessmentCreateEditFormProps) {
-	const [messageApi, contextHolder] = message.useMessage();
 	const {
 		state: { assessmentTypes },
 	} = useContext(AppContext);
+	const showMessage = useMessage();
 
 	if (!assessmentTypes) {
 		return <div>Loading...</div>;
@@ -69,11 +69,11 @@ export function AssessmentCreateEditForm(props: AssessmentCreateEditFormProps) {
 		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AssessmentLog}`, requestOptions);
 		if (response.ok) {
 			// handle success, maybe show a message or redirect
-			messageApi.success('Assessment log created successfully');
+			showMessage('success', 'Assessment log created successfully');
 			resetFields();
 		} else {
 			// handle error, maybe show an error message
-			messageApi.error('Failed to create assessment log');
+			showMessage('error', 'Failed to create assessment log');
 			console.error('Failed to create assessment log');
 		}
 	};
@@ -101,11 +101,11 @@ export function AssessmentCreateEditForm(props: AssessmentCreateEditFormProps) {
 			requestOptions
 		);
 		if (!response.ok) {
-			messageApi.error('Failed to update assessment log');
+			showMessage('error', 'Failed to update assessment log');
 			console.error('Failed to update assessment log');
 			return;
 		}
-		messageApi.success('Assessment log updated successfully');
+		showMessage('success', 'Assessment log updated successfully');
 	};
 
 	const handleSubmit = (result: AssessmentFormValues) => {
@@ -130,7 +130,6 @@ export function AssessmentCreateEditForm(props: AssessmentCreateEditFormProps) {
 
 	return (
 		<>
-			{contextHolder}
 			<div
 				style={{
 					display: 'flex',

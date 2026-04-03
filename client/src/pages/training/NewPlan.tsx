@@ -1,18 +1,18 @@
 import { TrainingCycleType } from '@libre-train/shared';
-import useMessage from 'antd/es/message/useMessage';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '../../components/PageLayout';
 import { Panel } from '../../components/Panel';
 import { CreateEditTrainingPlan, type CreateEditTrainingPlanFormValues } from '../../components/Training/CreateEditTrainingPlan';
 import { cycleCreateHelpers } from '../../helpers/training-helpers';
+import { useMessage } from '../../hooks/useMessage';
 
 export function NewPlan() {
 	const navigate = useNavigate();
-	const [messageApi, contextHolder] = useMessage();
+	const showMessage = useMessage();
 	const handleSubmit = async (values: CreateEditTrainingPlanFormValues) => {
 		const result = await cycleCreateHelpers[values.cycleType](values);
 		if (result) {
-			messageApi.success('Training plan created successfully!');
+			showMessage('success', 'Training plan created successfully!');
 			// Navigate to training plan viewer for the newly created plan
 			if (values.cycleType === TrainingCycleType.Microcycle) {
 				const microcycleId = result;
@@ -20,7 +20,7 @@ export function NewPlan() {
 				navigate(`/training/cycle/${microcycleId}/builder/`);
 			}
 		} else {
-			messageApi.error('Failed to create training plan.');
+			showMessage('error', 'Failed to create training plan.');
 		}
 	};
 
@@ -34,7 +34,6 @@ export function NewPlan() {
 				margin: '2rem',
 			}}
 		>
-			{contextHolder}
 			<Panel
 				style={{
 					height: '100%',

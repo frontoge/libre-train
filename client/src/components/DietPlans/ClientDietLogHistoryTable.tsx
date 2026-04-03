@@ -4,6 +4,7 @@ import type { ColumnsType, TableProps } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { fetchDietPlanLogEntries } from '../../helpers/api';
+import { useMessage } from '../../hooks/useMessage';
 
 export interface ClientDietLogHistoryTableProps extends TableProps<DietPlanLogEntry> {
 	dietPlanId?: number;
@@ -13,6 +14,7 @@ export function ClientDietLogHistoryTable(props: ClientDietLogHistoryTableProps)
 	const { dietPlanId, style, ...tableProps } = props;
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [logEntries, setLogEntries] = useState<DietPlanLogEntry[]>([]);
+	const showMessage = useMessage();
 
 	const fetchLogEntries = async () => {
 		if (!dietPlanId) return;
@@ -23,6 +25,7 @@ export function ClientDietLogHistoryTable(props: ClientDietLogHistoryTableProps)
 		} catch (error) {
 			// show error notification
 			console.error('Failed to fetch diet plan log entries:', error);
+			showMessage('error', 'Failed to fetch diet plan log entries');
 		} finally {
 			setIsLoading(false);
 		}

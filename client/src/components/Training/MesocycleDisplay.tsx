@@ -6,6 +6,7 @@ import { MdEdit } from 'react-icons/md';
 import dayjs from '../../config/dayjs';
 import { deleteMesocycle } from '../../helpers/api';
 import { fetchChildMicrocycles } from '../../helpers/training-helpers';
+import { useMessage } from '../../hooks/useMessage';
 import { MicrocycleCard } from './MicrocycleCard';
 
 export interface MesocycleDisplayProps extends React.ComponentProps<typeof Card> {
@@ -16,6 +17,7 @@ export interface MesocycleDisplayProps extends React.ComponentProps<typeof Card>
 export function MesocycleDisplay(props: MesocycleDisplayProps) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [subCards, setSubCards] = useState<Microcycle[]>([]);
+	const showMessage = useMessage();
 
 	const gridStyle: React.CSSProperties = {
 		width: subCards.length >= 4 ? 'calc(100% / 5)' : `calc(100% / ${subCards.length})`,
@@ -28,8 +30,10 @@ export function MesocycleDisplay(props: MesocycleDisplayProps) {
 		try {
 			await deleteMesocycle(props.mesocycle.id);
 			props.onChange?.();
+			showMessage('success', 'Mesocycle deleted successfully');
 		} catch (error) {
 			console.error('Error deleting mesocycle:', error);
+			showMessage('error', 'Error deleting mesocycle');
 		}
 	};
 

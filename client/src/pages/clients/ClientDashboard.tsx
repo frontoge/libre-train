@@ -8,10 +8,12 @@ import { ClientOverview } from '../../components/clients/ClientOverview';
 import PageLayout from '../../components/PageLayout';
 import { getAppConfiguration } from '../../config/app.config';
 import { ClientDashboardContext, defaultDashboardState, type DashboardState } from '../../contexts/ClientDashboardContext';
+import { useMessage } from '../../hooks/useMessage';
 
 export function ClientDashboard() {
 	const { state, stateRefreshers } = useContext(AppContext);
 	const [dashboardState, setDashboardState] = useState<DashboardState>(defaultDashboardState);
+	const showMessage = useMessage();
 	const { id } = useParams();
 
 	const clientId = id ? parseInt(id, 10) : undefined;
@@ -42,6 +44,7 @@ export function ClientDashboard() {
 				}));
 			} catch (error) {
 				console.error('Error fetching dashboard data:', error);
+				showMessage('error', 'An error occurred while fetching dashboard data');
 			}
 		};
 		if (state.clients.length === 0 || selectedClient === undefined) {

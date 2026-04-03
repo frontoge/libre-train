@@ -4,11 +4,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { AppContext } from '../../app-context';
 import '../../styles/ClientDashboard/client-list.css';
 import { deleteClient, updateClient, updateContact } from '../../helpers/api';
+import { useMessage } from '../../hooks/useMessage';
 import { type ClientContactEditFormValues } from '../../types/types';
 import { ClientContactEditForm } from './ClientContactEditForm';
 
 export function ClientList() {
 	const { state, stateRefreshers } = useContext(AppContext);
+	const showMessage = useMessage();
 	const [showEditModal, setShowEditModal] = useState(false);
 	const navigate = useNavigate();
 	const { id } = useParams();
@@ -28,10 +30,12 @@ export function ClientList() {
 			if (id && parseInt(id, 10) === clientId) {
 				navigate('/clients');
 			}
+			showMessage('success', 'Client deleted successfully');
 			stateRefreshers?.refreshClients();
 		} else {
 			// Handle deletion error (e.g., show a notification)
 			console.error('Failed to delete client with id:', clientId);
+			showMessage('error', 'Failed to delete client');
 		}
 	};
 
@@ -64,8 +68,10 @@ export function ClientList() {
 					last_name: values.lastName,
 					date_of_birth: values.dob?.format('YYYY-MM-DD'),
 				});
+				showMessage('success', 'Contact updated successfully');
 			} catch (error) {
 				console.error('Error updating contact:', error);
+				showMessage('error', 'Failed to update contact');
 			}
 		}
 
@@ -75,11 +81,14 @@ export function ClientList() {
 					height: values.height,
 					notes: values.notes,
 				});
+				showMessage('success', 'Client updated successfully');
 			} catch (error) {
 				console.error('Error updating client:', error);
+				showMessage('error', 'Failed to update client');
 			}
 		}
 
+		showMessage('info', 'No changes detected');
 		setShowEditModal(false);
 		stateRefreshers?.refreshClients();
 	};

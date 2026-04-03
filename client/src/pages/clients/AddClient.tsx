@@ -1,5 +1,4 @@
 import { Routes } from '@libre-train/shared';
-import { message } from 'antd';
 import Divider from 'antd/es/divider';
 import { useContext, useState } from 'react';
 import { AppContext } from '../../app-context';
@@ -9,12 +8,13 @@ import PageLayout from '../../components/PageLayout';
 import { Panel } from '../../components/Panel';
 import { getAppConfiguration } from '../../config/app.config';
 import { useAuth } from '../../hooks/useAuth';
+import { useMessage } from '../../hooks/useMessage';
 import type { ClientEditCreateFormValues, ContactEditCreateFormValues } from '../../types/types';
 
 export function AddClient() {
 	const { user } = useAuth();
-	const [messageApi, contextHolder] = message.useMessage();
 	const { stateRefreshers } = useContext(AppContext);
+	const showMessage = useMessage();
 	const [contactFormValues, setContactFormValues] = useState<ContactEditCreateFormValues | undefined>(undefined);
 	const [clientFormValues, setClientFormValues] = useState<ClientEditCreateFormValues | undefined>(undefined);
 	const [formStage, setFormStage] = useState(0);
@@ -71,52 +71,49 @@ export function AddClient() {
 			};
 			const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}`, requestOptions);
 			if (!response.ok) {
-				messageApi.error('Failed to add client.');
+				showMessage('error', 'Failed to add client.');
 				return;
 			}
 			await response.json();
-			messageApi.success('Client added successfully.');
+			showMessage('success', 'Client added successfully.');
 			resetFormValues();
 			stateRefreshers?.refreshClients();
 		} catch (error) {
 			console.error('Error adding client:', error);
-			messageApi.error('An error occurred while adding the client.');
+			showMessage('error', 'An error occurred while adding the client.');
 		}
 	};
 
 	return (
-		<>
-			{contextHolder}
-			<PageLayout
-				title="Add Client"
+		<PageLayout
+			title="Add Client"
+			style={{
+				padding: '2rem 3rem',
+				display: 'flex',
+				justifyContent: 'center',
+			}}
+		>
+			<Panel
 				style={{
-					padding: '2rem 3rem',
+					width: '60%',
 					display: 'flex',
-					justifyContent: 'center',
+					flexDirection: 'column',
+					padding: '2rem 3rem',
+					alignItems: 'center',
 				}}
 			>
-				<Panel
+				<h2
 					style={{
-						width: '60%',
-						display: 'flex',
-						flexDirection: 'column',
-						padding: '2rem 3rem',
-						alignItems: 'center',
+						marginTop: 0,
+						marginBottom: 0,
+						fontSize: '2rem',
 					}}
 				>
-					<h2
-						style={{
-							marginTop: 0,
-							marginBottom: 0,
-							fontSize: '2rem',
-						}}
-					>
-						New Client
-					</h2>
-					<Divider />
-					{formStages[formStage]}
-				</Panel>
-			</PageLayout>
-		</>
+					New Client
+				</h2>
+				<Divider />
+				{formStages[formStage]}
+			</Panel>
+		</PageLayout>
 	);
 }

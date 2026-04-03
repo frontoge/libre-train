@@ -4,6 +4,7 @@ import { useContext } from 'react';
 import { AppContext } from '../../app-context';
 import { getAppConfiguration } from '../../config/app.config';
 import { exerciseFormOptions, exerciseMovementPatternOptions } from '../../helpers/enum-select-options';
+import { useMessage } from '../../hooks/useMessage';
 import { MuscleGroupSearch } from './MuscleGroupSearch';
 
 export interface CreateEditExerciseFormProps extends React.ComponentProps<typeof Form<CreateEditExerciseFormValues>> {
@@ -24,6 +25,7 @@ export interface CreateEditExerciseFormValues {
 
 export function CreateEditExerciseForm(props: CreateEditExerciseFormProps) {
 	const [form] = Form.useForm<CreateEditExerciseFormValues>();
+	const showMessage = useMessage();
 	const {
 		state: { exerciseData },
 		stateRefreshers,
@@ -67,9 +69,11 @@ export function CreateEditExerciseForm(props: CreateEditExerciseFormProps) {
 			}
 
 			stateRefreshers?.refreshExerciseData();
+			showMessage('success', 'Exercise created successfully');
 			props.onComplete?.();
 		} catch (error) {
 			console.error('Error creating exercise:', error);
+			showMessage('error', 'Failed to create exercise. Please try again.');
 		}
 	};
 
@@ -98,9 +102,11 @@ export function CreateEditExerciseForm(props: CreateEditExerciseFormProps) {
 				throw new Error(`Error updating exercise: ${response.statusText}`);
 			}
 			stateRefreshers?.refreshExerciseData();
+			showMessage('success', 'Exercise updated successfully');
 			props.onComplete?.();
 		} catch (error) {
-			console.error('Error creating exercise:', error);
+			console.error('Error updating exercise:', error);
+			showMessage('error', 'Failed to update exercise. Please try again.');
 		}
 	};
 

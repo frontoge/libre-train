@@ -11,6 +11,7 @@ import { Panel } from '../../components/Panel';
 import { getAppConfiguration } from '../../config/app.config';
 import { createSearchParams } from '../../helpers/fetch-helpers';
 import { mapAssessmentLogToDataTableEntry } from '../../helpers/mappers';
+import { useMessage } from '../../hooks/useMessage';
 
 export function AssessmentHistory() {
 	const {
@@ -18,6 +19,7 @@ export function AssessmentHistory() {
 	} = useContext(AppContext);
 	const [tableData, setTableData] = useState<AssessmentHistoryTableEntry[]>([]);
 	const [searchQuery, setSearchQuery] = useState<AssessmentHistorySearchQuery | undefined>(undefined);
+	const showMessage = useMessage();
 
 	const getNewClientLogData = async () => {
 		try {
@@ -42,6 +44,7 @@ export function AssessmentHistory() {
 			setTableData(mappedData);
 		} catch (error) {
 			console.error('Error fetching assessment history data:', error);
+			showMessage('error', 'An error occurred while fetching assessment history data');
 		}
 	};
 
