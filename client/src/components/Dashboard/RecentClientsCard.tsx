@@ -1,16 +1,9 @@
+import type { ClientContact } from '@libre-train/shared';
 import { Avatar, Button, Card, Divider, List, Space, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
-interface Client {
-	id?: number;
-	first_name?: string;
-	last_name?: string;
-	email?: string;
-	created_at?: string;
-}
-
 interface RecentClientsCardProps {
-	clients: Client[];
+	clients: ClientContact[];
 	onMessage: (clientName: string) => void;
 }
 
@@ -66,7 +59,7 @@ export function RecentClientsCard({ clients, onMessage }: RecentClientsCardProps
 								avatar={<Avatar>{getInitials(client.first_name, client.last_name)}</Avatar>}
 								title={`${client.first_name} ${client.last_name}`}
 								description={
-									<Space split={<Divider type="vertical" />} size={4}>
+									<Space separator={<Divider orientation="vertical" />} size={4}>
 										<span>{client.email || 'No email on file'}</span>
 										<span>Joined {getReadableDate(client.created_at)}</span>
 									</Space>
