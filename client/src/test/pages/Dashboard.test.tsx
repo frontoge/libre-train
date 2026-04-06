@@ -1,10 +1,12 @@
 import type { ClientContact } from '@libre-train/shared';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppContext, type AppState } from '../../app-context';
+import { getTrainerCheckIns, getTrainerMissingPlans } from '../../helpers/dashboard-helpers';
 import { Dashboard } from '../../pages/Dashboard';
+import type { CheckIn, TrainingPlanStatus } from '../../types/types';
 
 const mockNavigate = vi.fn();
 
@@ -15,6 +17,34 @@ vi.mock('react-router-dom', async () => {
 		useNavigate: () => mockNavigate,
 	};
 });
+
+// Mock data-fetching layer so api.ts (and its @libre-train/shared imports) are never loaded
+vi.mock('../../helpers/dashboard-helpers', () => ({
+	getTrainerCheckIns: vi.fn(),
+	getTrainerMissingPlans: vi.fn(),
+}));
+
+vi.mock('../../hooks/useAuth', () => ({
+	useAuth: vi.fn().mockReturnValue({ user: 1 }),
+}));
+
+const mockCheckIns: CheckIn[] = [
+	{
+		id: 101,
+		clientName: 'Sofia Kim',
+		lastCheckIn: '0 day(s) ago',
+		note: 'No diet log today',
+		risk: 'medium',
+	},
+];
+
+const mockMissingPlans: TrainingPlanStatus[] = [
+	{
+		id: 202,
+		clientName: 'Jordan Rivers',
+		priority: 'high',
+	},
+];
 
 const makeClient = (overrides: Partial<ClientContact>): ClientContact => ({
 	id: 1,
@@ -100,9 +130,14 @@ const renderDashboard = (stateOverrides?: Partial<AppState>) => {
 describe('Dashboard', () => {
 	beforeEach(() => {
 		mockNavigate.mockReset();
+		vi.mocked(getTrainerCheckIns).mockResolvedValue([]);
+		vi.mocked(getTrainerMissingPlans).mockResolvedValue([]);
 	});
 
-	it('renders dashboard sections and metric values from state', () => {
+	it('renders dashboard sections and metric values from state', async () => {
+		vi.mocked(getTrainerCheckIns).mockResolvedValue(mockCheckIns);
+		vi.mocked(getTrainerMissingPlans).mockResolvedValue(mockMissingPlans);
+
 		renderDashboard();
 
 		expect(screen.getByRole('heading', { name: 'Trainer Dashboard' })).toBeInTheDocument();
@@ -113,36 +148,52 @@ describe('Dashboard', () => {
 		expect(screen.getByText('Clients Missing Training Plan')).toBeInTheDocument();
 
 		expect(screen.getAllByRole('heading', { name: '2' })).toHaveLength(3);
-		expect(screen.getByText('1 of 2 client profiles include email contact data.')).toBeInTheDocument();
-		expect(screen.getByText('2 Unprogrammed')).toBeInTheDocument();
+
+		await waitFor(() => {
+			expect(screen.getByText('2 of 2 clients still need follow-up action.')).toBeInTheDocument();
+			expect(screen.getByText('1 Unprogrammed')).toBeInTheDocument();
+		});
 	});
 
-	it('shows empty-state messaging when there are no clients', () => {
+	it('shows empty-state messaging when there are no clients', async () => {
 		renderDashboard({ clients: [] });
 
 		expect(screen.getByText('No clients yet. Start by creating your first client profile.')).toBeInTheDocument();
-		expect(screen.getByText('0 of 0 client profiles include email contact data.')).toBeInTheDocument();
+
+		await waitFor(() => {
+			expect(screen.getByText('0 of 0 clients still need follow-up action.')).toBeInTheDocument();
+		});
 	});
 
-	it('shows profile completion percentages for 0%, 50%, and 100% scenarios', () => {
-		renderDashboard({ clients: [] });
-		expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
+	it('shows 100% task completion when no clients have outstanding tasks', async () => {
+		renderDashboard();
 
-		renderDashboard({
-			clients: [
-				makeClient({ id: 1, first_name: 'Alpha', last_name: 'One', email: 'alpha@example.com' }),
-				makeClient({ id: 2, first_name: 'Beta', last_name: 'Two', email: undefined }),
-			],
+		await waitFor(() => {
+			expect(screen.getAllByRole('progressbar')[0]).toHaveAttribute('aria-valuenow', '100');
 		});
-		expect(screen.getAllByRole('progressbar')[1]).toHaveAttribute('aria-valuenow', '50');
+	});
 
-		renderDashboard({
-			clients: [
-				makeClient({ id: 3, first_name: 'Gamma', last_name: 'Three', email: 'gamma@example.com' }),
-				makeClient({ id: 4, first_name: 'Delta', last_name: 'Four', email: 'delta@example.com' }),
-			],
+	it('shows 0% task completion when all clients have outstanding tasks', async () => {
+		vi.mocked(getTrainerMissingPlans).mockResolvedValue([
+			{ id: 101, clientName: 'Alice Anderson', priority: 'high' },
+			{ id: 202, clientName: 'Bob Baker', priority: 'high' },
+		]);
+
+		renderDashboard();
+
+		await waitFor(() => {
+			expect(screen.getAllByRole('progressbar')[0]).toHaveAttribute('aria-valuenow', '0');
 		});
-		expect(screen.getAllByRole('progressbar')[2]).toHaveAttribute('aria-valuenow', '100');
+	});
+
+	it('shows 50% task completion when half of clients have outstanding tasks', async () => {
+		vi.mocked(getTrainerMissingPlans).mockResolvedValue([{ id: 101, clientName: 'Alice Anderson', priority: 'high' }]);
+
+		renderDashboard();
+
+		await waitFor(() => {
+			expect(screen.getAllByRole('progressbar')[0]).toHaveAttribute('aria-valuenow', '50');
+		});
 	});
 
 	it('navigates from quick action buttons', async () => {
@@ -166,16 +217,19 @@ describe('Dashboard', () => {
 	});
 
 	it('calls showMessage for interactive mock actions', async () => {
+		vi.mocked(getTrainerCheckIns).mockResolvedValue(mockCheckIns);
+		vi.mocked(getTrainerMissingPlans).mockResolvedValue(mockMissingPlans);
+
 		const user = userEvent.setup();
 		const { showMessage } = renderDashboard();
 
 		await user.click(screen.getAllByText('Complete')[0]);
 		expect(showMessage).toHaveBeenCalledWith('info', 'Maya Patel session marked complete.');
 
-		await user.click(screen.getAllByText('Follow-up')[0]);
+		await user.click(await screen.findByText('Follow-up'));
 		expect(showMessage).toHaveBeenCalledWith('info', 'Follow-up task created for Sofia Kim.');
 
-		await user.click(screen.getAllByText('Create Plan')[0]);
+		await user.click(await screen.findByText('Create Plan'));
 		expect(showMessage).toHaveBeenCalledWith('info', 'Plan builder opened for Jordan Rivers (mock).');
 	});
 });
