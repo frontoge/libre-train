@@ -1,4 +1,5 @@
 import {
+	ClientTrainingPlanTodo,
 	Macrocycle,
 	MacrocycleSearchParams,
 	Mesocycle,
@@ -15,6 +16,43 @@ import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql2';
 import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastructure/mysql-database';
 import { createWorkoutRoutine, deactivateCycleRoutines } from './workout-routine-handlers';
+
+export const handleGetTrainingPlanTodos = async (req: Request<{}, {}, {}, { trainerId?: string }>, res: Response) => {
+	const connection = await getDatabaseConnection();
+	try {
+		const { trainerId } = req.query;
+		if (!trainerId) {
+			return res.status(400).json({ message: 'trainerId is required' });
+		}
+
+		const parsedTrainerId = Number(trainerId);
+		if (!Number.isInteger(parsedTrainerId) || parsedTrainerId <= 0) {
+			return res.status(400).json({ message: 'trainerId must be a positive integer' });
+		}
+
+		const [result] = await connection.query<RowDataPacket[]>({
+			sql: 'CALL spGetClientsWithoutActiveTrainingPlan(?)',
+			values: [parsedTrainerId],
+		});
+
+		const rows = (result as RowDataPacket[][])[0] ?? [];
+		const todos: ClientTrainingPlanTodo[] = rows.map((entry: RowDataPacket) => ({
+			clientId: entry.ClientId,
+			first_name: entry.first_name,
+			last_name: entry.last_name,
+			email: entry.email,
+			phone: entry.phone,
+			trainerId: entry.trainerId,
+		}));
+
+		return res.json(todos);
+	} catch (error) {
+		console.error('Error fetching training plan todos:', error);
+		return res.status(500).json({ message: 'Internal server error' });
+	} finally {
+		await closeDatabaseConnection(connection);
+	}
+};
 
 export const handleGetMacrocycle = async (
 	req: Request<{ clientId: string }, {}, {}, MacrocycleSearchParams>,

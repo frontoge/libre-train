@@ -220,3 +220,22 @@ export interface ClientDietPlan {
 	dietPlanId?: number;
 	clientId: number;
 }
+
+export interface ClientDietLogTodo {
+	clientId: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+	phone: string;
+	trainerId: number;
+	lastLogDate?: string;
+}
+
+export interface ClientTrainingPlanTodo {
+	clientId: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+	phone: string;
+	trainerId: number;
+}

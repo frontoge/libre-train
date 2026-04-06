@@ -14,6 +14,7 @@ export const items: NavMenuItem[] = [
 		key: 'dashboard',
 		label: 'Home',
 		icon: <HomeFilled />,
+		urlPath: '/',
 	},
 	{
 		type: 'divider',
