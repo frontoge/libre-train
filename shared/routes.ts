@@ -18,4 +18,6 @@ export const Routes = {
 	WorkoutRoutine: '/workout-routine',
 	DietPlan: '/diet/plan',
 	DietLog: '/diet/log',
+	DietLogTodos: '/diet/log/todos',
+	TrainingPlanTodos: '/cycle/todos/no-active-plan',
 };

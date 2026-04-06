@@ -1,5 +1,5 @@
 import { AlertOutlined } from '@ant-design/icons';
-import { Button, Card, List, Space, Tag, theme, Typography } from 'antd';
+import { Button, Card, List, Space, Tag, Typography } from 'antd';
 
 interface CheckIn {
 	id: number;
@@ -11,16 +11,22 @@ interface CheckIn {
 
 interface CheckInsCardProps {
 	checkIns: CheckIn[];
+	orderByRisk?: boolean;
 	onFollowUp: (clientName: string) => void;
 }
 
-export function CheckInsCard({ checkIns, onFollowUp }: CheckInsCardProps) {
-	const { token } = theme.useToken();
+export function CheckInsCard({ checkIns, orderByRisk = true, onFollowUp }: CheckInsCardProps) {
+	const sortedCheckIns = orderByRisk
+		? [...checkIns].sort((a, b) => {
+				const riskLevels = { high: 3, medium: 2, low: 1 };
+				return riskLevels[b.risk] - riskLevels[a.risk];
+			})
+		: checkIns;
 
 	return (
-		<Card bordered={false} title="Check-ins Needing Attention" style={{ borderRadius: 16, height: '100%' }}>
+		<Card variant="borderless" title="Check-ins Needing Attention" style={{ borderRadius: 16, height: '100%' }}>
 			<List
-				dataSource={checkIns}
+				dataSource={sortedCheckIns}
 				renderItem={(checkIn) => {
 					const riskColor = checkIn.risk === 'high' ? 'red' : checkIn.risk === 'medium' ? 'gold' : 'green';
 					return (
@@ -33,10 +39,10 @@ export function CheckInsCard({ checkIns, onFollowUp }: CheckInsCardProps) {
 							]}
 						>
 							<List.Item.Meta
-								avatar={<AlertOutlined style={{ color: token.colorWarning }} />}
+								avatar={<AlertOutlined style={{ color: riskColor }} />}
 								title={checkIn.clientName}
 								description={
-									<Space direction="vertical" size={2}>
+									<Space orientation="vertical" size={2}>
 										<Typography.Text type="secondary">Last update: {checkIn.lastCheckIn}</Typography.Text>
 										<Typography.Text type="secondary">{checkIn.note}</Typography.Text>
 										<Tag color={riskColor}>{checkIn.risk.toUpperCase()} PRIORITY</Tag>

@@ -2,7 +2,9 @@
 
 import type {
 	ClientContact,
+	ClientDietLogTodo,
 	ClientDietPlan,
+	ClientTrainingPlanTodo,
 	DietPlan,
 	DietPlanLogEntry,
 	UpdateClientRequest,
@@ -84,6 +86,44 @@ export const fetchClientDietPlansForTrainer = async (trainerId: number): Promise
 		return data as ClientDietPlan[];
 	} catch (error) {
 		console.error('Error fetching client diet plans for trainer:', error);
+		throw error;
+	}
+};
+
+export const fetchDietLogTodos = async (trainerId: number): Promise<ClientDietLogTodo[]> => {
+	try {
+		const requestOptions = {
+			method: 'GET',
+			headers: { 'Content-Type': 'application/json' },
+		};
+		const searchParams = createSearchParams({ trainerId: trainerId.toString() });
+		const response = await fetch(`${API_BASE_URL}${Routes.DietLogTodos}?${searchParams}`, requestOptions);
+		if (!response.ok) {
+			throw new Error(`Error fetching diet log todos: ${response.statusText}`);
+		}
+		const data = await response.json();
+		return data as ClientDietLogTodo[];
+	} catch (error) {
+		console.error('Error fetching diet log todos:', error);
+		throw error;
+	}
+};
+
+export const fetchTrainingPlanTodos = async (trainerId: number): Promise<ClientTrainingPlanTodo[]> => {
+	try {
+		const requestOptions = {
+			method: 'GET',
+			headers: { 'Content-Type': 'application/json' },
+		};
+		const searchParams = createSearchParams({ trainerId: trainerId.toString() });
+		const response = await fetch(`${API_BASE_URL}${Routes.TrainingPlanTodos}?${searchParams}`, requestOptions);
+		if (!response.ok) {
+			throw new Error(`Error fetching training plan todos: ${response.statusText}`);
+		}
+		const data = await response.json();
+		return data as ClientTrainingPlanTodo[];
+	} catch (error) {
+		console.error('Error fetching training plan todos:', error);
 		throw error;
 	}
 };

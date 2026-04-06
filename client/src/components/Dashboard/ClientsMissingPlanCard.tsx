@@ -1,16 +1,9 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Card, List, Space, Tag, theme, Typography } from 'antd';
-
-interface ClientMissingPlan {
-	id: number;
-	clientName: string;
-	hasPlan: boolean;
-	priority: 'normal' | 'high';
-	lastUpdated: string;
-}
+import type { TrainingPlanStatus } from '../../types/types';
 
 interface ClientsMissingPlanCardProps {
-	clients: ClientMissingPlan[];
+	clients: TrainingPlanStatus[];
 	onCreatePlan: (clientName: string) => void;
 	onNotifyClient: (clientName: string) => void;
 }
@@ -20,7 +13,7 @@ export function ClientsMissingPlanCard({ clients, onCreatePlan, onNotifyClient }
 
 	return (
 		<Card
-			bordered={false}
+			variant="borderless"
 			title="Clients Missing Training Plan"
 			extra={<Tag color="red">{clients.length} Unprogrammed</Tag>}
 			style={{ borderRadius: 16, height: '100%' }}
@@ -46,8 +39,8 @@ export function ClientsMissingPlanCard({ clients, onCreatePlan, onNotifyClient }
 								avatar={<ExclamationCircleOutlined style={{ color: token.colorError }} />}
 								title={client.clientName}
 								description={
-									<Space direction="vertical" size={2}>
-										<Typography.Text type="secondary">Status: No active plan programmed</Typography.Text>
+									<Space orientation="vertical" size={2}>
+										<Typography.Text type="secondary">Status: No active plan</Typography.Text>
 										<Tag color={client.priority === 'high' ? 'red' : 'default'}>
 											{client.priority === 'high' ? 'HIGH PRIORITY' : 'NORMAL PRIORITY'}
 										</Tag>

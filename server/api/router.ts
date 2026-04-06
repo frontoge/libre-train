@@ -37,6 +37,7 @@ import {
 	handleGetMacrocycle,
 	handleGetMesocycle,
 	handleGetMicrocycle,
+	handleGetTrainingPlanTodos,
 	handleUpdateMacrocycle,
 	handleUpdateMesocycle,
 	handleUpdateMicrocycle,
@@ -49,6 +50,7 @@ import {
 	handleDeleteDietPlan,
 	handleGetClientsDietPlans,
 	handleGetDietLog,
+	handleGetDietLogTodos,
 	handleGetDietPlan,
 	handleUpdateDietLog,
 	handleUpdateDietPlan,
@@ -109,6 +111,7 @@ router.delete(`${Routes.AssessmentLog}/:id`, handleDeleteAssessmentLog);
 
 // Training Cycle Routes
 // TODO update these to use cycle ID instead of client ID
+router.get(`${Routes.TrainingPlanTodos}`, handleGetTrainingPlanTodos);
 router.get(`${Routes.Macrocycle}/:clientId`, handleGetMacrocycle);
 router.get(`${Routes.Mesocycle}/:clientId`, handleGetMesocycle);
 router.get(`${Routes.Microcycle}/:id`, handleGetMicrocycle);
@@ -137,6 +140,7 @@ router.get(`${Routes.DietPlan}{/:planId}`, handleGetDietPlan);
 router.put(`${Routes.DietPlan}/:planId`, handleUpdateDietPlan);
 router.delete(`${Routes.DietPlan}/:planId`, handleDeleteDietPlan);
 
+router.get(`${Routes.DietLogTodos}`, handleGetDietLogTodos);
 router.get(`${Routes.DietLog}{/:logId}`, handleGetDietLog);
 router.post(`${Routes.DietLog}`, handleCreateDietLog);
 router.put(`${Routes.DietLog}/:logId`, handleUpdateDietLog);

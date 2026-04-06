@@ -34,6 +34,7 @@ export default defineConfig([
 			'@typescript-eslint/ban-ts-comment': 'off',
 			'@typescript-eslint/no-empty-object-type': 'off',
 			'@typescript-eslint/no-unused-expressions': 'off',
+			'@typescript-eslint/no-deprecated': 'warn',
 			'semi': ['warn', 'always'],
 		},
 	},

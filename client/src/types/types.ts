@@ -101,3 +101,17 @@ export type ClientDietPlanTableData = {
 	carbs?: number;
 	fats?: number;
 };
+
+export type CheckIn = {
+	id: number;
+	clientName: string;
+	lastCheckIn: string;
+	note: string;
+	risk: 'low' | 'medium' | 'high';
+};
+
+export type TrainingPlanStatus = {
+	id: number;
+	clientName: string;
+	priority: 'normal' | 'high';
+};
