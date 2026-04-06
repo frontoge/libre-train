@@ -10,12 +10,13 @@ import { MicrocycleRoutinePicker } from '../../components/Training/MicrocycleRou
 import { updateMicrocycleRoutines } from '../../helpers/api';
 import { fetchMicrocycleRoutines } from '../../helpers/routine-helpers';
 import { fetchMicrocycleById } from '../../helpers/training-helpers';
+import { useMessage } from '../../hooks/useMessage';
 import type { WorkoutRoutineEdit } from '../../types/types';
 
 export function CycleRoutineBuilder() {
 	const navigate = useNavigate();
 	const { cycleId } = useParams<{ cycleId: string }>();
-
+	const showMessage = useMessage();
 	const [microcycle, setMicrocycle] = useState<Microcycle | undefined>(undefined);
 	const [routines, setRoutines] = useState<WorkoutRoutineEdit[]>([]);
 	const [selectedRoutine, setSelectedRoutine] = useState<number | undefined>(undefined);
@@ -89,9 +90,11 @@ export function CycleRoutineBuilder() {
 				navigate(`/training/`);
 			} else {
 				// Show error notification
+				showMessage('error', 'Failed to save routines');
 			}
 		} catch (error) {
 			console.error('Error saving routines:', error);
+			showMessage('error', 'An error occurred while saving routines');
 		}
 	};
 

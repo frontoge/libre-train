@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import dayjs from '../../config/dayjs';
 import { deleteMicrocycle } from '../../helpers/api';
 import { fetchMicrocycleRoutines } from '../../helpers/routine-helpers';
+import { useMessage } from '../../hooks/useMessage';
 import { RoutineCard } from '../Routines/RoutineCard';
 import { RoutineDisplayModal } from '../Routines/RoutineDisplayModal';
 
@@ -21,6 +22,7 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [subCards, setSubCards] = useState<WorkoutRoutine[]>([]);
 	const [selectedRoutineIndex, setSelectedRoutineIndex] = useState<number | undefined>(undefined);
+	const showMessage = useMessage();
 
 	const gridStyle: React.CSSProperties = {
 		width: subCards.length >= 4 ? 'calc(100% / 5)' : `calc(100% / ${subCards.length})`,
@@ -35,9 +37,11 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
 	const handleDelete = async () => {
 		const result = await deleteMicrocycle(microcycle.id);
 		if (result.ok) {
+			showMessage('success', 'Microcycle deleted successfully');
 			onChange?.();
 		} else {
 			// show error notification
+			showMessage('error', 'Failed to delete microcycle');
 		}
 	};
 

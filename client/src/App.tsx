@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import { Routes as ApiRoutes } from '@libre-train/shared';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { AppContext, type AppState } from './app-context';
@@ -23,11 +23,17 @@ import { Logout } from './pages/Logout';
 
 function App() {
 	const env = import.meta.env.VITE_ENV || 'local';
+	const [messageApi, contextHolder] = message.useMessage();
+
+	const showMessage = (type: 'success' | 'error' | 'info' | 'warning', content: string, duration?: number) => {
+		return messageApi[type](content, duration);
+	};
 
 	const [appState, setAppState] = useState<AppState>({
 		clients: [],
 		assessmentTypes: [],
 		exerciseData: [],
+		showMessage,
 		auth: {
 			authToken: undefined,
 			user: env === 'local' && getAppConfiguration().disableAuth ? 10 : undefined,
@@ -127,6 +133,7 @@ function App() {
 						width: '100%',
 					}}
 				>
+					{contextHolder}
 					<Routes>
 						<Route path="/" element={<RouterLayout />}>
 							<Route

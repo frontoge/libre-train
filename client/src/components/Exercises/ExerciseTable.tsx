@@ -8,6 +8,7 @@ import { AppContext } from '../../app-context';
 import { getAppConfiguration } from '../../config/app.config';
 import { applyExerciseTableFilters } from '../../helpers/filter-helpers';
 import { ExerciseTypeLabels, MovementPatternLabels, MuscleGroupLabels } from '../../helpers/label-formatters';
+import { useMessage } from '../../hooks/useMessage';
 import { CreateEditExerciseModal } from './CreateEditExerciseModal';
 import { ExerciseSearch, type ExerciseSearchParams } from './ExerciseSearch';
 import { MuscleGroupTag } from './MuscleGroupTag';
@@ -20,6 +21,7 @@ export function ExerciseTable() {
 	const [filterParams, setFilterParams] = useState<ExerciseSearchParams>({});
 	const [isCreateEditModalOpen, setIsCreateEditModalOpen] = useState(false);
 	const [exerciseIdToEdit, setExerciseIdToEdit] = useState<number | undefined>(undefined);
+	const showMessage = useMessage();
 
 	const handleDelete = async (key: string | number) => {
 		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Exercise}/${key}`, {
@@ -28,9 +30,10 @@ export function ExerciseTable() {
 
 		if (response.ok) {
 			stateRefreshers?.refreshExerciseData();
+			showMessage('success', 'Exercise deleted successfully');
 		} else {
-			// TODO add error handling/UI feedback
 			console.error('Failed to delete exercise');
+			showMessage('error', 'Failed to delete exercise');
 		}
 	};
 
@@ -137,7 +140,7 @@ export function ExerciseTable() {
 				color="default"
 				variant="filled"
 				icon={<IoAddCircle />}
-				iconPosition="end"
+				iconPlacement="end"
 				onClick={() => handleOpenNewExercise()}
 			>
 				Create New

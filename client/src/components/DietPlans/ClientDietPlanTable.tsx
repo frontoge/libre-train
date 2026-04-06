@@ -5,6 +5,7 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import { stringSimilarity } from 'string-similarity-js';
 import { AppContext } from '../../app-context';
 import { createDietPlan, deleteDietPlan, fetchClientDietPlansForTrainer } from '../../helpers/api';
+import { useMessage } from '../../hooks/useMessage';
 import type { ClientDietPlanTableData } from '../../types/types';
 import { ClientDietPlanSearch } from './ClientDietPlanSearch';
 import { ClientDietPlanTableColumns, getClientDietPlanTableData } from './ClientDietPlanTableColumns';
@@ -24,6 +25,7 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 	const [clientPlans, setClientPlans] = useState<ClientDietPlan[]>([]);
 	const [openModalType, setOpenModalType] = useState<'view' | 'edit' | 'create' | undefined>(undefined);
 	const [selectedClientId, setSelectedClientId] = useState<number | undefined>(undefined);
+	const showMessage = useMessage();
 	const [searchParams, setSearchParams] = useState<ClientDietPlanSearch>({
 		searchText: '',
 		hasPlan: 'both',
@@ -40,6 +42,7 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 		} catch (error) {
 			// show error notification
 			console.error('Failed to fetch client diet plans:', error);
+			showMessage('error', 'Failed to fetch client diet plans');
 		}
 	};
 
@@ -96,11 +99,13 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 
 		if (response.ok) {
 			// handle successful creation
+			showMessage('success', 'Diet plan created successfully');
 			fetchClientPlans();
 			handleCloseModal();
 		} else {
 			// handle error
 			console.error('Failed to create diet plan');
+			showMessage('error', 'Failed to create diet plan');
 		}
 	};
 
@@ -114,9 +119,11 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 		if (response.ok) {
 			// handle successful deletion
 			fetchClientPlans();
+			showMessage('success', 'Diet plan deleted successfully');
 		} else {
 			// handle error
 			console.error('Failed to delete diet plan');
+			showMessage('error', 'Failed to delete diet plan');
 		}
 	};
 
