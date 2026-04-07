@@ -1,4 +1,6 @@
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import mysql from 'mysql2/promise';
+import { PrismaClient } from './generated/prisma/client';
 
 export const getDatabaseConnection = async () => {
 	try {
@@ -22,3 +24,15 @@ export const getDatabaseConnection = async () => {
 export async function closeDatabaseConnection(connection: mysql.Connection) {
 	if (connection) await connection.end();
 }
+
+const adapter = new PrismaMariaDb({
+	host: process.env.DB_HOST!,
+	port: Number(process.env.DB_PORT!),
+	user: process.env.DB_USER!,
+	password: process.env.DB_PASSWORD!,
+	database: process.env.DB_NAME!,
+});
+
+const prisma = new PrismaClient({ adapter });
+
+export { prisma };

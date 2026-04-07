@@ -25,13 +25,20 @@
 		"lint:fix": "eslint . --fix",
 		"test": "vitest",
 		"test:run": "vitest run",
-		"test:coverage": "vitest run --coverage"
+		"test:coverage": "vitest run --coverage",
+		"db:push": "prisma db push",
+		"db:generate": "prisma generate",
+		"db:migrate": "prisma migrate dev",
+		"db:migrate:deploy": "prisma migrate deploy",
+		"db:migrate:reset": "prisma migrate reset"
 	},
 	"peerDependencies": {
 		"typescript": "^5.8.3"
 	},
 	"dependencies": {
 		"@libre-train/shared": "workspace:*",
+		"@prisma/client": "^7.6.0",
+		"@prisma/adapter-mariadb": "^7.6.0",
 		"@types/cookie-parser": "^1.4.10",
 		"@types/cors": "^2.8.19",
 		"@types/jsonwebtoken": "^9.0.10",

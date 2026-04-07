@@ -1,0 +1,374 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../infrastructure/generated/prisma"
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model AssessmentClientLog {
+  id               Int            @id @default(autoincrement()) @db.UnsignedInt
+  clientId         Int            @db.UnsignedInt
+  assessmentTypeId Int            @db.UnsignedInt
+  assessmentValue  String         @db.VarChar(500)
+  assessmentDate   DateTime       @default(dbgenerated("(curdate())")) @db.Date
+  notes            String?        @db.VarChar(512)
+  AssessmentType   AssessmentType @relation(fields: [assessmentTypeId], references: [id], onDelete: Cascade, map: "AssessmentClientLog_assessmentType_FK")
+  Client           Client         @relation(fields: [clientId], references: [id], onDelete: Cascade, map: "AssessmentClientLog_client_FK")
+
+  @@index([assessmentTypeId], map: "AssessmentClientLog_assessmentType_FK")
+  @@index([clientId], map: "AssessmentClientLog_client_FK")
+}
+
+model AssessmentGroup {
+  id             Int              @id @default(autoincrement()) @db.UnsignedInt
+  name           String           @db.VarChar(255)
+  created_at     DateTime         @default(now()) @db.Timestamp(0)
+  updated_at     DateTime         @default(now()) @db.Timestamp(0)
+  AssessmentType AssessmentType[]
+}
+
+model AssessmentType {
+  id                  Int                   @id @db.UnsignedInt
+  name                String                @db.VarChar(255)
+  assessmentUnit      String?               @db.VarChar(255)
+  assessmentGroupId   Int?                  @db.UnsignedInt
+  created_at          DateTime              @default(now()) @db.Timestamp(0)
+  updated_at          DateTime              @default(now()) @db.Timestamp(0)
+  AssessmentClientLog AssessmentClientLog[]
+  AssessmentGroup     AssessmentGroup?      @relation(fields: [assessmentGroupId], references: [id], map: "AssessmentType_assessmentGroup_FK")
+
+  @@index([assessmentGroupId], map: "AssessmentType_assessmentGroup_FK")
+}
+
+model Client {
+  id                  Int                   @id @default(autoincrement()) @db.UnsignedInt
+  height              Int?                  @db.UnsignedInt
+  created_at          DateTime              @default(now()) @db.Timestamp(0)
+  updated_at          DateTime              @default(now()) @db.Timestamp(0)
+  contactId           Int                   @db.UnsignedInt
+  trainerId           Int                   @db.UnsignedInt
+  isActive            Boolean               @default(true)
+  notes               String?               @db.VarChar(500)
+  AssessmentClientLog AssessmentClientLog[]
+  Contact             Contact               @relation(fields: [contactId], references: [id], onDelete: Cascade, map: "Client_contact_FK")
+  User                User                  @relation(fields: [trainerId], references: [id], onDelete: Cascade, map: "Client_trainer_FK")
+  ClientDailyLog      ClientDailyLog[]
+  ClientGoal          ClientGoal[]
+  DietPlan            DietPlan[]
+  DietPlanLogEntry    DietPlanLogEntry[]
+  Macrocycle          Macrocycle[]
+  Mesocycle           Mesocycle[]
+  Microcycle          Microcycle[]
+
+  @@index([contactId], map: "Client_contact_FK")
+  @@index([trainerId], map: "Client_trainer_FK")
+}
+
+model ClientDailyLog {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  client_id       Int       @db.UnsignedInt
+  logged_weight   Decimal?  @db.Decimal(5, 1)
+  body_fat        Decimal?  @db.Decimal(5, 1)
+  logged_calories Int?
+  target_calories Int?
+  logged_protein  Int?
+  target_protein  Int?
+  logged_carbs    Int?
+  target_carbs    Int?
+  logged_fat      Int?
+  target_fat      Int?
+  created_at      DateTime? @db.Date
+  updated_at      DateTime  @default(now()) @db.Timestamp(0)
+  Client          Client    @relation(fields: [client_id], references: [id], onDelete: Cascade, map: "FK_CLIENTLOG_CLIENT")
+
+  @@unique([client_id, created_at], map: "idx_client_date")
+}
+
+model ClientGoal {
+  id             Int             @id @default(autoincrement()) @db.UnsignedInt
+  client_id      Int             @db.UnsignedInt
+  goal_id        Int?            @db.UnsignedInt
+  target_weight  Float?
+  target_bodyfat Float?
+  created_at     DateTime        @default(now()) @db.Timestamp(0)
+  updated_at     DateTime        @default(now()) @db.Timestamp(0)
+  Client         Client          @relation(fields: [client_id], references: [id], onDelete: Cascade, map: "FK_CLIENTGOAL_CLIENT")
+  ClientGoalType ClientGoalType? @relation(fields: [goal_id], references: [id], map: "FK_CLIENTGOAL_GOAL")
+
+  @@index([client_id], map: "FK_CLIENTGOAL_CLIENT")
+  @@index([goal_id], map: "FK_CLIENTGOAL_GOAL")
+}
+
+model ClientGoalType {
+  id         Int          @id @default(autoincrement()) @db.UnsignedInt
+  goal       String       @db.VarChar(100)
+  ClientGoal ClientGoal[]
+}
+
+model Contact {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  first_name    String    @db.VarChar(100)
+  last_name     String    @db.VarChar(100)
+  email         String    @unique(map: "email") @db.VarChar(100)
+  phone         String?   @db.VarChar(15)
+  date_of_birth DateTime? @db.Date
+  img           String?   @db.VarChar(255)
+  created_at    DateTime  @default(now()) @db.Timestamp(0)
+  updated_at    DateTime  @default(now()) @db.Timestamp(0)
+  Client        Client[]
+  User          User[]
+}
+
+model DietPlan {
+  id               Int                @id @default(autoincrement()) @db.UnsignedInt
+  planName         String             @db.VarChar(255)
+  clientId         Int                @db.UnsignedInt
+  trainerId        Int                @db.UnsignedInt
+  isActive         Boolean            @default(true)
+  targetCalories   Int
+  targetProtein    Int
+  targetCarbs      Int
+  targetFats       Int
+  created_at       DateTime           @default(now()) @db.Timestamp(0)
+  updated_at       DateTime           @default(now()) @db.Timestamp(0)
+  notes            String?            @db.VarChar(512)
+  Client           Client             @relation(fields: [clientId], references: [id], onDelete: Cascade, map: "DietPlan_client_FK")
+  User             User               @relation(fields: [trainerId], references: [id], onDelete: Cascade, map: "DietPlan_trainer_FK")
+  DietPlanLogEntry DietPlanLogEntry[]
+
+  @@index([clientId], map: "DietPlan_client_FK")
+  @@index([trainerId], map: "DietPlan_trainer_FK")
+}
+
+model DietPlanLogEntry {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  dietPlanId Int      @db.UnsignedInt
+  clientId   Int      @db.UnsignedInt
+  logDate    DateTime @db.Date
+  calories   Int
+  protein    Int
+  carbs      Int
+  fats       Int
+  Client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade, map: "DietPlanLogEntry_client_FK")
+  DietPlan   DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade, map: "DietPlanLogEntry_dietPlan_FK")
+
+  @@index([clientId], map: "DietPlanLogEntry_client_FK")
+  @@index([dietPlanId], map: "DietPlanLogEntry_dietPlan_FK")
+}
+
+model Exercise {
+  id                      Int                      @id @default(autoincrement()) @db.UnsignedInt
+  exercise_name           String                   @db.VarChar(64)
+  muscle_groups           String?                  @default("NULL") @db.VarChar(512)
+  created_at              DateTime                 @default(now()) @db.Timestamp(0)
+  updated_at              DateTime                 @default(now()) @db.Timestamp(0)
+  video_link              String?                  @db.VarChar(512)
+  exercise_description    String?                  @default("NULL") @db.VarChar(255)
+  equipment               String?                  @db.VarChar(512)
+  exercise_form           Int?                     @db.UnsignedInt
+  movement_pattern        Int?                     @db.UnsignedInt
+  progression_level       Int                      @default(1) @db.UnsignedInt
+  ExerciseForm            ExerciseForm?            @relation(fields: [exercise_form], references: [id], map: "Exercise_form_FK")
+  ExerciseMovementPattern ExerciseMovementPattern? @relation(fields: [movement_pattern], references: [id], map: "Exercise_movement_pattern_fk")
+  PlannedExercise         PlannedExercise[]
+
+  @@index([exercise_form], map: "Exercise_form_FK")
+  @@index([movement_pattern], map: "Exercise_movement_pattern_fk")
+}
+
+model ExerciseForm {
+  id                 Int        @id @db.UnsignedInt
+  exercise_form_name String     @db.VarChar(255)
+  Exercise           Exercise[]
+}
+
+model ExerciseMovementPattern {
+  id           Int        @id @default(autoincrement()) @db.UnsignedInt
+  pattern_name String     @db.VarChar(255)
+  Exercise     Exercise[]
+}
+
+model Macrocycle {
+  id               Int         @id @default(autoincrement()) @db.UnsignedInt
+  cycle_name       String?     @db.VarChar(255)
+  client_id        Int         @db.UnsignedInt
+  cycle_start_date DateTime    @db.Date
+  cycle_end_date   DateTime    @db.Date
+  is_active        Boolean     @default(true)
+  notes            String?     @db.VarChar(512)
+  created_at       DateTime    @default(now()) @db.Timestamp(0)
+  updated_at       DateTime    @default(now()) @db.Timestamp(0)
+  Client           Client      @relation(fields: [client_id], references: [id], onUpdate: Restrict, map: "Macrocycle_ibfk_1")
+  Mesocycle        Mesocycle[]
+
+  @@index([client_id], map: "client_id")
+}
+
+model Mesocycle {
+  id               Int          @id @default(autoincrement()) @db.UnsignedInt
+  client_id        Int          @db.UnsignedInt
+  cycle_name       String?      @db.VarChar(255)
+  macrocycle_id    Int          @db.UnsignedInt
+  cycle_start_date DateTime     @db.Date
+  cycle_end_date   DateTime     @db.Date
+  opt_levels       String?      @db.VarChar(255)
+  cardio_levels    String?      @db.VarChar(255)
+  notes            String?      @db.VarChar(512)
+  is_active        Boolean      @default(true)
+  created_at       DateTime     @default(now()) @db.Timestamp(0)
+  updated_at       DateTime     @default(now()) @db.Timestamp(0)
+  Client           Client       @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Mesocycle_ibfk_1")
+  Macrocycle       Macrocycle   @relation(fields: [macrocycle_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Mesocycle_ibfk_2")
+  Microcycle       Microcycle[]
+
+  @@index([client_id], map: "client_id")
+  @@index([macrocycle_id], map: "macrocycle_id")
+}
+
+model Microcycle {
+  id               Int              @id @default(autoincrement()) @db.UnsignedInt
+  mesocycle_id     Int              @db.UnsignedInt
+  client_id        Int              @db.UnsignedInt
+  cycle_name       String?          @db.VarChar(255)
+  cycle_start_date DateTime         @db.Date
+  cycle_end_date   DateTime         @db.Date
+  notes            String?          @db.VarChar(512)
+  is_active        Boolean          @default(true)
+  created_at       DateTime         @default(now()) @db.Timestamp(0)
+  updated_at       DateTime         @default(now()) @db.Timestamp(0)
+  Mesocycle        Mesocycle        @relation(fields: [mesocycle_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Microcycle_ibfk_1")
+  Client           Client           @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Microcycle_ibfk_2")
+  WorkoutRoutine   WorkoutRoutine[]
+
+  @@index([client_id], map: "client_id")
+  @@index([mesocycle_id], map: "mesocycle_id")
+}
+
+model PlannedExercise {
+  id                   Int                  @id @default(autoincrement()) @db.UnsignedInt
+  exercise_id          Int                  @db.UnsignedInt
+  exercise_group_id    Int                  @db.UnsignedInt
+  repetitions          Int?
+  exercise_weight      Int?
+  exercise_duration    Int?
+  exercise_distance    Decimal?             @db.Decimal(10, 2)
+  target_heart_rate    Int?
+  pace                 String?              @db.VarChar(32)
+  rpe                  Int?
+  target_calories      Int?
+  target_mets          Int?
+  created_at           DateTime             @default(now()) @db.Timestamp(0)
+  updated_at           DateTime             @default(now()) @db.Timestamp(0)
+  exercise_sets        Int?
+  exercise_group_index Int
+  Exercise             Exercise             @relation(fields: [exercise_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_exercise")
+  PlannedExerciseGroup PlannedExerciseGroup @relation(fields: [exercise_group_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_exercise_group")
+
+  @@index([exercise_id], map: "fk_exercise")
+  @@index([exercise_group_id], map: "fk_exercise_group")
+}
+
+model PlannedExerciseGroup {
+  id                     Int                    @id @default(autoincrement()) @db.UnsignedInt
+  workout_routine_id     Int                    @db.UnsignedInt
+  group_index            Int
+  rest_between           Int?
+  rest_after             Int?
+  routine_category       Int                    @db.UnsignedInt
+  PlannedExercise        PlannedExercise[]
+  WorkoutRoutineCategory WorkoutRoutineCategory @relation(fields: [routine_category], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_group_workout_category")
+  WorkoutRoutine         WorkoutRoutine         @relation(fields: [workout_routine_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_workout_routine")
+
+  @@unique([workout_routine_id, group_index], map: "PlannedExerciseGroup_index_3")
+  @@index([routine_category], map: "fk_group_workout_category")
+}
+
+model User {
+  id         Int        @id @default(autoincrement()) @db.UnsignedInt
+  username   String     @db.VarChar(32)
+  pass       String     @db.VarChar(255)
+  created_at DateTime   @default(now()) @db.Timestamp(0)
+  updated_at DateTime   @default(now()) @db.Timestamp(0)
+  contactId  Int        @db.UnsignedInt
+  Client     Client[]
+  DietPlan   DietPlan[]
+  Contact    Contact    @relation(fields: [contactId], references: [id], onDelete: Cascade, map: "User_contact_FK")
+
+  @@index([contactId], map: "User_contact_FK")
+}
+
+model WorkoutRoutine {
+  id                   Int                    @id @default(autoincrement()) @db.UnsignedInt
+  microcycle_id        Int                    @db.UnsignedInt
+  routine_index        Int
+  routine_name         String?                @db.VarChar(255)
+  created_at           DateTime               @default(now()) @db.Timestamp(0)
+  updated_at           DateTime               @default(now()) @db.Timestamp(0)
+  isActive             Boolean                @default(false)
+  PlannedExerciseGroup PlannedExerciseGroup[]
+  Microcycle           Microcycle             @relation(fields: [microcycle_id], references: [id], onDelete: Cascade, map: "WorkoutRoutine_parent")
+
+  @@index([microcycle_id], map: "WorkoutRoutine_parent")
+}
+
+model WorkoutRoutineCategory {
+  id                   Int                    @id @default(autoincrement()) @db.UnsignedInt
+  category_name        String                 @db.VarChar(255)
+  PlannedExerciseGroup PlannedExerciseGroup[]
+}
+
+view WorkoutRoutineExercises {
+  routineId            Int      @default(0) @db.UnsignedInt
+  microcycle_id        Int      @db.UnsignedInt
+  routine_index        Int
+  routine_name         String?  @db.VarChar(255)
+  isActive             Boolean  @default(false)
+  group_index          Int?
+  rest_after           Int?
+  rest_between         Int?
+  routine_category     Int?     @db.UnsignedInt
+  exercise_id          Int?     @db.UnsignedInt
+  exercise_name        String?  @db.VarChar(64)
+  exercise_group_index Int?
+  repetitions          Int?
+  exercise_sets        Int?
+  exercise_weight      Int?
+  exercise_duration    Int?
+  exercise_distance    Decimal? @db.Decimal(10, 2)
+  target_heart_rate    Int?
+  pace                 String?  @db.VarChar(32)
+  rpe                  Int?
+  target_calories      Int?
+  target_mets          Int?
+}
+
+view ClientContact {
+  ClientId      Int       @default(0) @db.UnsignedInt
+  ContactId     Int       @default(0) @db.UnsignedInt
+  first_name    String    @db.VarChar(100)
+  last_name     String    @db.VarChar(100)
+  email         String    @db.VarChar(100)
+  phone         String?   @db.VarChar(15)
+  date_of_birth DateTime? @db.Date
+  height        Int?      @db.UnsignedInt
+  trainerId     Int       @db.UnsignedInt
+  img           String?   @db.VarChar(255)
+  notes         String?   @db.VarChar(500)
+}
+
+view ClientDietPlan {
+  first_name     String  @db.VarChar(100)
+  last_name      String  @db.VarChar(100)
+  trainerId      Int     @db.UnsignedInt
+  planName       String? @db.VarChar(255)
+  targetCalories Int?
+  targetProtein  Int?
+  targetCarbs    Int?
+  targetFats     Int?
+  notes          String? @db.VarChar(512)
+  dietPlanId     Int?    @default(0) @db.UnsignedInt
+  clientId       Int     @default(0) @db.UnsignedInt
+}
