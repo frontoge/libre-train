@@ -10,20 +10,37 @@ import {
 	UpdateClientRequest,
 } from '@libre-train/shared';
 import { Request, Response } from 'express';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { closeDatabaseConnection, getDatabaseConnection } from '../../database/mysql-database';
+import { prisma } from '../../database/mysql-database';
 
-export const handleGetClientContacts = async (req: Request<{ id?: string }>, res: Response) => {
+type MessageResponse = { message: string };
+
+const numberOrUndefined = (value: unknown): number | undefined => {
+	if (value === null || value === undefined) return undefined;
+	if (typeof value === 'number') return value;
+	if (typeof value === 'object' && 'toNumber' in value && typeof value.toNumber === 'function') {
+		return value.toNumber();
+	}
+	const parsed = Number(value);
+	return Number.isNaN(parsed) ? undefined : parsed;
+};
+
+const numberOrZero = (value: unknown): number => numberOrUndefined(value) ?? 0;
+
+export const handleGetClientContacts = async (
+	req: Request<{ id?: string }>,
+	res: Response<ClientContact[] | MessageResponse>
+) => {
 	const { id } = req.params;
 
-	const connection = await getDatabaseConnection();
 	try {
-		const [results] = await connection.query<RowDataPacket[]>({
-			sql: 'CALL spGetClientContacts(?)',
-			values: [id ? parseInt(id, 10) : null],
-		});
+		const contacts = id
+			? await prisma.clientContact.findMany({
+					where: { ClientId: parseInt(id, 10) },
+					orderBy: { ClientId: 'asc' },
+				})
+			: await prisma.clientContact.findMany({ orderBy: { ClientId: 'asc' } });
 
-		res.status(200).json(results[0] as ClientContact[]);
+		res.status(200).json(contacts);
 	} catch (error) {
 		if (error instanceof Error) {
 			console.error('Error fetching client contacts:', error.message);
@@ -32,8 +49,6 @@ export const handleGetClientContacts = async (req: Request<{ id?: string }>, res
 		}
 		console.error('Unexpected error fetching client contacts:', error);
 		res.status(500).json({ message: 'An unexpected error occurred.' });
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 };
 
@@ -43,44 +58,40 @@ export const handleGetClientContacts = async (req: Request<{ id?: string }>, res
  * @param res
  * @returns
  */
-export const handleGetClients = async (req: Request, res: Response<Client[] | { message: string }>) => {
-	const connection = await getDatabaseConnection();
+export const handleGetClients = async (req: Request, res: Response<Client[] | MessageResponse>) => {
 	try {
-		const [results] = await connection.query<RowDataPacket[]>({ sql: 'SELECT * FROM Client' });
+		const clients = await prisma.client.findMany({
+			include: { Contact: true },
+		});
 
-		const clients: Client[] = results.map((row) => ({
+		const mappedClients: Client[] = clients.map((row) => ({
 			id: row.id,
-			first_name: row.first_name,
-			last_name: row.last_name,
-			email: row.email,
-			phone: row.phone,
-			height: row.height,
-			img: row.img,
-			age: row.age,
-			notes: row.notes,
+			first_name: row.Contact?.first_name ?? '',
+			last_name: row.Contact?.last_name ?? '',
+			email: row.Contact?.email ?? '',
+			phone: row.Contact?.phone ?? undefined,
+			height: row.height ?? undefined,
+			img: row.Contact?.img ?? undefined,
+			age: undefined,
+			notes: row.notes ?? undefined,
 			created_at: row.created_at,
 			updated_at: row.updated_at,
 		}));
 
-		res.json(clients);
+		res.json(mappedClients);
 	} catch (error) {
 		if (error instanceof Error) {
 			res.status(500).json({ message: error.message });
 			return;
 		}
 		res.status(500).json({ message: 'An unexpected error occurred.' });
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 };
 
 // This should not all be handled on this endpoint. This should only take a contact ID and client create data
 // TODO: Fix this
-export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValues>, res: Response) => {
-	const connection = await getDatabaseConnection();
-
+export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValues>, res: Response<MessageResponse>) => {
 	if (!req.body) {
-		await closeDatabaseConnection(connection);
 		res.status(400).json({ message: 'Request body is required' });
 		return;
 	}
@@ -88,39 +99,36 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
 	const body = req.body;
 
 	try {
-		// Insert contact into database
-		const [result] = await connection.query<RowDataPacket[][]>({
-			sql: 'CALL spCreateContact(?, ?, ?, ?, ?, ?)',
-			values: [
-				body.firstName ?? null,
-				body.lastName ?? null,
-				body.email ?? null,
-				body.phoneNumber ?? null,
-				body.dob ?? null,
-				body.img64 ?? null,
-			],
+		// Create contact in database
+		const contact = await prisma.contact.create({
+			data: {
+				first_name: body.firstName ?? 'Unknown',
+				last_name: body.lastName ?? 'Unknown',
+				email: body.email ?? 'unknown@unknown.com',
+				phone: body.phoneNumber ?? null,
+				date_of_birth: body.dob ? new Date(body.dob) : null,
+				img: body.img64 ?? null,
+			},
 		});
 
-		const insertResult = result[0];
-
-		if (!insertResult || insertResult.length === 0 || !insertResult[0]?.id) {
+		if (!contact?.id) {
 			console.error('Failed to create client:', 'Failed to create contact.');
 			res.status(500).json({ message: 'Failed to create client.' });
 			return;
 		}
 
-		const insertId = insertResult[0].id;
-
-		// Insert client into database
-		const [clientResult] = await connection.query<RowDataPacket[][]>({
-			sql: 'CALL spCreateClient(?, ?, ?, ?)',
-			values: [insertId, body.trainerId, body.height ?? null, body.notes ?? null],
+		// Create client linked to contact
+		const client = await prisma.client.create({
+			data: {
+				contactId: contact.id,
+				trainerId: body.trainerId,
+				height: body.height ?? null,
+				notes: body.notes ?? null,
+			},
 		});
 
-		const clientInsertResult = clientResult[0];
-
-		if (!clientInsertResult || clientInsertResult.length === 0 || !clientInsertResult[0]?.id) {
-			console.error('Failed to create client:', 'Failed to create contact.');
+		if (!client?.id) {
+			console.error('Failed to create client:', 'Failed to create client.');
 			res.status(500).json({ message: 'Failed to create client.' });
 			return;
 		}
@@ -137,36 +145,55 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
 		}
 		console.error('Unexpected error creating client:', error);
 		res.status(500).json({ message: 'An unexpected error occurred.' });
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 };
 
-export const handleDailyUpdate = async (req: Request<{}, {}, DailyUpdateRequest>, res: Response) => {
+export const handleDailyUpdate = async (req: Request<{}, {}, DailyUpdateRequest>, res: Response<MessageResponse>) => {
 	if (!req.body) {
 		res.status(400).json({ message: 'Request body is required' });
 		return;
 	}
 
 	const { date, data } = req.body;
-	const connection = await getDatabaseConnection();
 	try {
-		await connection.execute<ResultSetHeader>({
-			sql: 'CALL spCreateClientDailyLog(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-			values: [
-				req.body.clientId, // Assuming clientId is part of the request body
-				new Date(date),
-				data.weight ?? null,
-				data.body_fat ?? null,
-				data.calories ?? null,
-				data.target_calories ?? null,
-				data.protein ?? null,
-				data.target_protein ?? null,
-				data.carbs ?? null,
-				data.target_carbs ?? null,
-				data.fats ?? null,
-				data.target_fats ?? null,
-			],
+		const logDate = new Date(date);
+		// Set the date to start of day for consistent matching
+		const startOfDay = new Date(logDate.getFullYear(), logDate.getMonth(), logDate.getDate());
+
+		// Use upsert to handle insert or update
+		await prisma.clientDailyLog.upsert({
+			where: {
+				client_id_created_at: {
+					client_id: req.body.clientId,
+					created_at: startOfDay,
+				},
+			},
+			update: {
+				logged_weight: data.weight ?? undefined,
+				body_fat: data.body_fat ?? undefined,
+				logged_calories: data.calories ?? undefined,
+				target_calories: data.target_calories ?? undefined,
+				logged_protein: data.protein ?? undefined,
+				target_protein: data.target_protein ?? undefined,
+				logged_carbs: data.carbs ?? undefined,
+				target_carbs: data.target_carbs ?? undefined,
+				logged_fat: data.fats ?? undefined,
+				target_fat: data.target_fats ?? undefined,
+			},
+			create: {
+				client_id: req.body.clientId,
+				created_at: startOfDay,
+				logged_weight: data.weight ?? null,
+				body_fat: data.body_fat ?? null,
+				logged_calories: data.calories ?? null,
+				target_calories: data.target_calories ?? null,
+				logged_protein: data.protein ?? null,
+				target_protein: data.target_protein ?? null,
+				logged_carbs: data.carbs ?? null,
+				target_carbs: data.target_carbs ?? null,
+				logged_fat: data.fats ?? null,
+				target_fat: data.target_fats ?? null,
+			},
 		});
 	} catch (error) {
 		if (error instanceof Error) {
@@ -176,8 +203,6 @@ export const handleDailyUpdate = async (req: Request<{}, {}, DailyUpdateRequest>
 		}
 		console.error('Unexpected error submitting daily update:', error);
 		res.status(500).json({ message: 'An unexpected error occurred.' });
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 
 	res.status(200).json({ message: 'Daily update submitted successfully.' });
@@ -193,39 +218,62 @@ export const handleGetDashboard = async (
 		res.status(400).json({ message: 'Client ID and date are required.' });
 		return;
 	}
-	const connection = await getDatabaseConnection();
 	try {
-		const [results] = await connection.query<RowDataPacket[]>({
-			sql: 'CALL spGetClientDashboard(?, ?)',
-			values: [parseInt(clientId, 10), new Date(date)],
+		const parsedClientId = parseInt(clientId, 10);
+		const parsedDate = new Date(date);
+		const startOfDay = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+
+		// Fetch client with contact
+		const client = await prisma.client.findUnique({
+			where: { id: parsedClientId },
+			include: { Contact: true },
 		});
 
-		if (results.length === 0 || !results[0] || results[0].length === 0) {
+		if (!client) {
 			res.status(200).json({ message: 'no data found' });
 			return;
 		}
 
+		// Fetch daily log for the specified date
+		const dailyLog = await prisma.clientDailyLog.findFirst({
+			where: {
+				client_id: parsedClientId,
+				created_at: startOfDay,
+			},
+		});
+
+		// Fetch the latest goal for this client up to the specified date
+		const latestGoal = await prisma.clientGoal.findFirst({
+			where: {
+				client_id: parsedClientId,
+				created_at: { lte: parsedDate },
+			},
+			include: { ClientGoalType: true },
+			orderBy: { created_at: 'desc' },
+			take: 1,
+		});
+
 		const dashboardData: DashboardData = {
-			clientId: results[0][0].client_id,
-			first_name: results[0][0].first_name,
-			last_name: results[0][0].last_name,
-			email: results[0][0].email,
-			phone: results[0][0].phone,
-			height: results[0][0].height,
-			img: results[0][0].img,
-			logged_weight: results[0][0].logged_weight,
-			logged_calories: results[0][0].logged_calories,
-			logged_body_fat: results[0][0].logged_body_fat,
-			logged_protein: results[0][0].logged_protein,
-			logged_carbs: results[0][0].logged_carbs,
-			logged_fats: results[0][0].logged_fat,
-			target_calories: results[0][0].target_calories,
-			target_protein: results[0][0].target_protein,
-			target_carbs: results[0][0].target_carbs,
-			target_fats: results[0][0].target_fat,
-			goal: results[0][0].goal,
-			goal_weight: results[0][0].goal_weight,
-			goal_bodyFat: results[0][0].goal_bodyFat,
+			clientId: client.id,
+			first_name: client.Contact?.first_name ?? 'Unknown',
+			last_name: client.Contact?.last_name ?? 'Unknown',
+			email: client.Contact?.email ?? 'unknown@unknown.com',
+			phone: client.Contact?.phone ?? '',
+			height: client.height ?? undefined,
+			img: client.Contact?.img ?? undefined,
+			logged_weight: numberOrZero(dailyLog?.logged_weight),
+			logged_calories: numberOrUndefined(dailyLog?.logged_calories),
+			logged_body_fat: numberOrUndefined(dailyLog?.body_fat),
+			logged_protein: numberOrUndefined(dailyLog?.logged_protein),
+			logged_carbs: numberOrUndefined(dailyLog?.logged_carbs),
+			logged_fats: numberOrUndefined(dailyLog?.logged_fat),
+			target_calories: numberOrUndefined(dailyLog?.target_calories),
+			target_protein: numberOrUndefined(dailyLog?.target_protein),
+			target_carbs: numberOrUndefined(dailyLog?.target_carbs),
+			target_fats: numberOrUndefined(dailyLog?.target_fat),
+			goal: latestGoal?.ClientGoalType?.goal ?? undefined,
+			goal_weight: numberOrUndefined(latestGoal?.target_weight),
+			goal_bodyFat: numberOrUndefined(latestGoal?.target_bodyfat),
 		};
 
 		res.status(200).json(dashboardData);
@@ -237,8 +285,6 @@ export const handleGetDashboard = async (
 		}
 		console.error('Unexpected error fetching dashboard data:', error);
 		res.status(500).json({ message: 'An unexpected error occurred.' });
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 };
 
@@ -252,20 +298,45 @@ export const handleGetDashboardSummary = async (
 		res.status(400).json({ message: 'Client ID, start date, and end date are required.' });
 		return;
 	}
-
-	const connection = await getDatabaseConnection();
 	try {
-		const [results] = await connection.query<RowDataPacket[]>({
-			sql: 'CALL spGetClientWeeklySummary(?, ?, ?)',
-			values: [new Date(startDate), new Date(endDate), parseInt(clientId, 10)],
+		const parsedClientId = parseInt(clientId, 10);
+		const startDateObj = new Date(startDate);
+		const endDateObj = new Date(endDate);
+
+		const dailyLogs = await prisma.clientDailyLog.findMany({
+			where: {
+				client_id: parsedClientId,
+				created_at: {
+					gte: startDateObj,
+					lte: endDateObj,
+				},
+			},
+			orderBy: { created_at: 'asc' },
 		});
 
-		if (results.length === 0 || !results[0] || results[0].length === 0) {
+		if (dailyLogs.length === 0) {
 			res.status(200).json({ message: 'No data found for the specified date range.' });
 			return;
 		}
 
-		res.status(200).json(results[0] as DashboardWeeklySummaryResponse);
+		const logCount = dailyLogs.length;
+		const summary = {
+			avg_weight: dailyLogs.reduce((sum, log) => sum + numberOrZero(log.logged_weight), 0) / logCount,
+			avg_bodyfat: dailyLogs.reduce((sum, log) => sum + numberOrZero(log.body_fat), 0) / logCount,
+			avg_calories: dailyLogs.reduce((sum, log) => sum + numberOrZero(log.logged_calories), 0) / logCount,
+			total_macros: dailyLogs.reduce(
+				(sum, log) =>
+					sum + numberOrZero(log.logged_protein) + numberOrZero(log.logged_carbs) + numberOrZero(log.logged_fat),
+				0
+			),
+			target_macros: dailyLogs.reduce(
+				(sum, log) =>
+					sum + numberOrZero(log.target_protein) + numberOrZero(log.target_carbs) + numberOrZero(log.target_fat),
+				0
+			),
+		};
+
+		res.status(200).json([summary]);
 	} catch (error) {
 		if (error instanceof Error) {
 			console.error('Error fetching dashboard weekly summary:', error.message);
@@ -274,21 +345,14 @@ export const handleGetDashboardSummary = async (
 		}
 		console.error('Unexpected error fetching dashboard weekly summary:', error);
 		res.status(500).json({ message: 'An unexpected error occurred.' });
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 };
 
-export const handleDeleteClient = async (req: Request<{ id: string }>, res: Response) => {
-	const connection = await getDatabaseConnection();
-
+export const handleDeleteClient = async (req: Request<{ id: string }>, res: Response<void | MessageResponse>) => {
 	const { id } = req.params;
 
 	try {
-		await connection.query({
-			sql: 'DELETE FROM Client WHERE id = ?',
-			values: [parseInt(id, 10)],
-		});
+		await prisma.client.delete({ where: { id: parseInt(id, 10) } });
 
 		res.status(204).send();
 	} catch (error) {
@@ -299,13 +363,13 @@ export const handleDeleteClient = async (req: Request<{ id: string }>, res: Resp
 		}
 		console.error('Unexpected error deleting client:', error);
 		res.status(500).json({ message: 'An unexpected error occurred.' });
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 };
 
-export const handleUpdateClient = async (req: Request<{ id: string }, {}, UpdateClientRequest>, res: Response) => {
-	const connection = await getDatabaseConnection();
+export const handleUpdateClient = async (
+	req: Request<{ id: string }, {}, UpdateClientRequest>,
+	res: Response<void | MessageResponse>
+) => {
 	try {
 		const { id } = req.params;
 		const { height, notes, trainer_id } = req.body;
@@ -315,9 +379,13 @@ export const handleUpdateClient = async (req: Request<{ id: string }, {}, Update
 			return;
 		}
 
-		await connection.query({
-			sql: 'CALL spUpdateClient(?, ?, ?, ?)',
-			values: [parseInt(id, 10), height ?? null, notes ?? null, trainer_id ?? null],
+		await prisma.client.update({
+			where: { id: parseInt(id, 10) },
+			data: {
+				height: height ?? undefined,
+				notes: notes ?? undefined,
+				trainerId: trainer_id ?? undefined,
+			},
 		});
 
 		res.status(204).send();
@@ -329,7 +397,5 @@ export const handleUpdateClient = async (req: Request<{ id: string }, {}, Update
 		}
 		console.error('Unexpected error updating client:', error);
 		res.status(500).json({ message: 'An unexpected error occurred.' });
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 };

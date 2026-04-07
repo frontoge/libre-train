@@ -12,6 +12,7 @@
 		}
 	},
 	"scripts": {
+		"types:sync:prisma": "bun --cwd .. run types:sync:prisma",
 		"build": "tsc",
 		"clean": "rimraf dist",
 		"clean:all": "rimraf dist node_modules",

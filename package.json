@@ -8,9 +8,10 @@
 		"shared"
 	],
 	"scripts": {
+		"types:sync:prisma": "bun run --filter @libre-train/server db:generate && mkdir -p shared/generated && rimraf shared/generated/prisma && cp -R server/infrastructure/generated/prisma shared/generated/prisma",
 		"clean": "bun run --parallel --no-exit-on-error --workspaces clean",
 		"clean:all": "rimraf node_modules bun.lock && bun run --parallel --no-exit-on-error --workspaces clean:all",
-		"build": "bun run --filter @libre-train/shared build && bun run --sequential --filter '!@libre-train/shared' build",
+		"build": "bun run types:sync:prisma && bun run --filter @libre-train/shared build && bun run --sequential --filter '!@libre-train/shared' build",
 		"build:clean": "bun run clean && bun run build",
 		"start:client": "bun run --filter @libre-train/client dev",
 		"start:server": "bun run --filter @libre-train/server dev",

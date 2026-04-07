@@ -6,10 +6,7 @@ import {
 	WorkoutRoutine,
 } from '@libre-train/shared';
 import { Request, Response } from 'express';
-import { RowDataPacket } from 'mysql2';
-import { closeDatabaseConnection, getDatabaseConnection } from '../../database/mysql-database';
-import { mapWorkoutRoutineExerciseDTOToWorkoutRoutine } from '../../mappers/routine-mappers';
-import { WorkoutRoutineExerciseDTO } from '../../types/dto';
+import { prisma } from '../../database/mysql-database';
 
 export async function handleCreateWorkoutRoutine(req: Request<{}, {}, Omit<WorkoutRoutine, 'id'>>, res: Response) {
 	try {
@@ -78,21 +75,54 @@ export async function handleGetCycleWorkoutRoutines(
 	req: Request<{ microcycleId: string }>,
 	res: Response<ResponseWithError<WorkoutRoutine[]>>
 ) {
-	const connection = await getDatabaseConnection();
 	try {
 		const { microcycleId } = req.params;
-		const [result] = await connection.query<RowDataPacket[]>({
-			sql: 'CALL spGetMicrocycleRoutines(?)',
-			values: [microcycleId],
+		const parsedId = parseInt(microcycleId, 10);
+
+		const routines = await prisma.workoutRoutine.findMany({
+			where: {
+				microcycle_id: parsedId,
+				isActive: true,
+			},
+			include: {
+				PlannedExerciseGroup: {
+					include: {
+						PlannedExercise: true,
+					},
+				},
+			},
 		});
 
-		if (!result) {
+		if (!routines || routines.length === 0) {
 			throw new Error('No workout routines found for the specified microcycle');
 		}
 
-		const rows = result[0] as WorkoutRoutineExerciseDTO[];
+		const workoutRoutines: WorkoutRoutine[] = routines.map((routine) => ({
+			id: routine.id,
+			microcycle_id: routine.microcycle_id,
+			routine_index: routine.routine_index,
+			routine_name: routine.routine_name,
+			isActive: routine.isActive,
+			exercise_groups: routine.PlannedExerciseGroup.map((group) => ({
+				routine_category: group.routine_category,
+				rest_between: group.rest_between,
+				rest_after: group.rest_after,
+				exercises: group.PlannedExercise.map((ex) => ({
+					exercise_id: ex.exercise_id,
+					repetitions: ex.repetitions,
+					sets: ex.exercise_sets,
+					weight: ex.exercise_weight,
+					duration: ex.exercise_duration,
+					distance: ex.exercise_distance,
+					target_heart_rate: ex.target_heart_rate,
+					pace: ex.pace,
+					rpe: ex.rpe,
+					target_calories: ex.target_calories,
+					target_mets: ex.target_mets,
+				})),
+			})),
+		}));
 
-		const workoutRoutines = mapWorkoutRoutineExerciseDTOToWorkoutRoutine(rows);
 		res.status(200).json(workoutRoutines);
 	} catch (error: Error | unknown) {
 		if (error instanceof Error) {
@@ -102,74 +132,154 @@ export async function handleGetCycleWorkoutRoutines(
 			console.error('Unknown error fetching workout routines:', error);
 			res.status(500).json({ hasError: true, errorMessage: 'An unknown error occurred while fetching workout routines' });
 		}
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 }
 
 async function deleteWorkoutRoutine(id: string) {
-	const connection = await getDatabaseConnection();
-	try {
-		await connection.execute('CALL spDeleteWorkoutRoutine(?)', [id]);
-	} finally {
-		await closeDatabaseConnection(connection);
+	const parsedId = parseInt(id, 10);
+
+	// Get the routine to find its microcycle_id and routine_index
+	const routine = await prisma.workoutRoutine.findUnique({
+		where: { id: parsedId },
+	});
+
+	if (!routine) {
+		throw new Error('Workout routine not found');
 	}
+
+	// Deactivate this routine
+	await prisma.workoutRoutine.update({
+		where: { id: parsedId },
+		data: { isActive: false },
+	});
+
+	// Decrement routine_index for all active routines with higher indices in the same microcycle
+	await prisma.workoutRoutine.updateMany({
+		where: {
+			microcycle_id: routine.microcycle_id,
+			routine_index: { gt: routine.routine_index },
+			isActive: true,
+		},
+		data: {
+			routine_index: {
+				decrement: 1,
+			},
+		},
+	});
 }
 
 async function getWorkoutRoutineById(id: string): Promise<WorkoutRoutine | undefined> {
-	const connection = await getDatabaseConnection();
-	try {
-		const [result] = await connection.query<RowDataPacket[]>({
-			sql: 'SELECT * FROM WorkoutRoutineExercises WHERE routineId = ?',
-			values: [id],
-		});
-		if (!result) {
-			throw new Error('Workout routine not found');
-		}
+	const parsedId = parseInt(id, 10);
 
-		return mapWorkoutRoutineExerciseDTOToWorkoutRoutine(result as WorkoutRoutineExerciseDTO[])[0];
-	} finally {
-		await closeDatabaseConnection(connection);
+	const routine = await prisma.workoutRoutine.findUnique({
+		where: { id: parsedId },
+		include: {
+			PlannedExerciseGroup: {
+				include: {
+					PlannedExercise: true,
+				},
+			},
+		},
+	});
+
+	if (!routine) {
+		return undefined;
 	}
+
+	return {
+		id: routine.id,
+		microcycle_id: routine.microcycle_id,
+		routine_index: routine.routine_index,
+		routine_name: routine.routine_name,
+		isActive: routine.isActive,
+		exercise_groups: routine.PlannedExerciseGroup.map((group) => ({
+			routine_category: group.routine_category,
+			rest_between: group.rest_between,
+			rest_after: group.rest_after,
+			exercises: group.PlannedExercise.map((ex) => ({
+				exercise_id: ex.exercise_id,
+				repetitions: ex.repetitions,
+				sets: ex.exercise_sets,
+				weight: ex.exercise_weight,
+				duration: ex.exercise_duration,
+				distance: ex.exercise_distance,
+				target_heart_rate: ex.target_heart_rate,
+				pace: ex.pace,
+				rpe: ex.rpe,
+				target_calories: ex.target_calories,
+				target_mets: ex.target_mets,
+			})),
+		})),
+	};
 }
 
 export async function createWorkoutRoutine(routine: Omit<WorkoutRoutine, 'id'>): Promise<number | undefined> {
-	const connection = await getDatabaseConnection();
 	try {
 		const { microcycle_id, routine_index, routine_name, isActive, exercise_groups } = routine;
-		const [result] = await connection.query<RowDataPacket[]>({
-			sql: 'CALL spCreateWorkoutRoutine(?, ?, ?, ?)',
-			values: [microcycle_id, routine_index, routine_name, isActive],
+
+		// Create the workout routine
+		const createdRoutine = await prisma.workoutRoutine.create({
+			data: {
+				microcycle_id,
+				routine_index,
+				routine_name,
+				isActive: isActive,
+			},
 		});
-		if (!result || result[0] === undefined) {
-			throw new Error('Failed to create workout routine');
+
+		const workoutRoutineId = createdRoutine.id;
+
+		// If this is active, increment indices of other routines with same or higher index
+		if (isActive) {
+			await prisma.workoutRoutine.updateMany({
+				where: {
+					microcycle_id,
+					routine_index: { gte: routine_index },
+					id: { not: workoutRoutineId },
+					isActive: true,
+				},
+				data: {
+					routine_index: {
+						increment: 1,
+					},
+				},
+			});
 		}
-		const workoutRoutineId = result[0][0].workout_routine_id;
 
 		// Create the exercise groups for the routine
 		await Promise.all(
 			exercise_groups.map(async (group: PlannedExerciseGroup, index: number) => {
 				const { rest_between, rest_after, routine_category, exercises } = group;
-				const [groupResult] = await connection.query<RowDataPacket[]>(
-					'CALL spCreatePlannedExerciseGroup(?, ?, ?, ?, ?)',
-					[
-						workoutRoutineId,
-						index, // group index
-						rest_between ?? null,
-						rest_after ?? null,
+
+				const createdGroup = await prisma.plannedExerciseGroup.create({
+					data: {
+						workout_routine_id: workoutRoutineId,
+						group_index: index,
+						rest_between: rest_between ?? null,
+						rest_after: rest_after ?? null,
 						routine_category,
-					]
-				);
+					},
+				});
 
-				if (!groupResult || groupResult[0] === undefined) {
-					throw new Error('Failed to create planned exercise group');
-				}
+				const groupId = createdGroup.id;
 
-				const groupId = groupResult[0][0].planned_exercise_group_id;
+				// Increment group indices for existing groups with same or higher index
+				await prisma.plannedExerciseGroup.updateMany({
+					where: {
+						workout_routine_id: workoutRoutineId,
+						group_index: { gte: index },
+						id: { not: groupId },
+					},
+					data: {
+						group_index: {
+							increment: 1,
+						},
+					},
+				});
 
 				// Create the exercises for the group
 				await Promise.all(
-					exercises.map(async (exercise: PlannedExercise, index: number) => {
+					exercises.map(async (exercise: PlannedExercise, exIndex: number) => {
 						const {
 							exercise_id,
 							repetitions,
@@ -183,38 +293,57 @@ export async function createWorkoutRoutine(routine: Omit<WorkoutRoutine, 'id'>):
 							target_calories,
 							target_mets,
 						} = exercise;
-						await connection.execute('CALL spCreatePlannedExercise(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-							exercise_id,
-							groupId,
-							index, // exercise index
-							repetitions ?? null,
-							sets ?? null,
-							weight ?? null,
-							duration ?? null,
-							distance ?? null,
-							target_heart_rate ?? null,
-							pace ?? null,
-							rpe ?? null,
-							target_calories ?? null,
-							target_mets ?? null,
-						]);
+
+						const createdExercise = await prisma.plannedExercise.create({
+							data: {
+								exercise_id,
+								planned_exercise_group_id: groupId,
+								exercise_index: exIndex,
+								repetitions: repetitions ?? null,
+								sets: sets ?? null,
+								weight: weight ?? null,
+								duration: duration ?? null,
+								distance: distance ?? null,
+								target_heart_rate: target_heart_rate ?? null,
+								pace: pace ?? null,
+								rpe: rpe ?? null,
+								target_calories: target_calories ?? null,
+								target_mets: target_mets ?? null,
+							},
+						});
+
+						// Increment exercise indices for existing exercises with same or higher index
+						await prisma.plannedExercise.updateMany({
+							where: {
+								planned_exercise_group_id: groupId,
+								exercise_index: { gte: exIndex },
+								id: { not: createdExercise.id },
+							},
+							data: {
+								exercise_index: {
+									increment: 1,
+								},
+							},
+						});
 					})
 				);
 			})
 		);
+
+		return workoutRoutineId;
 		return workoutRoutineId;
 	} catch (error) {
 		console.error('Error creating workout routine:', error);
 		throw new Error('Failed to create workout routine');
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 }
 
 export async function deactivateCycleRoutines(cycleId: number): Promise<void> {
-	const connection = await getDatabaseConnection();
 	try {
-		await connection.execute('UPDATE WorkoutRoutine SET isActive = FALSE WHERE microcycle_id = ?', [cycleId]);
+		await prisma.workoutRoutine.updateMany({
+			where: { microcycle_id: cycleId },
+			data: { is_active: false },
+		});
 	} catch (error: Error | unknown) {
 		if (error instanceof Error) {
 			console.error('Error deactivating workout routines:', error.message);
@@ -223,7 +352,5 @@ export async function deactivateCycleRoutines(cycleId: number): Promise<void> {
 			console.error('Unknown error deactivating workout routines:', error);
 			throw new Error('An unknown error occurred while deactivating workout routines');
 		}
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 }

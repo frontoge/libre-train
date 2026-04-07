@@ -3,8 +3,7 @@ import argon2 from 'argon2';
 import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
-import { RowDataPacket } from 'mysql2';
-import { closeDatabaseConnection, getDatabaseConnection } from '../../database/mysql-database';
+import { prisma } from '../../database/mysql-database';
 
 async function hashPassword(plain: string): Promise<string> {
 	const salt = crypto.randomBytes(32);
@@ -48,18 +47,12 @@ export const handleAuthLogin = async (req: Request, res: Response) => {
 	}
 
 	const { username, password } = req.body;
-	const connection = await getDatabaseConnection();
 	try {
-		const [results] = await connection.query<RowDataPacket[]>({
-			sql: 'SELECT * FROM User WHERE username = ?',
-			values: [username],
-		});
+		const user = await prisma.user.findFirst({ where: { username } });
 
-		if (results.length === 0 || !results[0] || results[0].length === 0) {
+		if (!user) {
 			return res.status(401).json({ message: 'Invalid username' });
 		}
-
-		const user = results[0];
 
 		const passwordMatch = await verifyPassword(user.pass, password);
 
@@ -86,8 +79,6 @@ export const handleAuthLogin = async (req: Request, res: Response) => {
 	} catch (error) {
 		console.error('Error during login:', error);
 		return res.status(500).json({ message: 'Internal server error during login' });
-	} finally {
-		if (connection) await connection.end();
 	}
 };
 
@@ -118,42 +109,41 @@ export const handleAuthSignup = async (req: Request, res: Response) => {
 	}
 
 	const { username, password } = req.body;
-	const connection = await getDatabaseConnection();
 	try {
-		const [results] = await connection.query<RowDataPacket[][]>({
-			sql: 'SELECT * FROM User WHERE username = ?',
-			values: [username],
-		});
+		const existingUser = await prisma.user.findFirst({ where: { username } });
 
-		if (results.length > 0) {
-			await closeDatabaseConnection(connection);
+		if (existingUser) {
 			return res.status(409).json({ message: 'Username already exists' });
 		}
 	} catch (error) {
 		console.error('Error checking existing username:', error);
-		await closeDatabaseConnection(connection);
 		return res.status(500).json({ message: 'Internal server error while checking for duplicate usernames' });
 	}
 
 	const passwordHash = await hashPassword(password);
 
 	try {
-		const [result] = await connection.execute<RowDataPacket[][]>({
-			sql: 'CALL spCreateUser(?, ?)',
-			values: [username, `${passwordHash}`],
+		const createdUser = await prisma.$transaction(async (tx) => {
+			const placeholderContact = await tx.contact.create({
+				data: {
+					first_name: username,
+					last_name: username,
+					email: `${username.toLowerCase()}-${crypto.randomUUID()}@local.invalid`,
+				},
+			});
+
+			return tx.user.create({
+				data: {
+					username,
+					pass: passwordHash,
+					contactId: placeholderContact.id,
+				},
+			});
 		});
 
-		const insertResult = result[0];
+		const accessToken = jwt.sign({ sub: createdUser.id }, process.env.JWT_SECRET!, { expiresIn: '2h' });
 
-		if (!insertResult || insertResult.length === 0 || !insertResult[0]?.id) {
-			console.error('Failed to create client:', 'Failed to create contact.');
-			res.status(500).json({ message: 'Failed to create client.' });
-			return;
-		}
-
-		const accessToken = jwt.sign({ sub: insertResult[0].id }, process.env.JWT_SECRET!, { expiresIn: '2h' });
-
-		const refreshToken = jwt.sign({ sub: insertResult[0].id }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
+		const refreshToken = jwt.sign({ sub: createdUser.id }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
 
 		res.cookie('refreshToken', refreshToken, {
 			httpOnly: true,
@@ -165,13 +155,11 @@ export const handleAuthSignup = async (req: Request, res: Response) => {
 
 		return res.status(201).json({
 			accessToken,
-			user: insertResult[0].id,
+			user: createdUser.id,
 		});
 	} catch (error) {
 		console.error('Error creating user:', error);
 		return res.status(500).json({ message: 'Internal server error while creating user' });
-	} finally {
-		await closeDatabaseConnection(connection);
 	}
 };
 
