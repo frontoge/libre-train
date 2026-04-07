@@ -1,7 +1,7 @@
 import { Contact, ResponseWithError, UpdateContactRequest } from '@libre-train/shared';
 import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql2';
-import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastructure/mysql-database';
+import { closeDatabaseConnection, getDatabaseConnection } from '../../database/mysql-database';
 
 export const handleGetContacts = async (req: Request, res: Response<ResponseWithError<Contact[]>>) => {
 	const connection = await getDatabaseConnection();

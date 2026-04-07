@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import type { Connection } from 'mysql2/promise';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleGetTrainingPlanTodos } from '../../api/handlers/cycle-handlers';
-import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastructure/mysql-database';
+import { closeDatabaseConnection, getDatabaseConnection } from '../../database/mysql-database';
 
 // Mock the DB module so no real connection is made
 vi.mock('../../infrastructure/mysql-database', () => ({

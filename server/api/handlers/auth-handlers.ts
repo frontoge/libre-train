@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { RowDataPacket } from 'mysql2';
-import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastructure/mysql-database';
+import { closeDatabaseConnection, getDatabaseConnection } from '../../database/mysql-database';
 
 async function hashPassword(plain: string): Promise<string> {
 	const salt = crypto.randomBytes(32);

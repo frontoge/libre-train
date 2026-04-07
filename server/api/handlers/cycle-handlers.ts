@@ -14,7 +14,7 @@ import {
 } from '@libre-train/shared';
 import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql2';
-import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastructure/mysql-database';
+import { closeDatabaseConnection, getDatabaseConnection } from '../../database/mysql-database';
 import { createWorkoutRoutine, deactivateCycleRoutines } from './workout-routine-handlers';
 
 export const handleGetTrainingPlanTodos = async (req: Request<{}, {}, {}, { trainerId?: string }>, res: Response) => {

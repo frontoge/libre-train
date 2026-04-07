@@ -7,7 +7,7 @@ import {
 } from '@libre-train/shared';
 import { Request, Response } from 'express';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastructure/mysql-database';
+import { closeDatabaseConnection, getDatabaseConnection } from '../../database/mysql-database';
 
 export const handleGetAssessmentTypes = async (
 	req: Request<{ id?: string }>,

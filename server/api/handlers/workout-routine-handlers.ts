@@ -7,7 +7,7 @@ import {
 } from '@libre-train/shared';
 import { Request, Response } from 'express';
 import { RowDataPacket } from 'mysql2';
-import { closeDatabaseConnection, getDatabaseConnection } from '../../infrastructure/mysql-database';
+import { closeDatabaseConnection, getDatabaseConnection } from '../../database/mysql-database';
 import { mapWorkoutRoutineExerciseDTOToWorkoutRoutine } from '../../mappers/routine-mappers';
 import { WorkoutRoutineExerciseDTO } from '../../types/dto';
 
