@@ -17,7 +17,7 @@ export function ClientList() {
 
 	const clientId = id ? parseInt(id, 10) : undefined;
 
-	const selectedClient = useMemo(() => state.clients.find((client) => client.id === clientId), [state.clients, id]);
+	const selectedClient = useMemo(() => state.clients.find((client) => client.ClientId === clientId), [state.clients, id]);
 
 	const selectClient = (clientId: number) => {
 		navigate(`/clients/${clientId}`);
@@ -61,7 +61,7 @@ export function ClientList() {
 
 		if (contactChanged) {
 			try {
-				await updateContact(selectedClient.contact_id, {
+				await updateContact(selectedClient.ContactId, {
 					email: values.email,
 					phone: values.phoneNumber,
 					first_name: values.firstName,
@@ -77,7 +77,7 @@ export function ClientList() {
 
 		if (clientChanged) {
 			try {
-				await updateClient(selectedClient.id, {
+				await updateClient(selectedClient.ClientId, {
 					height: values.height,
 					notes: values.notes,
 				});
@@ -94,7 +94,7 @@ export function ClientList() {
 	};
 
 	const list = state.clients.map((client) => ({
-		id: client.id,
+		id: client.ClientId,
 		name: client.first_name + ' ' + client.last_name,
 		avatar: client?.img,
 		email: client.email,

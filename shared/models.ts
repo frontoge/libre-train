@@ -1,48 +1,50 @@
-export type TargetMetric = {
-	id: number;
-	metric_name: string;
-	target_unit: string;
-};
+import {
+	AssessmentClientLogSchema,
+	AssessmentTypeSchema,
+	ClientContactSchema,
+	ClientDietPlanSchema,
+	ClientSchema,
+	ContactSchema,
+	DietPlanLogEntrySchema,
+	DietPlanSchema,
+	ExerciseSchema,
+	MacrocycleSchema,
+	MesocycleSchema,
+	MicrocycleSchema,
+	PlannedExerciseGroupSchema,
+	PlannedExerciseSchema,
+	WorkoutRoutineSchema,
+} from '@libre-train/db/zod';
+import z from 'zod';
 
-export type Contact = {
-	id: number;
-	first_name: string;
-	last_name: string;
-	email?: string;
-	phone?: string;
-	date_of_birth?: string;
-	img?: string;
-};
+export type StringifyDates<T> = T extends Date
+	? string
+	: T extends Array<infer U>
+		? Array<StringifyDates<U>>
+		: T extends object
+			? { [K in keyof T]: StringifyDates<T[K]> }
+			: T;
 
-export type Client = {
-	id: number;
-	trainer_id?: number;
-	height?: number;
-	created_at: Date;
-	updated_at: Date;
-	notes?: string;
-};
+export type NullToUndefined<T> =
+	T extends Array<infer U>
+		? Array<NullToUndefined<U>>
+		: T extends object
+			? { [K in keyof T]: NullToUndefined<T[K]> }
+			: [Extract<T, null>] extends [never]
+				? T
+				: Exclude<T, null> | undefined;
 
-export type ClientContact = Client
-	& Omit<Contact, 'id'> & {
-		contact_id: number;
-	};
+export type DataModel<T> = NullToUndefined<StringifyDates<z.infer<T>>>;
 
-export type AssessmentType = {
-	id: number;
-	name: string;
-	assessmentUnit: string;
-	assessmentGroupId: number;
-};
+export type Contact = DataModel<typeof ContactSchema>;
 
-export type AssessmentClientLog = {
-	id: number;
-	clientId: number;
-	assessmentTypeId: number;
-	assessmentValue: string;
-	assessmentDate: string;
-	notes?: string;
-};
+export type Client = DataModel<typeof ClientSchema>;
+
+export type ClientContact = DataModel<typeof ClientContactSchema>;
+
+export type AssessmentType = DataModel<typeof AssessmentTypeSchema>;
+
+export type AssessmentClientLog = DataModel<typeof AssessmentClientLogSchema>;
 
 export enum AssessmentGroup {
 	Posture = 1,
@@ -97,82 +99,33 @@ export enum MuscleGroup {
 	DeepCore = 26,
 }
 
-export type Exercise = {
-	id: number;
-	exercise_name: string;
+export type Exercise = Omit<DataModel<typeof ExerciseSchema>, 'muscle_groups'> & {
 	muscle_groups: MuscleGroup[];
-	video_link?: string;
-	exercise_description?: string;
-	equipment?: string;
-	exercise_form?: ExerciseForm;
-	movement_pattern?: ExerciseMovementPattern;
-	progression_level: number;
 };
 
-export type Macrocycle = {
-	id: number;
-	cycle_name?: string;
-	client_id: number;
-	cycle_start_date: Date;
-	cycle_end_date: Date;
-	isActive: boolean;
-	notes?: string;
+export type Macrocycle = DataModel<typeof MacrocycleSchema>;
+
+export type Mesocycle = Omit<DataModel<typeof MesocycleSchema>, 'opt_levels' | 'cardio_levels'> & {
+	opt_levels?: number[] | undefined;
+	cardio_levels?: number[] | undefined;
 };
 
-export type Mesocycle = {
-	id: number;
-	client_id: number;
-	cycle_name?: string;
-	macrocycle_id: number;
-	cycle_start_date: Date;
-	cycle_end_date: Date;
-	isActive: boolean;
-	notes?: string;
-	optLevels?: number[];
-	cardioLevels?: number[];
+export type Microcycle = DataModel<typeof MicrocycleSchema>;
+
+export type PlannedExercise = Omit<
+	DataModel<typeof PlannedExerciseSchema>,
+	'exercise_group_id' | 'exercise_group_index' | 'exercise_distance'
+> & {
+	exercise_distance?: number | undefined;
 };
 
-export type Microcycle = {
-	id: number;
-	mesocycle_id: number;
-	client_id: number;
-	cycle_name?: string;
-	cycle_start_date: Date;
-	cycle_end_date: Date;
-	isActive: boolean;
-	notes?: string;
-};
-
-export interface PlannedExercise {
-	exercise_id: number;
-	exerciseName?: string;
-	repetitions?: number;
-	sets?: number;
-	weight?: number;
-	duration?: number;
-	distance?: number;
-	target_heart_rate?: number;
-	pace?: string;
-	rpe?: number;
-	target_calories?: number;
-	target_mets?: number;
-}
-
-export interface PlannedExerciseGroup {
-	rest_between?: number;
-	rest_after?: number;
-	routine_category: number;
+export type PlannedExerciseGroup = Omit<DataModel<typeof PlannedExerciseGroupSchema>, 'workout_routine_id' | 'group_index'> & {
 	exercises: PlannedExercise[];
-}
+};
 
-export interface WorkoutRoutine {
-	id: number;
-	microcycle_id: number;
-	routine_index: number;
-	routine_name?: string;
-	isActive: boolean;
+export type WorkoutRoutine = DataModel<typeof WorkoutRoutineSchema> & {
 	exercise_groups: PlannedExerciseGroup[];
-}
+};
 
 export enum WorkoutRoutineCategory {
 	Warmup = 1,
@@ -183,43 +136,11 @@ export enum WorkoutRoutineCategory {
 	Cooldown = 6,
 }
 
-export interface DietPlan {
-	id: number;
-	planName?: string;
-	clientId: number;
-	trainerId: number;
-	isActive: boolean;
-	targetCalories?: number;
-	targetProtein?: number;
-	targetCarbs?: number;
-	targetFats?: number;
-	notes?: string;
-}
+export type DietPlan = DataModel<typeof DietPlanSchema>;
 
-export interface DietPlanLogEntry {
-	id: number;
-	dietPlanId: number;
-	clientId: number;
-	logDate: string;
-	calories: number;
-	protein: number;
-	carbs: number;
-	fats: number;
-}
+export type DietPlanLogEntry = DataModel<typeof DietPlanLogEntrySchema>;
 
-export interface ClientDietPlan {
-	first_name: string;
-	last_name: string;
-	trainerId: number;
-	planName?: string;
-	targetCalories?: number;
-	targetProtein?: number;
-	targetCarbs?: number;
-	targetFats?: number;
-	notes?: string;
-	dietPlanId?: number;
-	clientId: number;
-}
+export type ClientDietPlan = DataModel<typeof ClientDietPlanSchema>;
 
 export interface ClientDietLogTodo {
 	clientId: number;

@@ -5,6 +5,7 @@ import {
 	AssessmentType,
 	ResponseWithError,
 } from '@libre-train/shared';
+import dayjs from 'dayjs';
 import { Request, Response } from 'express';
 import { prisma } from '../../database/mysql-database';
 
@@ -34,6 +35,8 @@ export const handleGetAssessmentTypes = async (
 				name: row.name,
 				assessmentUnit: row.assessmentUnit ?? '',
 				assessmentGroupId: row.assessmentGroupId ?? 0,
+				created_at: dayjs(row.created_at).toISOString(),
+				updated_at: dayjs(row.updated_at).toISOString(),
 			})) ?? [];
 
 		res.json(assessmentType);
@@ -70,11 +73,17 @@ export const handleGetAssessmentGroupTypes = async (
 			name: row.name,
 			assessmentUnit: row.assessmentUnit ?? '',
 			assessmentGroupId: row.assessmentGroupId ?? 0,
+			created_at: dayjs(row.created_at).toISOString(),
+			updated_at: dayjs(row.updated_at).toISOString(),
 		}));
 
 		res.json(assessmentTypes);
-	} catch (error) {
-		console.error(`Error fetching assessment types for group: ${req.params.id} - ${error}`);
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			console.error(`Error fetching assessment types for group: ${req.params.id} - ${error.message}`);
+		} else {
+			console.error(`Error fetching assessment types for group: ${req.params.id} - ${String(error)}`);
+		}
 		res.status(500).json({
 			hasError: true,
 			errorMessage: 'An error occurred while fetching assessment types for the group.',

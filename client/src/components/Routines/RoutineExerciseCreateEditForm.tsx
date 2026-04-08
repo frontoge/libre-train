@@ -1,4 +1,3 @@
-import type { PlannedExercise } from '@libre-train/shared';
 import { Button, Form, Input, Select } from 'antd';
 import { useEffect } from 'react';
 import { routineCategoryOptions } from '../../helpers/enum-select-options';
@@ -12,7 +11,17 @@ export interface RoutineExerciseCreateEditFormProps extends React.HTMLAttributes
 	onSubmitForm?: (values: RoutineExerciseCreateEditFormValues) => void;
 }
 
-export interface RoutineExerciseCreateEditFormValues extends Omit<PlannedExercise, 'exerciseName' | 'duration'> {
+export interface RoutineExerciseCreateEditFormValues {
+	exercise_id: number;
+	repetitions?: number;
+	sets?: number;
+	weight?: number;
+	distance?: number;
+	target_heart_rate?: number;
+	pace?: string;
+	rpe?: number;
+	target_calories?: number;
+	target_mets?: number;
 	category: number;
 	rest_after?: number;
 	duration?: string;

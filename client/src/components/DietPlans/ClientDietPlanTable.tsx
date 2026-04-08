@@ -89,7 +89,7 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 		const response = await createDietPlan({
 			clientId: parseInt(values.clientId),
 			trainerId: user,
-			planName: values.planName,
+			planName: values.planName ?? '',
 			notes: values.notes,
 			targetCalories: values.targetCalories,
 			targetProtein: values.targetProtein,

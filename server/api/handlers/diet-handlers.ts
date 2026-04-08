@@ -1,13 +1,16 @@
 import {
 	ClientDietLogTodo,
+	ClientDietPlan,
+	CreateDietPlan,
 	DietPlan,
 	DietPlanLogEntry,
 	GetDietPlanLogEntrySearchParams,
 	GetDietPlanSearchParams,
-	undefinedIfNull,
 } from '@libre-train/shared';
+import dayjs from 'dayjs';
 import { Request, Response } from 'express';
 import { prisma } from '../../database/mysql-database';
+import { MessageResponse } from '../../types/utilities';
 
 const toDateOnly = (value: string): Date => {
 	const date = new Date(value);
@@ -17,7 +20,10 @@ const toDateOnly = (value: string): Date => {
 	return date;
 };
 
-export const handleGetDietPlan = async (req: Request<{ planId?: string }, {}, {}, GetDietPlanSearchParams>, res: Response) => {
+export const handleGetDietPlan = async (
+	req: Request<{ planId?: string }, {}, {}, GetDietPlanSearchParams>,
+	res: Response<DietPlan[] | MessageResponse>
+) => {
 	try {
 		const { planId } = req.params;
 		const { clientId, trainerId, isActive } = req.query;
@@ -39,14 +45,32 @@ export const handleGetDietPlan = async (req: Request<{ planId?: string }, {}, {}
 			return res.status(404).json({ message: 'Diet plan not found' });
 		}
 
-		res.json(dietPlans);
+		const formattedResults: DietPlan[] = dietPlans.map((plan) => ({
+			id: plan.id,
+			clientId: plan.clientId,
+			trainerId: plan.trainerId,
+			planName: plan.planName ?? undefined,
+			targetCalories: plan.targetCalories ?? undefined,
+			targetProtein: plan.targetProtein ?? undefined,
+			targetCarbs: plan.targetCarbs ?? undefined,
+			targetFats: plan.targetFats ?? undefined,
+			notes: plan.notes ?? undefined,
+			isActive: plan.isActive,
+			created_at: dayjs(plan.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs(plan.updated_at).format('YYYY-MM-DD'),
+		}));
+
+		res.json(formattedResults);
 	} catch (error) {
 		console.error('Error fetching diet plans:', error);
 		res.status(500).json({ message: 'Internal server error' });
 	}
 };
 
-export const handleGetClientsDietPlans = async (req: Request<{}, {}, {}, { trainerId?: string }>, res: Response) => {
+export const handleGetClientsDietPlans = async (
+	req: Request<{}, {}, {}, { trainerId?: string }>,
+	res: Response<ClientDietPlan[] | MessageResponse>
+) => {
 	try {
 		const { trainerId } = req.query;
 		const parsedTrainerId = trainerId ? parseInt(trainerId, 10) : undefined;
@@ -58,18 +82,18 @@ export const handleGetClientsDietPlans = async (req: Request<{}, {}, {}, { train
 			return res.status(404).json({ message: 'No diet plans found for clients' });
 		}
 
-		const dietPlans = rows.map((plan) => ({
-			first_name: plan.first_name as string,
-			last_name: plan.last_name as string,
-			trainerId: undefinedIfNull(plan.trainerId),
-			planName: undefinedIfNull(plan.planName),
-			targetCalories: undefinedIfNull(plan.targetCalories),
-			targetProtein: undefinedIfNull(plan.targetProtein),
-			targetCarbs: undefinedIfNull(plan.targetCarbs),
-			targetFats: undefinedIfNull(plan.targetFats),
-			notes: undefinedIfNull(plan.notes),
-			dietPlanId: undefinedIfNull(plan.dietPlanId),
-			clientId: undefinedIfNull(plan.clientId),
+		const dietPlans: ClientDietPlan[] = rows.map((plan) => ({
+			first_name: plan.first_name,
+			last_name: plan.last_name,
+			trainerId: plan.trainerId,
+			planName: plan.planName ?? undefined,
+			targetCalories: plan.targetCalories ?? undefined,
+			targetProtein: plan.targetProtein ?? undefined,
+			targetCarbs: plan.targetCarbs ?? undefined,
+			targetFats: plan.targetFats ?? undefined,
+			notes: plan.notes ?? undefined,
+			dietPlanId: plan.dietPlanId ?? undefined,
+			clientId: plan.clientId ?? undefined,
 		}));
 
 		res.json(dietPlans);
@@ -79,7 +103,10 @@ export const handleGetClientsDietPlans = async (req: Request<{}, {}, {}, { train
 	}
 };
 
-export const handleGetDietLogTodos = async (req: Request<{}, {}, {}, { trainerId?: string }>, res: Response) => {
+export const handleGetDietLogTodos = async (
+	req: Request<{}, {}, {}, { trainerId?: string }>,
+	res: Response<ClientDietLogTodo[] | MessageResponse>
+) => {
 	try {
 		const { trainerId } = req.query;
 		if (!trainerId) {
@@ -133,7 +160,7 @@ export const handleGetDietLogTodos = async (req: Request<{}, {}, {}, { trainerId
 			email: entry.Contact.email,
 			phone: entry.Contact.phone ?? '',
 			trainerId: entry.trainerId,
-			lastLogDate: undefinedIfNull(entry.DietPlanLogEntry[0]?.logDate?.toISOString().slice(0, 10)),
+			lastLogDate: entry.DietPlanLogEntry[0]?.logDate?.toISOString().slice(0, 10) ?? undefined,
 		}));
 
 		return res.json(todos);
@@ -143,7 +170,7 @@ export const handleGetDietLogTodos = async (req: Request<{}, {}, {}, { trainerId
 	}
 };
 
-export const handleCreateDietPlan = async (req: Request<{}, {}, Omit<DietPlan, 'id' | 'isActive'>>, res: Response) => {
+export const handleCreateDietPlan = async (req: Request<{}, {}, CreateDietPlan>, res: Response) => {
 	try {
 		const { clientId, planName, trainerId, targetCalories, targetProtein, targetCarbs, targetFats, notes } = req.body;
 		if (!clientId || !trainerId) {
@@ -160,11 +187,11 @@ export const handleCreateDietPlan = async (req: Request<{}, {}, Omit<DietPlan, '
 				data: {
 					clientId,
 					trainerId,
-					planName: planName as string,
-					targetCalories: targetCalories as number,
-					targetProtein: targetProtein as number,
-					targetCarbs: targetCarbs as number,
-					targetFats: targetFats as number,
+					planName: planName,
+					targetCalories: targetCalories,
+					targetProtein: targetProtein,
+					targetCarbs: targetCarbs,
+					targetFats: targetFats,
 					notes: notes ?? null,
 				},
 				select: { id: true },
@@ -252,7 +279,7 @@ export const handleDeleteDietPlan = async (req: Request<{ planId: string }>, res
 		}
 		await prisma.dietPlan.update({ where: { id: parsedPlanId }, data: { isActive: false } });
 		res.status(204).send();
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		console.error('Error deleting diet plan:', error);
 		res.status(500).json({ message: 'Internal server error' });
 	}
@@ -278,16 +305,16 @@ export const handleCreateDietLog = async (req: Request<{}, {}, Omit<DietPlanLogE
 				dietPlanId: activeDietPlan.id,
 				clientId,
 				logDate: logDate ? toDateOnly(logDate) : new Date(),
-				calories: calories as number,
-				protein: protein as number,
-				carbs: carbs as number,
-				fats: fats as number,
+				calories: calories,
+				protein: protein,
+				carbs: carbs,
+				fats: fats,
 			},
 			select: { id: true },
 		});
 
 		res.status(201).json({ id: createdLog.id });
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		console.error('Error creating diet log:', error);
 		res.status(500).json({ message: 'Internal server error' });
 	}
@@ -335,7 +362,7 @@ export const handleGetDietLog = async (
 				fats: entry.fats,
 			}))
 		);
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		console.error('Error fetching diet logs:', error);
 		return res.status(500).json({ message: 'Internal server error' });
 	}
@@ -368,7 +395,7 @@ export const handleUpdateDietLog = async (
 		});
 
 		return res.status(200).json({ message: 'Diet log entry updated successfully' });
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		console.error('Error updating diet log:', error);
 		return res.status(500).json({ message: 'Internal server error' });
 	}
@@ -388,7 +415,7 @@ export const handleDeleteDietLog = async (req: Request<{ logId: string }>, res: 
 		await prisma.dietPlanLogEntry.delete({ where: { id: parsedLogId } });
 
 		return res.status(204).send();
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		console.error('Error deleting diet log:', error);
 		return res.status(500).json({ message: 'Internal server error' });
 	}

@@ -10,8 +10,8 @@ import {
 	MicrocycleUpdateRequest,
 	MicrocycleUpdateRoutinesRequest,
 	ResponseWithError,
-	WorkoutRoutine,
 } from '@libre-train/shared';
+import dayjs from 'dayjs';
 import { Request, Response } from 'express';
 import { prisma } from '../../database/mysql-database';
 import { createWorkoutRoutine, deactivateCycleRoutines } from './workout-routine-handlers';
@@ -111,10 +111,12 @@ export const handleGetMacrocycle = async (
 			id: row.id,
 			client_id: row.client_id,
 			cycle_name: row.cycle_name ?? undefined,
-			cycle_start_date: row.cycle_start_date,
-			cycle_end_date: row.cycle_end_date,
-			isActive: row.is_active,
+			cycle_start_date: dayjs(row.cycle_start_date).format('YYYY-MM-DD'),
+			cycle_end_date: dayjs(row.cycle_end_date).format('YYYY-MM-DD'),
+			is_active: row.is_active,
 			notes: row.notes ?? undefined,
+			created_at: dayjs(row.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs(row.updated_at).format('YYYY-MM-DD'),
 		}));
 
 		res.status(200).json(macrocycles);
@@ -137,7 +139,7 @@ export const handleCreateMacrocycle = async (req: Request<{}, {}, Omit<Macrocycl
 			return res.status(400).json({ error: 'Start date must be before end date' });
 		}
 
-		const shouldDeactivateOverlaps = reqBody.isActive === true;
+		const shouldDeactivateOverlaps = reqBody.is_active === true;
 		const newMacrocycle = await prisma.$transaction(async (tx) => {
 			if (shouldDeactivateOverlaps) {
 				await tx.macrocycle.updateMany({
@@ -157,7 +159,7 @@ export const handleCreateMacrocycle = async (req: Request<{}, {}, Omit<Macrocycl
 					cycle_name: reqBody.cycle_name ?? null,
 					cycle_start_date: cycleStartDate,
 					cycle_end_date: cycleEndDate,
-					is_active: reqBody.isActive ?? false,
+					is_active: reqBody.is_active ?? false,
 					notes: reqBody.notes ?? null,
 				},
 				select: { id: true },
@@ -197,12 +199,12 @@ export const handleUpdateMacrocycle = async (req: Request<{ id: string }, {}, Pa
 					...(reqBody.cycle_name !== undefined ? { cycle_name: reqBody.cycle_name ?? null } : {}),
 					...(reqBody.cycle_start_date !== undefined ? { cycle_start_date: nextStartDate } : {}),
 					...(reqBody.cycle_end_date !== undefined ? { cycle_end_date: nextEndDate } : {}),
-					...(reqBody.isActive !== undefined ? { is_active: reqBody.isActive } : {}),
+					...(reqBody.is_active !== undefined ? { is_active: reqBody.is_active } : {}),
 					...(reqBody.notes !== undefined ? { notes: reqBody.notes ?? null } : {}),
 				},
 			});
 
-			if (reqBody.isActive === true) {
+			if (reqBody.is_active === true) {
 				await tx.macrocycle.updateMany({
 					where: {
 						id: { not: macrocycleId },
@@ -276,16 +278,18 @@ export const handleGetMesocycle = async (
 			client_id: row.client_id,
 			cycle_name: row.cycle_name ?? undefined,
 			macrocycle_id: row.macrocycle_id,
-			cycle_start_date: row.cycle_start_date,
-			cycle_end_date: row.cycle_end_date,
-			optLevels: row.opt_levels ? row.opt_levels.split(',').map((level) => parseInt(level, 10)) : undefined,
-			cardioLevels: row.cardio_levels ? row.cardio_levels.split(',').map((level) => parseInt(level, 10)) : undefined,
+			cycle_start_date: dayjs(row.cycle_start_date).format('YYYY-MM-DD'),
+			cycle_end_date: dayjs(row.cycle_end_date).format('YYYY-MM-DD'),
+			opt_levels: row.opt_levels ? row.opt_levels.split(',').map((level) => parseInt(level, 10)) : undefined,
+			cardio_levels: row.cardio_levels ? row.cardio_levels.split(',').map((level) => parseInt(level, 10)) : undefined,
 			notes: row.notes ?? undefined,
-			isActive: row.is_active,
+			is_active: row.is_active,
+			created_at: dayjs(row.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs(row.updated_at).format('YYYY-MM-DD'),
 		}));
 
 		res.status(200).json(mesocycles);
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
@@ -320,7 +324,7 @@ export const handleCreateMesocycle = async (req: Request<{}, {}, Omit<Mesocycle,
 			return res.status(400).json({ error: 'Mesocycle dates must be within macrocycle dates' });
 		}
 
-		const shouldDeactivateOverlaps = reqBody.isActive !== false;
+		const shouldDeactivateOverlaps = reqBody.is_active !== false;
 		const newMesocycle = await prisma.$transaction(async (tx) => {
 			if (shouldDeactivateOverlaps) {
 				await tx.mesocycle.updateMany({
@@ -341,17 +345,17 @@ export const handleCreateMesocycle = async (req: Request<{}, {}, Omit<Mesocycle,
 					macrocycle_id: reqBody.macrocycle_id,
 					cycle_start_date: cycleStartDate,
 					cycle_end_date: cycleEndDate,
-					opt_levels: reqBody.optLevels ? reqBody.optLevels.join(',') : null,
-					cardio_levels: reqBody.cardioLevels ? reqBody.cardioLevels.join(',') : null,
+					opt_levels: reqBody.opt_levels ? reqBody.opt_levels.join(',') : null,
+					cardio_levels: reqBody.cardio_levels ? reqBody.cardio_levels.join(',') : null,
 					notes: reqBody.notes ?? null,
-					is_active: reqBody.isActive ?? true,
+					is_active: reqBody.is_active ?? true,
 				},
 				select: { id: true },
 			});
 		});
 
 		res.status(201).json({ mesocycleId: newMesocycle.id });
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
@@ -404,18 +408,18 @@ export const handleUpdateMesocycle = async (req: Request<{ id: string }, {}, Mes
 					...(reqBody.cycle_name !== undefined ? { cycle_name: reqBody.cycle_name ?? null } : {}),
 					...(reqBody.cycle_start_date !== undefined ? { cycle_start_date: nextStartDate } : {}),
 					...(reqBody.cycle_end_date !== undefined ? { cycle_end_date: nextEndDate } : {}),
-					...(reqBody.optLevels !== undefined
-						? { opt_levels: reqBody.optLevels ? reqBody.optLevels.join(',') : null }
+					...(reqBody.opt_levels !== undefined
+						? { opt_levels: reqBody.opt_levels ? reqBody.opt_levels.join(',') : null }
 						: {}),
-					...(reqBody.cardioLevels !== undefined
-						? { cardio_levels: reqBody.cardioLevels ? reqBody.cardioLevels.join(',') : null }
+					...(reqBody.cardio_levels !== undefined
+						? { cardio_levels: reqBody.cardio_levels ? reqBody.cardio_levels.join(',') : null }
 						: {}),
 					...(reqBody.notes !== undefined ? { notes: reqBody.notes ?? null } : {}),
-					...(reqBody.isActive !== undefined ? { is_active: reqBody.isActive } : {}),
+					...(reqBody.is_active !== undefined ? { is_active: reqBody.is_active } : {}),
 				},
 			});
 
-			if (reqBody.isActive === true) {
+			if (reqBody.is_active === true) {
 				await tx.mesocycle.updateMany({
 					where: {
 						id: { not: mesocycleId },
@@ -430,7 +434,7 @@ export const handleUpdateMesocycle = async (req: Request<{ id: string }, {}, Mes
 		});
 
 		res.status(204).send();
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
@@ -489,14 +493,16 @@ export const handleGetMicrocycle = async (req: Request<{ id: string }, {}, {}, M
 			client_id: row.client_id,
 			mesocycle_id: row.mesocycle_id,
 			cycle_name: row.cycle_name ?? undefined,
-			cycle_start_date: row.cycle_start_date,
-			cycle_end_date: row.cycle_end_date,
+			cycle_start_date: dayjs(row.cycle_start_date).format('YYYY-MM-DD'),
+			cycle_end_date: dayjs(row.cycle_end_date).format('YYYY-MM-DD'),
 			notes: row.notes ?? undefined,
-			isActive: row.is_active,
+			is_active: row.is_active,
+			created_at: dayjs(row.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs(row.updated_at).format('YYYY-MM-DD'),
 		}));
 
 		res.status(200).json(microcycles);
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
@@ -531,7 +537,7 @@ export const handleCreateMicrocycle = async (req: Request<{}, {}, Omit<Microcycl
 			return res.status(400).json({ error: 'Microcycle dates must be within mesocycle dates' });
 		}
 
-		const shouldDeactivateOverlaps = reqBody.isActive !== false;
+		const shouldDeactivateOverlaps = reqBody.is_active !== false;
 		const newMicrocycle = await prisma.$transaction(async (tx) => {
 			if (shouldDeactivateOverlaps) {
 				await tx.microcycle.updateMany({
@@ -553,14 +559,14 @@ export const handleCreateMicrocycle = async (req: Request<{}, {}, Omit<Microcycl
 					cycle_start_date: cycleStartDate,
 					cycle_end_date: cycleEndDate,
 					notes: reqBody.notes ?? null,
-					is_active: reqBody.isActive ?? true,
+					is_active: reqBody.is_active ?? true,
 				},
 				select: { id: true },
 			});
 		});
 
 		res.status(201).json({ microcycleId: newMicrocycle.id });
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
@@ -614,11 +620,11 @@ export const handleUpdateMicrocycle = async (req: Request<{ id: string }, {}, Mi
 					...(reqBody.cycle_start_date !== undefined ? { cycle_start_date: nextStartDate } : {}),
 					...(reqBody.cycle_end_date !== undefined ? { cycle_end_date: nextEndDate } : {}),
 					...(reqBody.notes !== undefined ? { notes: reqBody.notes ?? null } : {}),
-					...(reqBody.isActive !== undefined ? { is_active: reqBody.isActive } : {}),
+					...(reqBody.is_active !== undefined ? { is_active: reqBody.is_active } : {}),
 				},
 			});
 
-			if (reqBody.isActive === true) {
+			if (reqBody.is_active === true) {
 				await tx.microcycle.updateMany({
 					where: {
 						id: { not: microcycleId },
@@ -633,7 +639,7 @@ export const handleUpdateMicrocycle = async (req: Request<{ id: string }, {}, Mi
 		});
 
 		res.status(204).send();
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
@@ -655,7 +661,7 @@ export const handleUpdateMicrocycleRoutines = async (
 
 		const reqBody = req.body;
 
-		const createRoutineBodies: Omit<WorkoutRoutine, 'id'>[] = reqBody.routines.map((routine, index) => ({
+		const createRoutineBodies = reqBody.routines.map((routine, index) => ({
 			microcycle_id: microcycleId,
 			routine_index: index,
 			routine_name: routine.routine_name,
@@ -673,7 +679,7 @@ export const handleUpdateMicrocycleRoutines = async (
 		}
 
 		res.status(204).send();
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;
@@ -692,7 +698,7 @@ export const handleDeleteMicrocycle = async (req: Request<{ id: string }>, res: 
 
 		await prisma.microcycle.delete({ where: { id: microcycleId } });
 		res.status(200).json({ message: 'Microcycle deleted successfully' });
-	} catch (error: Error | unknown) {
+	} catch (error: unknown) {
 		let errorMessage = 'Internal server error';
 		if (error instanceof Error) {
 			errorMessage = error.message;

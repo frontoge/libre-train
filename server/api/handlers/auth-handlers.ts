@@ -40,7 +40,7 @@ export const passwordValidators = [
 	body('username').trim().notEmpty().withMessage('Username is required'),
 ];
 
-export const handleAuthLogin = async (req: Request, res: Response) => {
+export const handleAuthLogin = async (req: Request<{}, {}, { username: string; password: string }>, res: Response) => {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
@@ -82,8 +82,8 @@ export const handleAuthLogin = async (req: Request, res: Response) => {
 	}
 };
 
-export const handleAuthRefresh = async (req: Request, res: Response) => {
-	const refreshToken = req.cookies?.refreshToken;
+export const handleAuthRefresh = (req: Request, res: Response) => {
+	const refreshToken = req.cookies?.refreshToken as string | undefined;
 
 	if (!refreshToken) {
 		return res.status(401).json({ message: 'Refresh token missing' });
@@ -92,17 +92,20 @@ export const handleAuthRefresh = async (req: Request, res: Response) => {
 	try {
 		const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!);
 
+		// This is causing collision with TS sub function, which is deprecated. JWT sub is not.
+		// eslint-disable-next-line
 		const newAccessToken = jwt.sign({ sub: payload.sub }, process.env.JWT_SECRET!, { expiresIn: '2h' });
 
+		// eslint-disable-next-line
 		return res.status(200).json({ accessToken: newAccessToken, user: payload.sub });
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	} catch (error) {
+		console.log('Error verifying refresh token:', error);
 		res.clearCookie('refreshToken');
 		return res.status(401).json({ message: 'Invalid refresh token' });
 	}
 };
 
-export const handleAuthSignup = async (req: Request, res: Response) => {
+export const handleAuthSignup = async (req: Request<{}, {}, { username: string; password: string }>, res: Response) => {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		return res.status(400).json({ errors: errors.array() });
@@ -163,7 +166,7 @@ export const handleAuthSignup = async (req: Request, res: Response) => {
 	}
 };
 
-export const handleAuthLogout = async (req: Request, res: Response) => {
+export const handleAuthLogout = (req: Request, res: Response) => {
 	res.clearCookie('refreshToken');
 	return res.status(200).json({ message: 'Logged out successfully' });
 };

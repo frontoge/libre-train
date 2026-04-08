@@ -5,8 +5,8 @@
 		"target": "ESNext",
 		"module": "ESNext",
 		"moduleDetection": "force",
-		"jsx": "react-jsx",
 		"allowJs": true,
+		"noImplicitAny": true,
 
 		// Bundler mode
 		"moduleResolution": "bundler",
@@ -16,5 +16,7 @@
 		// Best practices
 		"strict": true,
 		"esModuleInterop": true
-	}
+	},
+	"include": ["**/*.ts"],
+	"exclude": ["node_modules", "dist"]
 }

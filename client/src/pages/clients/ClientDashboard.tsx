@@ -18,7 +18,7 @@ export function ClientDashboard() {
 
 	const clientId = id ? parseInt(id, 10) : undefined;
 
-	const selectedClient = useMemo(() => state.clients.find((client) => client.id === clientId), [state.clients, id]);
+	const selectedClient = useMemo(() => state.clients.find((client) => client.ClientId === clientId), [state.clients, id]);
 
 	useEffect(() => {
 		const fetchDashboardData = async () => {
@@ -34,7 +34,7 @@ export function ClientDashboard() {
 					},
 				};
 				const response = await fetch(
-					`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard?clientId=${selectedClient.id}&date=${dashboardState.selectedDate.format('YYYY-MM-DD')}`,
+					`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard?clientId=${selectedClient.ClientId}&date=${dashboardState.selectedDate.format('YYYY-MM-DD')}`,
 					requestOptions
 				);
 				const data = await response.json();

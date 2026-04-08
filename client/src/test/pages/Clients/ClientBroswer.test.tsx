@@ -17,9 +17,9 @@ vi.mock('react-router-dom', async () => {
 });
 
 const makeClient = (overrides: Partial<ClientContact>): ClientContact => ({
-	id: 1,
-	created_at: new Date('2025-01-01'),
-	updated_at: new Date('2025-01-01'),
+	ClientId: 1,
+	ContactId: 10,
+	trainerId: 1,
 	first_name: 'Default',
 	last_name: 'Client',
 	date_of_birth: '1990-01-01',
@@ -28,20 +28,23 @@ const makeClient = (overrides: Partial<ClientContact>): ClientContact => ({
 	notes: '',
 	email: 'default@example.com',
 	phone: '111-1111',
-	contact_id: 10,
 	...overrides,
 });
 
 const defaultClients: ClientContact[] = [
 	makeClient({
-		id: 101,
+		ClientId: 101,
+		ContactId: 1010,
+		trainerId: 1,
 		first_name: 'Alice',
 		last_name: 'Anderson',
 		email: 'alice@example.com',
 		phone: '555-1111',
 	}),
 	makeClient({
-		id: 202,
+		ClientId: 202,
+		ContactId: 2020,
+		trainerId: 1,
 		first_name: 'Bob',
 		last_name: 'Baker',
 		email: 'bob@example.com',

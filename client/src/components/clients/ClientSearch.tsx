@@ -30,18 +30,18 @@ export function ClientSearch(props: ClientSearchProps) {
 					|| stringSimilarity(search, formatClientFullName(client.first_name, client.last_name)) > 0.2
 			)
 			.map((client) => ({
-				key: client.id.toString(),
+				key: client.ClientId.toString(),
 				label: formatClientFullName(client.first_name, client.last_name),
-				value: client.id.toString(),
+				value: client.ClientId.toString(),
 			}));
 	}
 
 	const initialOptions = useMemo(
 		() =>
 			clients.map((client) => ({
-				key: client.id.toString(),
+				key: client.ClientId.toString(),
 				label: formatClientFullName(client.first_name, client.last_name),
-				value: client.id.toString(),
+				value: client.ClientId.toString(),
 			})),
 		[clients]
 	);

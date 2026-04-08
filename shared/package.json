@@ -12,12 +12,14 @@
 		}
 	},
 	"scripts": {
-		"types:sync:prisma": "bun --cwd .. run types:sync:prisma",
 		"build": "tsc",
 		"clean": "rimraf dist",
 		"clean:all": "rimraf dist node_modules",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix"
+	},
+	"dependencies": {
+		"@libre-train/db": "workspace:*"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.39.3",

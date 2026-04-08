@@ -1,6 +1,5 @@
 import type { PlannedExercise, PlannedExerciseGroup } from '@libre-train/shared';
-import { useContext, useState } from 'react';
-import { AppContext } from '../../app-context';
+import { useState } from 'react';
 import { timeStringToSeconds } from '../../helpers/date-helpers';
 import { getExerciseFormValuesFromNode, getGroupFormValuesFromNode } from '../../helpers/routine-helpers';
 import {
@@ -21,9 +20,6 @@ export interface RoutineEditorProps extends React.HTMLAttributes<HTMLDivElement>
 
 export function RoutineEditor(props: RoutineEditorProps) {
 	const { routine: routine, onRoutineChange, ...divProps } = props;
-	const {
-		state: { exerciseData },
-	} = useContext(AppContext);
 	const [selectedNode, setSelectedNode] = useState<WorkoutRoutineTreeNode | undefined>(undefined);
 
 	const handleEditRoutine = (updatedGroups: PlannedExerciseGroup[]) => {
@@ -37,21 +33,24 @@ export function RoutineEditor(props: RoutineEditorProps) {
 		if (selectedNode === undefined) {
 			// Adding new exercise
 			const newExercise: PlannedExercise = {
+				id: Date.now(), // Temporary ID, should be replaced with proper ID from backend
 				exercise_id: values.exercise_id,
-				exerciseName: exerciseData?.find((ex) => ex.id === values.exercise_id)?.exercise_name || '',
 				repetitions: values.repetitions,
-				sets: values.sets,
-				weight: values.weight,
-				duration: values.duration ? timeStringToSeconds(values.duration) : undefined,
-				distance: values.distance,
+				exercise_sets: values.sets,
+				exercise_weight: values.weight,
+				exercise_duration: values.duration ? timeStringToSeconds(values.duration) : undefined,
+				exercise_distance: values.distance,
 				target_heart_rate: values.target_heart_rate,
 				pace: values.pace,
 				rpe: values.rpe,
 				target_calories: values.target_calories,
 				target_mets: values.target_mets,
+				created_at: new Date().toISOString(),
+				updated_at: new Date().toISOString(),
 			};
 
 			const newGroup: PlannedExerciseGroup = {
+				id: Date.now(), // Temporary ID, should be replaced with proper ID from backend
 				routine_category: values.category,
 				rest_after: values.rest_after,
 				exercises: [newExercise],
@@ -67,18 +66,20 @@ export function RoutineEditor(props: RoutineEditorProps) {
 				const nodePos = selectedNode.key.toString().split('-').map(Number);
 				const nodeDepth = nodePos.length;
 				const updatedExercise: PlannedExercise = {
+					id: Date.now(),
 					exercise_id: values.exercise_id,
-					exerciseName: exerciseData?.find((ex) => ex.id === values.exercise_id)?.exercise_name || '',
 					repetitions: values.repetitions,
-					sets: values.sets,
-					weight: values.weight,
-					duration: values.duration ? timeStringToSeconds(values.duration) : undefined,
-					distance: values.distance,
+					exercise_sets: values.sets,
+					exercise_weight: values.weight,
+					exercise_duration: values.duration ? timeStringToSeconds(values.duration) : undefined,
+					exercise_distance: values.distance,
 					target_heart_rate: values.target_heart_rate,
 					pace: values.pace,
 					rpe: values.rpe,
 					target_calories: values.target_calories,
 					target_mets: values.target_mets,
+					created_at: new Date().toISOString(),
+					updated_at: new Date().toISOString(),
 				};
 
 				const updatedRoutine = { ...routine };

@@ -1,13 +1,15 @@
 import type { Request, Response } from 'express';
-import type { Connection } from 'mysql2/promise';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleGetDietLogTodos } from '../../api/handlers/diet-handlers';
-import { closeDatabaseConnection, getDatabaseConnection } from '../../database/mysql-database';
+import { prisma } from '../../database/mysql-database';
 
-// Mock the DB module so no real connection is made
-vi.mock('../../infrastructure/mysql-database', () => ({
-	getDatabaseConnection: vi.fn(),
-	closeDatabaseConnection: vi.fn(),
+// Mock the DB module so no real database call is made
+vi.mock('../../database/mysql-database', () => ({
+	prisma: {
+		client: {
+			findMany: vi.fn(),
+		},
+	},
 }));
 
 function createMockResponse() {
@@ -22,20 +24,12 @@ function createMockRequest(query: Record<string, string> = {}): Request<{}, {}, 
 	return { query } as unknown as Request<{}, {}, {}, { trainerId?: string }>;
 }
 
-function createMockConnection(rows: object[][] = [[]]) {
-	return {
-		query: vi.fn().mockResolvedValue([rows]),
-	} as unknown as Connection;
-}
-
 describe('handleGetDietLogTodos', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
 	it('returns 400 when trainerId query param is missing', async () => {
-		vi.mocked(getDatabaseConnection).mockResolvedValue(createMockConnection());
-
 		const req = createMockRequest();
 		const res = createMockResponse();
 
@@ -48,7 +42,6 @@ describe('handleGetDietLogTodos', () => {
 	it('returns 400 when trainerId is not a positive integer', async () => {
 		for (const invalid of ['0', '-5', 'abc', '1.5']) {
 			vi.clearAllMocks();
-			vi.mocked(getDatabaseConnection).mockResolvedValue(createMockConnection());
 
 			const req = createMockRequest({ trainerId: invalid });
 			const res = createMockResponse();
@@ -61,37 +54,71 @@ describe('handleGetDietLogTodos', () => {
 	});
 
 	it('returns mapped ClientDietLogTodo array on success', async () => {
-		const dbRows = [
+		vi.mocked(prisma.client.findMany).mockResolvedValue([
 			{
-				ClientId: 1,
-				first_name: 'Ada',
-				last_name: 'Lovelace',
-				email: 'ada@example.com',
-				phone: '555-0001',
+				id: 1,
 				trainerId: 10,
-				lastLogDate: '2026-04-05',
+				Contact: {
+					first_name: 'Ada',
+					last_name: 'Lovelace',
+					email: 'ada@example.com',
+					phone: '555-0001',
+				},
+				DietPlanLogEntry: [{ logDate: new Date('2026-04-05T00:00:00.000Z') }],
 			},
 			{
-				ClientId: 2,
-				first_name: 'Grace',
-				last_name: 'Hopper',
-				email: 'grace@example.com',
-				phone: '555-0002',
+				id: 2,
 				trainerId: 10,
-				lastLogDate: '2026-04-03',
+				Contact: {
+					first_name: 'Grace',
+					last_name: 'Hopper',
+					email: 'grace@example.com',
+					phone: '555-0002',
+				},
+				DietPlanLogEntry: [{ logDate: new Date('2026-04-03T00:00:00.000Z') }],
 			},
-		];
-		const mockConnection = createMockConnection([dbRows]);
-		vi.mocked(getDatabaseConnection).mockResolvedValue(mockConnection);
+		] as never);
 
 		const req = createMockRequest({ trainerId: '10' });
 		const res = createMockResponse();
 
 		await handleGetDietLogTodos(req, res);
 
-		expect(mockConnection.query).toHaveBeenCalledWith({
-			sql: 'CALL spGetDietLogTodosByTrainer(?)',
-			values: [10],
+		const expectedToday = new Date();
+		expectedToday.setHours(0, 0, 0, 0);
+
+		expect(prisma.client.findMany).toHaveBeenCalledWith({
+			where: {
+				trainerId: 10,
+				DietPlan: { some: { isActive: true } },
+				NOT: {
+					DietPlan: {
+						some: {
+							isActive: true,
+							DietPlanLogEntry: {
+								some: { logDate: expectedToday },
+							},
+						},
+					},
+				},
+			},
+			select: {
+				id: true,
+				trainerId: true,
+				Contact: {
+					select: {
+						first_name: true,
+						last_name: true,
+						email: true,
+						phone: true,
+					},
+				},
+				DietPlanLogEntry: {
+					orderBy: { logDate: 'desc' },
+					take: 1,
+					select: { logDate: true },
+				},
+			},
 		});
 		expect(res.json).toHaveBeenCalledWith([
 			{
@@ -113,23 +140,22 @@ describe('handleGetDietLogTodos', () => {
 				lastLogDate: '2026-04-03',
 			},
 		]);
-		expect(closeDatabaseConnection).toHaveBeenCalledWith(mockConnection);
 	});
 
 	it('maps null lastLogDate to undefined', async () => {
-		const dbRows = [
+		vi.mocked(prisma.client.findMany).mockResolvedValue([
 			{
-				ClientId: 3,
-				first_name: 'Alan',
-				last_name: 'Turing',
-				email: 'alan@example.com',
-				phone: '555-0003',
+				id: 3,
 				trainerId: 10,
-				lastLogDate: null,
+				Contact: {
+					first_name: 'Alan',
+					last_name: 'Turing',
+					email: 'alan@example.com',
+					phone: '555-0003',
+				},
+				DietPlanLogEntry: [],
 			},
-		];
-		const mockConnection = createMockConnection([dbRows]);
-		vi.mocked(getDatabaseConnection).mockResolvedValue(mockConnection);
+		] as never);
 
 		const req = createMockRequest({ trainerId: '10' });
 		const res = createMockResponse();
@@ -150,8 +176,7 @@ describe('handleGetDietLogTodos', () => {
 	});
 
 	it('returns an empty array when no clients are returned from DB', async () => {
-		const mockConnection = createMockConnection([[]]);
-		vi.mocked(getDatabaseConnection).mockResolvedValue(mockConnection);
+		vi.mocked(prisma.client.findMany).mockResolvedValue([] as never);
 
 		const req = createMockRequest({ trainerId: '10' });
 		const res = createMockResponse();
@@ -162,10 +187,7 @@ describe('handleGetDietLogTodos', () => {
 	});
 
 	it('returns 500 when the database query throws', async () => {
-		const mockConnection = {
-			query: vi.fn().mockRejectedValue(new Error('DB connection failed')),
-		} as unknown as Connection;
-		vi.mocked(getDatabaseConnection).mockResolvedValue(mockConnection);
+		vi.mocked(prisma.client.findMany).mockRejectedValue(new Error('DB connection failed'));
 
 		const req = createMockRequest({ trainerId: '10' });
 		const res = createMockResponse();
@@ -174,18 +196,14 @@ describe('handleGetDietLogTodos', () => {
 
 		expect(res.status).toHaveBeenCalledWith(500);
 		expect(res.json).toHaveBeenCalledWith({ message: 'Internal server error' });
-		expect(closeDatabaseConnection).toHaveBeenCalledWith(mockConnection);
 	});
 
-	it('closes the DB connection even when validation returns early', async () => {
-		const mockConnection = createMockConnection();
-		vi.mocked(getDatabaseConnection).mockResolvedValue(mockConnection);
-
+	it('does not query prisma when validation returns early', async () => {
 		const req = createMockRequest(); // missing trainerId
 		const res = createMockResponse();
 
 		await handleGetDietLogTodos(req, res);
 
-		expect(closeDatabaseConnection).toHaveBeenCalledWith(mockConnection);
+		expect(prisma.client.findMany).not.toHaveBeenCalled();
 	});
 });

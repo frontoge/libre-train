@@ -1,0 +1,38 @@
+{
+	"name": "@libre-train/db",
+	"module": "index.ts",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"clean": "rimraf generated",
+		"clean:all": "rimraf generated node_modules",
+		"db:push": "prisma db push",
+		"db:generate": "rimraf generated && prisma generate",
+		"db:migrate": "prisma migrate dev",
+		"db:migrate:deploy": "prisma migrate deploy",
+		"db:migrate:reset": "prisma migrate reset"
+	},
+	"exports": {
+		"./client": {
+			"types": "./generated/prisma/client.ts",
+			"default": "./generated/prisma/client.ts"
+		},
+		"./zod": {
+			"types": "./generated/zod/schemas/models/index.ts",
+			"default": "./generated/zod/schemas/models/index.ts"
+		}
+	},
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^6.0.2"
+	},
+	"dependencies": {
+		"@prisma/client": "^7.7.0",
+		"decimal.js": "^10.6.0",
+		"prisma": "^7.7.0",
+		"prisma-zod-generator": "^2.1.4",
+		"zod": "^4.3.6"
+	}
+}

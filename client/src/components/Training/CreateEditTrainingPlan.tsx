@@ -2,7 +2,6 @@ import { TrainingCycleType } from '@libre-train/shared';
 import { Button, Checkbox, DatePicker, Form, Input, Select } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import { useEffect, useState } from 'react';
-import { stringFormatDate } from '../../helpers/date-helpers';
 import { cycleTypeOptions } from '../../helpers/enum-select-options';
 import { fetchClientMacrocycles, fetchClientMesocycles } from '../../helpers/training-helpers';
 import { ClientSearch } from '../clients/ClientSearch';
@@ -27,8 +26,8 @@ export type CreateEditTrainingPlanFormValues = {
 type ParentCycle = {
 	id: number;
 	cycle_name?: string;
-	cycle_start_date: Date;
-	cycle_end_date: Date;
+	cycle_start_date: string;
+	cycle_end_date: string;
 	isActive: boolean;
 };
 
@@ -49,9 +48,7 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
 
 	const parentCycleOptions = parentCycles.map((cycle) => ({
 		label:
-			(cycle.cycle_name
-				? cycle.cycle_name
-				: `${stringFormatDate(cycle.cycle_start_date)} - ${stringFormatDate(cycle.cycle_end_date)}`)
+			(cycle.cycle_name ? cycle.cycle_name : `${cycle.cycle_start_date} - ${cycle.cycle_end_date}`)
 			+ (!cycle.isActive ? '*' : ''),
 		value: cycle.id,
 	}));
@@ -74,7 +71,7 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
 				cycle_name: cycle.cycle_name,
 				cycle_start_date: cycle.cycle_start_date,
 				cycle_end_date: cycle.cycle_end_date,
-				isActive: cycle.isActive,
+				isActive: cycle.is_active,
 			}));
 			setParentCycles(options);
 		} else if (selectedCycleType === TrainingCycleType.Microcycle) {
@@ -85,7 +82,7 @@ export function CreateEditTrainingPlan(props: CreateEditTrainingPlanProps) {
 				cycle_name: cycle.cycle_name,
 				cycle_start_date: cycle.cycle_start_date,
 				cycle_end_date: cycle.cycle_end_date,
-				isActive: cycle.isActive,
+				isActive: cycle.is_active,
 			}));
 			setParentCycles(options);
 		}

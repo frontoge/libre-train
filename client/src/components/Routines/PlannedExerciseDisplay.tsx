@@ -1,4 +1,6 @@
 import type { PlannedExercise } from '@libre-train/shared';
+import { useContext, useMemo } from 'react';
+import { AppContext } from '../../app-context';
 
 export interface PlannedExerciseProps {
 	exercise: PlannedExercise;
@@ -7,14 +9,21 @@ export interface PlannedExerciseProps {
 
 export function PlannedExerciseDisplay(props: PlannedExerciseProps) {
 	const plannedExercise = props.exercise;
+	const {
+		state: { exerciseData },
+	} = useContext(AppContext);
+
+	const exerciseInfo = useMemo(() => {
+		return exerciseData?.find((ex) => ex.id === plannedExercise.exercise_id);
+	}, [props.exercise, exerciseData]);
 
 	const variableStrings: string[] = [];
 
 	const volumeParts = [
-		plannedExercise.sets ? `${plannedExercise.sets}x` : '',
+		plannedExercise.exercise_sets ? `${plannedExercise.exercise_sets}x` : '',
 		plannedExercise.repetitions ?? '',
-		plannedExercise.duration ? `${plannedExercise.duration}s` : '',
-		plannedExercise.distance ? `${plannedExercise.distance}m` : '',
+		plannedExercise.exercise_duration ? `${plannedExercise.exercise_duration}s` : '',
+		plannedExercise.exercise_distance ? `${plannedExercise.exercise_distance}m` : '',
 		plannedExercise.target_calories ? `${plannedExercise.target_calories}kcal` : '',
 		plannedExercise.target_mets ? `${plannedExercise.target_mets}METs` : '',
 	]
@@ -24,7 +33,7 @@ export function PlannedExerciseDisplay(props: PlannedExerciseProps) {
 	if (volumeParts) variableStrings.push(volumeParts);
 
 	const intensityParts = [
-		plannedExercise.weight ? `${plannedExercise.weight}lbs` : '',
+		plannedExercise.exercise_weight ? `${plannedExercise.exercise_weight}lbs` : '',
 		plannedExercise.rpe ? `RPE ${plannedExercise.rpe}` : '',
 		plannedExercise.target_heart_rate ? `${plannedExercise.target_heart_rate}bpm` : '',
 	]
@@ -37,7 +46,7 @@ export function PlannedExerciseDisplay(props: PlannedExerciseProps) {
 
 	if (props.restAfter) variableStrings.push(`Rest ${props.restAfter}s`);
 
-	const displayString = `${plannedExercise.exerciseName ? plannedExercise.exerciseName : 'Unknown Exercise'}${variableStrings.length ? ' - ' : ''}${variableStrings.join(', ')}`;
+	const displayString = `${exerciseInfo ? exerciseInfo.exercise_name : 'Unknown Exercise'}${variableStrings.length ? ' - ' : ''}${variableStrings.join(', ')}`;
 
 	return <div>{displayString}</div>;
 }

@@ -1,25 +1,23 @@
 import {
 	AddClientFormValues,
-	Client,
 	ClientContact,
 	DailyUpdateRequest,
 	DashboardData,
 	DashboardResponse,
 	DashboardSummaryQuery,
 	DashboardWeeklySummaryResponse,
+	undefinedIfNull,
 	UpdateClientRequest,
 } from '@libre-train/shared';
+import dayjs from 'dayjs';
 import { Request, Response } from 'express';
 import { prisma } from '../../database/mysql-database';
-
-type MessageResponse = { message: string };
+import { MessageResponse } from '../../types/utilities';
 
 const numberOrUndefined = (value: unknown): number | undefined => {
 	if (value === null || value === undefined) return undefined;
 	if (typeof value === 'number') return value;
-	if (typeof value === 'object' && 'toNumber' in value && typeof value.toNumber === 'function') {
-		return value.toNumber();
-	}
+
 	const parsed = Number(value);
 	return Number.isNaN(parsed) ? undefined : parsed;
 };
@@ -40,7 +38,16 @@ export const handleGetClientContacts = async (
 				})
 			: await prisma.clientContact.findMany({ orderBy: { ClientId: 'asc' } });
 
-		res.status(200).json(contacts);
+		const mappedContacts: ClientContact[] = contacts.map((contact) => ({
+			...contact,
+			height: undefinedIfNull(contact.height),
+			phone: undefinedIfNull(contact.phone),
+			img: undefinedIfNull(contact.img),
+			notes: undefinedIfNull(contact.notes),
+			date_of_birth: contact.date_of_birth ? dayjs(contact.date_of_birth).format('YYYY-MM-DD') : undefined,
+		}));
+
+		res.status(200).json(mappedContacts);
 	} catch (error) {
 		if (error instanceof Error) {
 			console.error('Error fetching client contacts:', error.message);
@@ -48,42 +55,6 @@ export const handleGetClientContacts = async (
 			return;
 		}
 		console.error('Unexpected error fetching client contacts:', error);
-		res.status(500).json({ message: 'An unexpected error occurred.' });
-	}
-};
-
-/**
- * @deprecated - This endpoint is no longer used in the client application, but is left here for potential future use if needed.
- * @param req
- * @param res
- * @returns
- */
-export const handleGetClients = async (req: Request, res: Response<Client[] | MessageResponse>) => {
-	try {
-		const clients = await prisma.client.findMany({
-			include: { Contact: true },
-		});
-
-		const mappedClients: Client[] = clients.map((row) => ({
-			id: row.id,
-			first_name: row.Contact?.first_name ?? '',
-			last_name: row.Contact?.last_name ?? '',
-			email: row.Contact?.email ?? '',
-			phone: row.Contact?.phone ?? undefined,
-			height: row.height ?? undefined,
-			img: row.Contact?.img ?? undefined,
-			age: undefined,
-			notes: row.notes ?? undefined,
-			created_at: row.created_at,
-			updated_at: row.updated_at,
-		}));
-
-		res.json(mappedClients);
-	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({ message: error.message });
-			return;
-		}
 		res.status(500).json({ message: 'An unexpected error occurred.' });
 	}
 };
@@ -368,11 +339,11 @@ export const handleDeleteClient = async (req: Request<{ id: string }>, res: Resp
 
 export const handleUpdateClient = async (
 	req: Request<{ id: string }, {}, UpdateClientRequest>,
-	res: Response<void | MessageResponse>
+	res: Response<undefined | MessageResponse>
 ) => {
 	try {
 		const { id } = req.params;
-		const { height, notes, trainer_id } = req.body;
+		const { height, notes, trainerId } = req.body;
 
 		if (id === undefined) {
 			res.status(400).json({ message: 'Client ID is required.' });
@@ -384,7 +355,7 @@ export const handleUpdateClient = async (
 			data: {
 				height: height ?? undefined,
 				notes: notes ?? undefined,
-				trainerId: trainer_id ?? undefined,
+				trainerId: trainerId ?? undefined,
 			},
 		});
 

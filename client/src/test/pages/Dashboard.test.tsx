@@ -47,9 +47,9 @@ const mockMissingPlans: TrainingPlanStatus[] = [
 ];
 
 const makeClient = (overrides: Partial<ClientContact>): ClientContact => ({
-	id: 1,
-	created_at: new Date('2026-03-01'),
-	updated_at: new Date('2026-03-01'),
+	ClientId: 1,
+	ContactId: 1,
+	trainerId: 1,
 	first_name: 'Default',
 	last_name: 'Client',
 	date_of_birth: '1990-01-01',
@@ -58,32 +58,47 @@ const makeClient = (overrides: Partial<ClientContact>): ClientContact => ({
 	notes: '',
 	email: 'default@example.com',
 	phone: '111-1111',
-	contact_id: 1,
 	...overrides,
 });
 
 const defaultClients: ClientContact[] = [
 	makeClient({
-		id: 101,
+		ClientId: 101,
+		ContactId: 1001,
+		trainerId: 1,
 		first_name: 'Alice',
 		last_name: 'Anderson',
 		email: 'alice@example.com',
-		created_at: new Date('2026-03-04'),
 	}),
 	makeClient({
-		id: 202,
+		ClientId: 202,
+		ContactId: 2001,
+		trainerId: 1,
 		first_name: 'Bob',
 		last_name: 'Baker',
 		email: undefined,
-		created_at: new Date('2026-03-03'),
 	}),
 ];
 
 const createState = (overrides?: Partial<AppState>): AppState => ({
 	clients: defaultClients,
 	assessmentTypes: [
-		{ id: 1, name: 'Body Fat %', assessmentUnit: '%', assessmentGroupId: 1 },
-		{ id: 2, name: 'Resting Heart Rate', assessmentUnit: 'bpm', assessmentGroupId: 3 },
+		{
+			id: 1,
+			name: 'Body Fat %',
+			assessmentUnit: '%',
+			assessmentGroupId: 1,
+			created_at: '2026-03-01 00:00:00',
+			updated_at: '2026-03-01 00:00:00',
+		},
+		{
+			id: 2,
+			name: 'Resting Heart Rate',
+			assessmentUnit: 'bpm',
+			assessmentGroupId: 3,
+			created_at: '2026-03-01 00:00:00',
+			updated_at: '2026-03-01 00:00:00',
+		},
 	],
 	exerciseData: [
 		{
@@ -91,12 +106,16 @@ const createState = (overrides?: Partial<AppState>): AppState => ({
 			exercise_name: 'Goblet Squat',
 			muscle_groups: [],
 			progression_level: 1,
+			created_at: '2026-03-01 00:00:00',
+			updated_at: '2026-03-01 00:00:00',
 		},
 		{
 			id: 2,
 			exercise_name: 'Push-Up',
 			muscle_groups: [],
 			progression_level: 1,
+			created_at: '2026-03-01 00:00:00',
+			updated_at: '2026-03-01 00:00:00',
 		},
 	],
 	showMessage: vi.fn(),

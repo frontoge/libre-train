@@ -1,4 +1,6 @@
-import { Contact, ResponseWithError, UpdateContactRequest } from '@libre-train/shared';
+import { Prisma } from '@libre-train/db/client';
+import { Contact, CreateContactRequest, ResponseWithError, UpdateContactRequest } from '@libre-train/shared';
+import dayjs from 'dayjs';
 import { Request, Response } from 'express';
 import { prisma } from '../../database/mysql-database';
 
@@ -14,6 +16,8 @@ export const handleGetContacts = async (req: Request, res: Response<ResponseWith
 			phone: row.phone ?? undefined,
 			img: row.img ?? undefined,
 			date_of_birth: row.date_of_birth ? row.date_of_birth.toISOString().split('T')[0] : undefined,
+			created_at: dayjs(row.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs(row.updated_at).format('YYYY-MM-DD'),
 		}));
 
 		res.json(contacts);
@@ -42,7 +46,9 @@ export const handleGetContactById = async (req: Request<{ id: string }>, res: Re
 			email: row.email,
 			phone: row.phone ?? undefined,
 			img: row.img ?? undefined,
-			date_of_birth: row.date_of_birth ? row.date_of_birth.toISOString().split('T')[0] : undefined,
+			date_of_birth: row.date_of_birth ? dayjs(row.date_of_birth).format('YYYY-MM-DD') : undefined,
+			created_at: dayjs(row.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs(row.updated_at).format('YYYY-MM-DD'),
 		};
 
 		res.json(contact);
@@ -54,20 +60,22 @@ export const handleGetContactById = async (req: Request<{ id: string }>, res: Re
 };
 
 export const handleCreateContact = async (
-	req: Request<{}, {}, Omit<Contact, 'id'>>,
+	req: Request<{}, {}, CreateContactRequest>,
 	res: Response<ResponseWithError<number>>
 ) => {
 	const { first_name, last_name, email, phone, img, date_of_birth } = req.body;
 	try {
+		const data = {
+			first_name,
+			last_name,
+			email,
+			phone: phone ?? null,
+			date_of_birth: date_of_birth ? new Date(date_of_birth) : null,
+			img: img ?? null,
+		} satisfies Prisma.ContactCreateInput;
+
 		const contact = await prisma.contact.create({
-			data: {
-				first_name,
-				last_name,
-				email,
-				phone,
-				date_of_birth: date_of_birth ? new Date(date_of_birth) : null,
-				img,
-			},
+			data,
 		});
 
 		if (!contact?.id) {
@@ -103,17 +111,18 @@ export const handleUpdateContact = async (req: Request<{ id: string }, {}, Updat
 	const { first_name, last_name, email, phone, img, date_of_birth } = req.body;
 	try {
 		const parsedId = parseInt(id, 10);
+		const data = {
+			first_name: first_name ?? undefined,
+			last_name: last_name ?? undefined,
+			email: email ?? undefined,
+			phone: phone ?? undefined,
+			date_of_birth: date_of_birth ? new Date(date_of_birth) : undefined,
+			img: img ?? undefined,
+		} satisfies Prisma.ContactUpdateInput;
 
 		await prisma.contact.update({
 			where: { id: parsedId },
-			data: {
-				first_name: first_name ?? undefined,
-				last_name: last_name ?? undefined,
-				email: email ?? undefined,
-				phone: phone ?? undefined,
-				date_of_birth: date_of_birth ? new Date(date_of_birth) : undefined,
-				img: img ?? undefined,
-			},
+			data,
 		});
 
 		res.status(204).send();
