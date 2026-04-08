@@ -15,7 +15,6 @@ import {
 	handleDailyUpdate,
 	handleDeleteClient,
 	handleGetClientContacts,
-	handleGetClients,
 	handleGetDashboard,
 	handleGetDashboardSummary,
 	handleUpdateClient,
@@ -73,7 +72,6 @@ const router = Router();
 router.get(Routes.Health, handleHealthCheck);
 
 // Client routes
-router.get(Routes.Clients, handleGetClients);
 router.post(Routes.Clients, handleCreateClient);
 router.post(`${Routes.Clients}/daily-update`, handleDailyUpdate);
 router.get(`${Routes.Clients}/dashboard`, handleGetDashboard);

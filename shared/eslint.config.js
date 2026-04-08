@@ -11,6 +11,7 @@ export default tseslint.config([
 	globalIgnores(['dist']),
 	{
 		files: ['**/*.ts'],
+		ignores: ['generated'],
 		extends: [js.configs.recommended, tseslint.configs.recommended],
 		languageOptions: {
 			ecmaVersion: 2020,

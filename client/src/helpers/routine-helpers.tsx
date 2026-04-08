@@ -272,6 +272,7 @@ export function mapRoutineTreeToRoutineGroups(tree: WorkoutRoutineCategoryNode[]
 				}
 			} else {
 				groups.push({
+					id: Date.now(),
 					rest_between: 0,
 					rest_after: groupOrExerciseNode.restAfter ?? 0,
 					routine_category: index + 1,
@@ -326,10 +327,10 @@ export const getExerciseFormValuesFromNode = (
 		category: parseInt(node.key.toString().split('-')[0]) + 1,
 		exercise_id: node.data.exercise_id,
 		repetitions: node.data.repetitions,
-		sets: node.data.sets,
-		weight: node.data.weight,
-		duration: node.data.duration ? secondsToTimeString(node.data.duration) : undefined,
-		distance: node.data.distance,
+		sets: node.data.exercise_sets,
+		weight: node.data.exercise_weight,
+		duration: node.data.exercise_duration ? secondsToTimeString(node.data.exercise_duration) : undefined,
+		distance: node.data.exercise_distance,
 		pace: node.data.pace,
 		target_heart_rate: node.data.target_heart_rate,
 		target_mets: node.data.target_mets,

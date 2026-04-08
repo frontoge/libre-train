@@ -1,15 +1,10 @@
-import type {
-	AssessmentClientLog,
-	AssessmentType,
-	ClientContact,
-	PlannedExercise,
-	PlannedExerciseGroup,
-} from '@libre-train/shared';
+import type { AssessmentClientLog, AssessmentType, ClientContact, PlannedExerciseGroup } from '@libre-train/shared';
 import { type DashboardWeeklySummary } from '@libre-train/shared';
 import type { AssessmentHistoryTableEntry } from '../components/Assessments/AssessmentHistoryTable';
 import {
 	WorkoutNodeType,
 	type DashboardSummaryState,
+	type RoutineTreePlannedExercise,
 	type WorkoutRoutineExerciseNode,
 	type WorkoutRoutineGroupNode,
 } from '../types/types';
@@ -58,7 +53,7 @@ export function mapAssessmentLogToDataTableEntry(
 	assessmentTypes: AssessmentType[]
 ): AssessmentHistoryTableEntry[] {
 	return logs.map((log) => {
-		const client = clients.find((c) => c.id === log.clientId);
+		const client = clients.find((c) => c.ClientId === log.clientId);
 		const assessmentType = assessmentTypes.find((a) => a.id === log.assessmentTypeId);
 
 		return {
@@ -75,7 +70,11 @@ export function mapAssessmentLogToDataTableEntry(
 	});
 }
 
-export function mapPlannedExerciseToTreeNode(exercise: PlannedExercise, key: string, rest?: number): WorkoutRoutineExerciseNode {
+export function mapPlannedExerciseToTreeNode(
+	exercise: RoutineTreePlannedExercise,
+	key: string,
+	rest?: number
+): WorkoutRoutineExerciseNode {
 	return {
 		title: exercise.exerciseName ?? 'Unknown Exercise',
 		key: key,

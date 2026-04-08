@@ -68,9 +68,7 @@ export function Dashboard() {
 	const recentClients = useMemo(() => {
 		return [...state.clients]
 			.sort((a, b) => {
-				const dateA = new Date(a.created_at).getTime();
-				const dateB = new Date(b.created_at).getTime();
-				return dateB - dateA;
+				return b.ClientId - a.ClientId;
 			})
 			.slice(0, 5);
 	}, [state.clients]);

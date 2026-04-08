@@ -1,5 +1,4 @@
-import type { PlannedExercise } from '@libre-train/shared';
-import { Button, Form, Input, Select } from 'antd';
+import { Button, Form, Input, InputNumber, Select } from 'antd';
 import { useEffect } from 'react';
 import { routineCategoryOptions } from '../../helpers/enum-select-options';
 import { TimeInput } from '../Common/TimeInput';
@@ -12,7 +11,17 @@ export interface RoutineExerciseCreateEditFormProps extends React.HTMLAttributes
 	onSubmitForm?: (values: RoutineExerciseCreateEditFormValues) => void;
 }
 
-export interface RoutineExerciseCreateEditFormValues extends Omit<PlannedExercise, 'exerciseName' | 'duration'> {
+export interface RoutineExerciseCreateEditFormValues {
+	exercise_id: number;
+	repetitions?: number;
+	sets?: number;
+	weight?: number;
+	distance?: number;
+	target_heart_rate?: number;
+	pace?: string;
+	rpe?: number;
+	target_calories?: number;
+	target_mets?: number;
 	category: number;
 	rest_after?: number;
 	duration?: string;
@@ -23,6 +32,10 @@ export function RoutineExerciseCreateEditForm(props: RoutineExerciseCreateEditFo
 	const [form] = Form.useForm();
 
 	const isEdit = Object.keys(initialFormValues).length > 0;
+
+	const numberInputStyle: React.CSSProperties = {
+		width: '100%',
+	};
 
 	const onFinish = (values: RoutineExerciseCreateEditFormValues) => {
 		onSubmitForm?.(values);
@@ -73,37 +86,37 @@ export function RoutineExerciseCreateEditForm(props: RoutineExerciseCreateEditFo
 					}}
 				>
 					<Form.Item label="Reps" name="repetitions">
-						<Input type="number" placeholder="e.g. 10" />
+						<InputNumber placeholder="e.g. 10" style={numberInputStyle} />
 					</Form.Item>
 					<Form.Item label="Sets" name="sets">
-						<Input type="number" placeholder="e.g. 3" />
+						<InputNumber placeholder="e.g. 3" style={numberInputStyle} />
 					</Form.Item>
 					<Form.Item label="Weight" name="weight">
-						<Input type="number" placeholder="e.g. 50" suffix="lbs" />
+						<InputNumber placeholder="e.g. 50" suffix="lbs" style={numberInputStyle} />
 					</Form.Item>
 					<Form.Item label="Duration" name="duration">
 						<TimeInput placeholder="HH:MM:SS" />
 					</Form.Item>
 					<Form.Item label="Distance" name="distance">
-						<Input type="number" placeholder="e.g. 100" suffix="Mi" />
+						<InputNumber placeholder="e.g. 100" suffix="Mi" style={numberInputStyle} />
 					</Form.Item>
 					<Form.Item label="Pace" name="pace">
 						<Input placeholder="HH:MM:SS, 4-2-1-1" />
 					</Form.Item>
 					<Form.Item label="Target Heart Rate" name="target_heart_rate">
-						<Input type="number" placeholder="e.g. 150" suffix="bpm" />
+						<InputNumber placeholder="e.g. 150" suffix="bpm" style={numberInputStyle} />
 					</Form.Item>
 					<Form.Item label="Target METs" name="target_mets">
-						<Input type="number" placeholder="eg. 15.0" />
+						<InputNumber placeholder="eg. 15.0" style={numberInputStyle} />
 					</Form.Item>
 					<Form.Item label="Target Calories" name="target_calories">
-						<Input type="number" placeholder="e.g. 300" suffix="kcal" />
+						<InputNumber placeholder="e.g. 300" suffix="kcal" style={numberInputStyle} />
 					</Form.Item>
 					<Form.Item label="RPE" name="rpe">
-						<Input type="number" placeholder="eg. 15" />
+						<InputNumber placeholder="eg. 15" style={numberInputStyle} />
 					</Form.Item>
 					<Form.Item label="Rest After" name="rest_after" style={{ display: nodeDepth === 3 ? 'none' : undefined }}>
-						<Input type="number" placeholder="e.g. 60" suffix="s" />
+						<InputNumber placeholder="e.g. 60" suffix="s" style={numberInputStyle} />
 					</Form.Item>
 				</div>
 				<Form.Item>

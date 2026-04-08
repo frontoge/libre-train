@@ -15,7 +15,7 @@ export function ClientCard(props: ClientCardProps) {
 	const { clientId, style, ...cardProps } = props;
 
 	const client = useMemo(() => {
-		return clients.find((c) => c.id === clientId);
+		return clients.find((c) => c.ClientId === clientId);
 	}, [clients, clientId]);
 
 	if (!client) {

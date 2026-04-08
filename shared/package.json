@@ -18,6 +18,9 @@
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix"
 	},
+	"dependencies": {
+		"@libre-train/db": "workspace:*"
+	},
 	"devDependencies": {
 		"@eslint/js": "^9.39.3",
 		"eslint": "^9.39.3",

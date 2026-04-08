@@ -5,7 +5,7 @@ import type {
 	ClientDietLogTodo,
 	ClientDietPlan,
 	ClientTrainingPlanTodo,
-	DietPlan,
+	CreateDietPlan,
 	DietPlanLogEntry,
 	UpdateClientRequest,
 	UpdateContactRequest,
@@ -163,7 +163,7 @@ export const fetchClientDietPlan = async (clientId: number): Promise<ClientDietP
 	}
 };
 
-export const createDietPlan = async (dietPlan: Omit<DietPlan, 'id' | 'isActive'>): Promise<Response> => {
+export const createDietPlan = async (dietPlan: CreateDietPlan): Promise<Response> => {
 	const body: string = JSON.stringify(dietPlan);
 
 	const requestOptions: RequestInit = {

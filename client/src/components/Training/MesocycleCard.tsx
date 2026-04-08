@@ -1,7 +1,6 @@
 import type { Mesocycle } from '@libre-train/shared';
 import { Badge, Card, Descriptions, Tag } from 'antd';
 import dayjs from '../../config/dayjs';
-import { stringFormatCondensedDate } from '../../helpers/date-helpers';
 import { cardioLevelTagColors, optLevelTagColors } from '../../helpers/training-helpers';
 
 export interface MesocycleCardProps extends React.ComponentProps<typeof Card> {
@@ -11,8 +10,8 @@ export interface MesocycleCardProps extends React.ComponentProps<typeof Card> {
 
 export function MesocycleCard(props: MesocycleCardProps) {
 	const { mesocycleData, ...restProps } = props;
-	const startDate = mesocycleData?.cycle_start_date ? stringFormatCondensedDate(mesocycleData.cycle_start_date, '/') : '';
-	const endDate = mesocycleData?.cycle_end_date ? stringFormatCondensedDate(mesocycleData.cycle_end_date, '/') : '';
+	const startDate = mesocycleData?.cycle_start_date ? dayjs(mesocycleData.cycle_start_date).format('MM/DD') : '';
+	const endDate = mesocycleData?.cycle_end_date ? dayjs(mesocycleData.cycle_end_date).format('MM/DD') : '';
 	const dateString = startDate !== endDate ? `${startDate} - ${endDate}` : startDate;
 
 	const dataFields = [
@@ -24,8 +23,7 @@ export function MesocycleCard(props: MesocycleCardProps) {
 		{
 			key: 'opt_levels',
 			label: 'Opt Levels',
-			children: mesocycleData?.optLevels?.map((level) => (
-				// @ts-ignore this is only supported in antd v6+ will leave it in for when we update
+			children: mesocycleData?.opt_levels?.map((level) => (
 				<Tag key={level} color={optLevelTagColors[level]} variant="outlined">
 					{`${level}`}
 				</Tag>
@@ -34,8 +32,7 @@ export function MesocycleCard(props: MesocycleCardProps) {
 		{
 			key: 'cardio_levels',
 			label: 'Cardio Levels',
-			children: mesocycleData?.cardioLevels?.map((level) => (
-				// @ts-ignore this is only supported in antd v6+ will leave it in for when we update
+			children: mesocycleData?.cardio_levels?.map((level) => (
 				<Tag key={level} color={cardioLevelTagColors[level]} variant="outlined">
 					{`${level}`}
 				</Tag>

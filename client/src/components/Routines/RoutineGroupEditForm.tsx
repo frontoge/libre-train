@@ -7,7 +7,7 @@ export interface RoutineGroupEditFormProps extends React.HTMLAttributes<HTMLDivE
 	onSubmitForm?: (values: RoutineGroupEditFormValues) => void;
 }
 
-export interface RoutineGroupEditFormValues extends Omit<PlannedExerciseGroup, 'exercises' | 'routine_category'> {
+export interface RoutineGroupEditFormValues extends Omit<PlannedExerciseGroup, 'exercises' | 'routine_category' | 'id'> {
 	rest_after?: number;
 	rest_between?: number;
 }

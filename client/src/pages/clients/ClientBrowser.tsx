@@ -18,7 +18,6 @@ interface ClientTableData {
 	age?: number;
 	height?: number;
 	notes?: string;
-	createdAt: Date;
 }
 
 export function ClientBrowser() {
@@ -41,8 +40,8 @@ export function ClientBrowser() {
 				return fullName.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
 			})
 			.map((client: ClientContact) => ({
-				key: client.id.toString(),
-				id: client.id,
+				key: client.ClientId.toString(),
+				id: client.ClientId,
 				avatar: client.img,
 				name: `${client.first_name} ${client.last_name}`,
 				email: client.email,
@@ -50,9 +49,8 @@ export function ClientBrowser() {
 				age: client.date_of_birth ? getYearsSinceDate(client.date_of_birth) : undefined,
 				height: client.height,
 				notes: client.notes,
-				createdAt: client.created_at,
 			}))
-			.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+			.sort((a, b) => b.id - a.id);
 	}, [clients, searchInput]);
 
 	const handleClientSelect = (clientId: number) => {
@@ -143,7 +141,7 @@ export function ClientBrowser() {
 				>
 					<Row gutter={[16, 16]} align="middle" justify="space-between">
 						<Col xs={24} sm={12}>
-							<Space direction="vertical" size={2}>
+							<Space orientation="vertical" size={2}>
 								<Typography.Title
 									level={3}
 									style={{

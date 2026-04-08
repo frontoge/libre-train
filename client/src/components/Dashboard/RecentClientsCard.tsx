@@ -61,7 +61,7 @@ export function RecentClientsCard({ clients, onMessage }: RecentClientsCardProps
 								description={
 									<Space separator={<Divider orientation="vertical" />} size={4}>
 										<span>{client.email || 'No email on file'}</span>
-										<span>Joined {getReadableDate(client.created_at)}</span>
+										<span>Joined {getReadableDate('TBD')}</span>
 									</Space>
 								}
 							/>
