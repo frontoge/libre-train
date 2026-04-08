@@ -9,10 +9,14 @@ COPY package.json bun.lockb* ./
 COPY client/ ./client/
 COPY server/ ./server/
 COPY shared/ ./shared/
+COPY db/ ./db/
 
 # 3. Install ALL dependencies (including devDependencies) so the build can run
 #    --production would strip TS/build tools
 RUN bun install
+
+# 4. Generate the prisma client
+RUN bun run db:generate
 
 # 4. Build the server (and any dependent workspaces if needed)
 WORKDIR /app/server
