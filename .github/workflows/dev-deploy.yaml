@@ -52,6 +52,17 @@ jobs:
 
       - name: Install dependencies
         run: bun install
+      
+      - name: Create Prisma env
+        run: |
+          cat > db/.env << EOF
+          NODE_ENV=${{ vars.ENVIRONMENT }}
+          DB_HOST=${{ vars.DB_HOST }}
+          DB_PORT=${{ vars.DB_PORT }}
+          DB_USER=${{ vars.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_NAME=${{ vars.DB_NAME }}
+          EOF
 
       - name: Generate Prisma client
         run: bun run db:generate
