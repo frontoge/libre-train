@@ -1,5 +1,5 @@
 import type { ClientContact } from '@libre-train/shared';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -216,13 +216,22 @@ describe('Dashboard', () => {
 	});
 
 	it('navigates from quick action buttons', async () => {
-		const user = userEvent.setup();
 		renderDashboard();
 
-		await user.click(screen.getByRole('button', { name: /Create Client/i }));
+		await waitFor(() => {
+			expect(getTrainerCheckIns).toHaveBeenCalledWith(1);
+			expect(getTrainerMissingPlans).toHaveBeenCalledWith(1);
+		});
+
+		const quickActionsCard = screen.getByText('Quick Actions').closest('.ant-card');
+		expect(quickActionsCard).toBeInstanceOf(HTMLElement);
+
+		const quickActions = within(quickActionsCard as HTMLElement);
+
+		fireEvent.click(quickActions.getByText('Create Client'));
 		expect(mockNavigate).toHaveBeenCalledWith('/clients/create');
 
-		await user.click(screen.getByRole('button', { name: /Open Dashboards/i }));
+		fireEvent.click(quickActions.getByText('Open Dashboards'));
 		expect(mockNavigate).toHaveBeenCalledWith('/clients/');
 	});
 

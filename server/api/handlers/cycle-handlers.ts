@@ -1,5 +1,6 @@
 import {
 	ClientTrainingPlanTodo,
+	CreateWorkoutRoutine,
 	Macrocycle,
 	MacrocycleSearchParams,
 	Mesocycle,
@@ -11,8 +12,8 @@ import {
 	MicrocycleUpdateRoutinesRequest,
 	ResponseWithError,
 } from '@libre-train/shared';
-import dayjs from 'dayjs';
 import { Request, Response } from 'express';
+import dayjs from '../../config/dayjs';
 import { prisma } from '../../database/mysql-database';
 import { createWorkoutRoutine, deactivateCycleRoutines } from './workout-routine-handlers';
 
@@ -104,19 +105,21 @@ export const handleGetMacrocycle = async (
 		});
 
 		if (macrocyclesResult.length === 0) {
-			return res.status(500).json({ hasError: true, errorMessage: 'Error when fetching macrocycles' });
+			return res.status(200).json([]);
 		}
+
+		console.log(macrocyclesResult);
 
 		const macrocycles: Macrocycle[] = macrocyclesResult.map((row) => ({
 			id: row.id,
 			client_id: row.client_id,
 			cycle_name: row.cycle_name ?? undefined,
-			cycle_start_date: dayjs(row.cycle_start_date).format('YYYY-MM-DD'),
-			cycle_end_date: dayjs(row.cycle_end_date).format('YYYY-MM-DD'),
+			cycle_start_date: dayjs.utc(row.cycle_start_date).format('YYYY-MM-DD'),
+			cycle_end_date: dayjs.utc(row.cycle_end_date).format('YYYY-MM-DD'),
 			is_active: row.is_active,
 			notes: row.notes ?? undefined,
-			created_at: dayjs(row.created_at).format('YYYY-MM-DD'),
-			updated_at: dayjs(row.updated_at).format('YYYY-MM-DD'),
+			created_at: dayjs.utc(row.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs.utc(row.updated_at).format('YYYY-MM-DD'),
 		}));
 
 		res.status(200).json(macrocycles);
@@ -270,7 +273,7 @@ export const handleGetMesocycle = async (
 		});
 
 		if (mesocyclesResult.length === 0) {
-			return res.status(500).json({ hasError: true, errorMessage: 'Error when fetching mesocycles' });
+			return res.status(200).json([]);
 		}
 
 		const mesocycles: Mesocycle[] = mesocyclesResult.map((row) => ({
@@ -278,14 +281,14 @@ export const handleGetMesocycle = async (
 			client_id: row.client_id,
 			cycle_name: row.cycle_name ?? undefined,
 			macrocycle_id: row.macrocycle_id,
-			cycle_start_date: dayjs(row.cycle_start_date).format('YYYY-MM-DD'),
-			cycle_end_date: dayjs(row.cycle_end_date).format('YYYY-MM-DD'),
+			cycle_start_date: dayjs.utc(row.cycle_start_date).format('YYYY-MM-DD'),
+			cycle_end_date: dayjs.utc(row.cycle_end_date).format('YYYY-MM-DD'),
 			opt_levels: row.opt_levels ? row.opt_levels.split(',').map((level) => parseInt(level, 10)) : undefined,
 			cardio_levels: row.cardio_levels ? row.cardio_levels.split(',').map((level) => parseInt(level, 10)) : undefined,
 			notes: row.notes ?? undefined,
 			is_active: row.is_active,
-			created_at: dayjs(row.created_at).format('YYYY-MM-DD'),
-			updated_at: dayjs(row.updated_at).format('YYYY-MM-DD'),
+			created_at: dayjs.utc(row.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs.utc(row.updated_at).format('YYYY-MM-DD'),
 		}));
 
 		res.status(200).json(mesocycles);
@@ -485,7 +488,7 @@ export const handleGetMicrocycle = async (req: Request<{ id: string }, {}, {}, M
 		});
 
 		if (microcyclesResult.length === 0) {
-			return res.status(500).json({ error: 'Error when fetching microcycles' });
+			return res.status(200).json([]);
 		}
 
 		const microcycles: Microcycle[] = microcyclesResult.map((row) => ({
@@ -493,12 +496,12 @@ export const handleGetMicrocycle = async (req: Request<{ id: string }, {}, {}, M
 			client_id: row.client_id,
 			mesocycle_id: row.mesocycle_id,
 			cycle_name: row.cycle_name ?? undefined,
-			cycle_start_date: dayjs(row.cycle_start_date).format('YYYY-MM-DD'),
-			cycle_end_date: dayjs(row.cycle_end_date).format('YYYY-MM-DD'),
+			cycle_start_date: dayjs.utc(row.cycle_start_date).format('YYYY-MM-DD'),
+			cycle_end_date: dayjs.utc(row.cycle_end_date).format('YYYY-MM-DD'),
 			notes: row.notes ?? undefined,
 			is_active: row.is_active,
-			created_at: dayjs(row.created_at).format('YYYY-MM-DD'),
-			updated_at: dayjs(row.updated_at).format('YYYY-MM-DD'),
+			created_at: dayjs.utc(row.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs.utc(row.updated_at).format('YYYY-MM-DD'),
 		}));
 
 		res.status(200).json(microcycles);
@@ -661,16 +664,22 @@ export const handleUpdateMicrocycleRoutines = async (
 
 		const reqBody = req.body;
 
-		const createRoutineBodies = reqBody.routines.map((routine, index) => ({
-			microcycle_id: microcycleId,
-			routine_index: index,
-			routine_name: routine.routine_name,
-			isActive: true,
-			exercise_groups: routine.exercise_groups,
-		}));
+		const createRoutineBodies = reqBody.routines.map(
+			(routine, index): CreateWorkoutRoutine => ({
+				microcycle_id: microcycleId,
+				routine_index: index,
+				routine_name: routine.routine_name,
+				isActive: true,
+				exercise_groups: routine.exercise_groups,
+			})
+		);
 
 		await deactivateCycleRoutines(microcycleId);
-		const results = await Promise.all(createRoutineBodies.map(async (routine) => await createWorkoutRoutine(routine)));
+		const results = [];
+		for (const routine of createRoutineBodies) {
+			const result = await createWorkoutRoutine(routine);
+			results.push(result);
+		}
 
 		if (results.some((result) => result === undefined)) {
 			console.error('Failed to create one or more workout routines:', 'Failed to create one or more workout routines.');

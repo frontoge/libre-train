@@ -9,8 +9,8 @@ import {
 	undefinedIfNull,
 	UpdateClientRequest,
 } from '@libre-train/shared';
-import dayjs from 'dayjs';
 import { Request, Response } from 'express';
+import dayjs from '../../config/dayjs';
 import { prisma } from '../../database/mysql-database';
 import { MessageResponse } from '../../types/utilities';
 
@@ -44,7 +44,7 @@ export const handleGetClientContacts = async (
 			phone: undefinedIfNull(contact.phone),
 			img: undefinedIfNull(contact.img),
 			notes: undefinedIfNull(contact.notes),
-			date_of_birth: contact.date_of_birth ? dayjs(contact.date_of_birth).format('YYYY-MM-DD') : undefined,
+			date_of_birth: contact.date_of_birth ? dayjs.utc(contact.date_of_birth).format('YYYY-MM-DD') : undefined,
 		}));
 
 		res.status(200).json(mappedContacts);

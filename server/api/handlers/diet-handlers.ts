@@ -7,8 +7,8 @@ import {
 	GetDietPlanLogEntrySearchParams,
 	GetDietPlanSearchParams,
 } from '@libre-train/shared';
-import dayjs from 'dayjs';
 import { Request, Response } from 'express';
+import dayjs from '../../config/dayjs';
 import { prisma } from '../../database/mysql-database';
 import { MessageResponse } from '../../types/utilities';
 
@@ -56,8 +56,8 @@ export const handleGetDietPlan = async (
 			targetFats: plan.targetFats ?? undefined,
 			notes: plan.notes ?? undefined,
 			isActive: plan.isActive,
-			created_at: dayjs(plan.created_at).format('YYYY-MM-DD'),
-			updated_at: dayjs(plan.updated_at).format('YYYY-MM-DD'),
+			created_at: dayjs.utc(plan.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs.utc(plan.updated_at).format('YYYY-MM-DD'),
 		}));
 
 		res.json(formattedResults);

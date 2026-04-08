@@ -81,7 +81,6 @@ export function Login() {
 			const { accessToken, user } = await res.json();
 			setAuth({ authToken: accessToken, user });
 		} catch (e: any) {
-			console.log('Login error:', e);
 			setLoginError(e?.message ?? 'Unable to sign in. Please verify your credentials and try again.');
 		} finally {
 			setIsSubmitting(false);
@@ -89,7 +88,6 @@ export function Login() {
 	};
 
 	const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-		console.log('Failed:', errorInfo);
 		setLoginError('Please complete the required fields.');
 	};
 

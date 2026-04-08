@@ -5,8 +5,8 @@ import {
 	AssessmentType,
 	ResponseWithError,
 } from '@libre-train/shared';
-import dayjs from 'dayjs';
 import { Request, Response } from 'express';
+import dayjs from '../../config/dayjs';
 import { prisma } from '../../database/mysql-database';
 
 export const handleGetAssessmentTypes = async (
@@ -35,8 +35,8 @@ export const handleGetAssessmentTypes = async (
 				name: row.name,
 				assessmentUnit: row.assessmentUnit ?? '',
 				assessmentGroupId: row.assessmentGroupId ?? 0,
-				created_at: dayjs(row.created_at).toISOString(),
-				updated_at: dayjs(row.updated_at).toISOString(),
+				created_at: dayjs.utc(row.created_at).toISOString(),
+				updated_at: dayjs.utc(row.updated_at).toISOString(),
 			})) ?? [];
 
 		res.json(assessmentType);
@@ -73,8 +73,8 @@ export const handleGetAssessmentGroupTypes = async (
 			name: row.name,
 			assessmentUnit: row.assessmentUnit ?? '',
 			assessmentGroupId: row.assessmentGroupId ?? 0,
-			created_at: dayjs(row.created_at).toISOString(),
-			updated_at: dayjs(row.updated_at).toISOString(),
+			created_at: dayjs.utc(row.created_at).toISOString(),
+			updated_at: dayjs.utc(row.updated_at).toISOString(),
 		}));
 
 		res.json(assessmentTypes);

@@ -24,7 +24,6 @@ export function MesocycleCard(props: MesocycleCardProps) {
 			key: 'opt_levels',
 			label: 'Opt Levels',
 			children: mesocycleData?.opt_levels?.map((level) => (
-				// @ts-ignore this is only supported in antd v6+ will leave it in for when we update
 				<Tag key={level} color={optLevelTagColors[level]} variant="outlined">
 					{`${level}`}
 				</Tag>
@@ -34,7 +33,6 @@ export function MesocycleCard(props: MesocycleCardProps) {
 			key: 'cardio_levels',
 			label: 'Cardio Levels',
 			children: mesocycleData?.cardio_levels?.map((level) => (
-				// @ts-ignore this is only supported in antd v6+ will leave it in for when we update
 				<Tag key={level} color={cardioLevelTagColors[level]} variant="outlined">
 					{`${level}`}
 				</Tag>

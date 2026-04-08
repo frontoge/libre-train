@@ -7,7 +7,7 @@ import { createSearchParams } from './fetch-helpers';
 async function createMacrocycle(values: CreateEditTrainingPlanFormValues): Promise<number | undefined> {
 	const requestBody = {
 		cycle_name: values.cycleName,
-		client_id: values.selectedClient,
+		client_id: Number(values.selectedClient),
 		cycle_start_date: values.dateRange[0].format('YYYY-MM-DD'),
 		cycle_end_date: values.dateRange[1].format('YYYY-MM-DD'),
 		isActive: values.isActive,
@@ -42,9 +42,9 @@ async function createMesocycle(values: CreateEditTrainingPlanFormValues): Promis
 		cycle_name: values.cycleName,
 		cycle_start_date: values.dateRange[0].format('YYYY-MM-DD'),
 		cycle_end_date: values.dateRange[1].format('YYYY-MM-DD'),
-		isActive: values.isActive,
-		optLevels: values.optLevels,
-		cardioLevels: values.cardioLevels,
+		is_active: values.isActive,
+		opt_levels: values.optLevels,
+		cardio_levels: values.cardioLevels,
 		notes: values.notes,
 	};
 

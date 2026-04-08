@@ -1,6 +1,6 @@
 import { Exercise, ResponseWithError } from '@libre-train/shared';
-import dayjs from 'dayjs';
 import { Request, Response } from 'express';
+import dayjs from '../../config/dayjs';
 import { prisma } from '../../database/mysql-database';
 
 export const handleExerciseCreate = async (req: Request<{}, {}, Omit<Exercise, 'id'>>, res: Response) => {
@@ -53,8 +53,8 @@ export const handleGetAllExercises = async (req: Request, res: Response<Response
 			exercise_form: row.exercise_form ?? undefined,
 			movement_pattern: row.movement_pattern ?? undefined,
 			progression_level: row.progression_level,
-			created_at: dayjs(row.created_at).format('YYYY-MM-DD'),
-			updated_at: dayjs(row.updated_at).format('YYYY-MM-DD'),
+			created_at: dayjs.utc(row.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs.utc(row.updated_at).format('YYYY-MM-DD'),
 		}));
 		res.status(200).json(formattedResults);
 	} catch (error) {

@@ -1,7 +1,7 @@
 import { Prisma } from '@libre-train/db/client';
 import { Contact, CreateContactRequest, ResponseWithError, UpdateContactRequest } from '@libre-train/shared';
-import dayjs from 'dayjs';
 import { Request, Response } from 'express';
+import dayjs from '../../config/dayjs';
 import { prisma } from '../../database/mysql-database';
 
 export const handleGetContacts = async (req: Request, res: Response<ResponseWithError<Contact[]>>) => {
@@ -15,9 +15,9 @@ export const handleGetContacts = async (req: Request, res: Response<ResponseWith
 			email: row.email,
 			phone: row.phone ?? undefined,
 			img: row.img ?? undefined,
-			date_of_birth: row.date_of_birth ? row.date_of_birth.toISOString().split('T')[0] : undefined,
-			created_at: dayjs(row.created_at).format('YYYY-MM-DD'),
-			updated_at: dayjs(row.updated_at).format('YYYY-MM-DD'),
+			date_of_birth: row.date_of_birth ? dayjs.utc(row.date_of_birth).format('YYYY-MM-DD') : undefined,
+			created_at: dayjs.utc(row.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs.utc(row.updated_at).format('YYYY-MM-DD'),
 		}));
 
 		res.json(contacts);
@@ -46,9 +46,9 @@ export const handleGetContactById = async (req: Request<{ id: string }>, res: Re
 			email: row.email,
 			phone: row.phone ?? undefined,
 			img: row.img ?? undefined,
-			date_of_birth: row.date_of_birth ? dayjs(row.date_of_birth).format('YYYY-MM-DD') : undefined,
-			created_at: dayjs(row.created_at).format('YYYY-MM-DD'),
-			updated_at: dayjs(row.updated_at).format('YYYY-MM-DD'),
+			date_of_birth: row.date_of_birth ? dayjs.utc(row.date_of_birth).format('YYYY-MM-DD') : undefined,
+			created_at: dayjs.utc(row.created_at).format('YYYY-MM-DD'),
+			updated_at: dayjs.utc(row.updated_at).format('YYYY-MM-DD'),
 		};
 
 		res.json(contact);

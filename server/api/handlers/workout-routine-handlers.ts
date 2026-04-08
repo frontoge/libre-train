@@ -6,9 +6,9 @@ import {
 	UpdateWorkoutRoutineRequest,
 	WorkoutRoutine,
 } from '@libre-train/shared';
-import dayjs from 'dayjs';
 import { Request, Response } from 'express';
 import { ZodError } from 'zod';
+import dayjs from '../../config/dayjs';
 import { prisma } from '../../database/mysql-database';
 import { CreateWorkoutRoutineSchema, IdParamSchema, UpdateWorkoutRoutineSchema } from '../validators/workout-routine-validators';
 
@@ -90,7 +90,7 @@ export async function handleGetCycleWorkoutRoutines(
 
 		const routines = await prisma.workoutRoutine.findMany({
 			where: {
-				microcycle_id: parsedId,
+				Microcycle: { id: parsedId },
 				isActive: true,
 			},
 			include: {
@@ -106,39 +106,41 @@ export async function handleGetCycleWorkoutRoutines(
 			throw new Error('No workout routines found for the specified microcycle');
 		}
 
-		const workoutRoutines: WorkoutRoutine[] = routines.map((routine) => ({
-			id: routine.id,
-			microcycle_id: routine.microcycle_id,
-			routine_index: routine.routine_index,
-			routine_name: undefinedIfNull(routine.routine_name),
-			isActive: routine.isActive,
-			created_at: dayjs(routine.created_at).format('YYYY-MM-DD HH:mm:ss'),
-			updated_at: dayjs(routine.updated_at).format('YYYY-MM-DD HH:mm:ss'),
-			exercise_groups: routine.PlannedExerciseGroup.map((group) => ({
-				id: group.id,
-				routine_category: group.routine_category,
-				rest_between: undefinedIfNull(group.rest_between),
-				rest_after: undefinedIfNull(group.rest_after),
-				exercises: group.PlannedExercise.map(
-					(ex): PlannedExercise => ({
-						id: ex.id,
-						exercise_id: ex.exercise_id,
-						repetitions: undefinedIfNull(ex.repetitions),
-						exercise_sets: undefinedIfNull(ex.exercise_sets),
-						exercise_weight: undefinedIfNull(ex.exercise_weight),
-						exercise_duration: undefinedIfNull(ex.exercise_duration),
-						exercise_distance: undefinedIfNull(ex.exercise_distance?.toNumber()),
-						target_heart_rate: undefinedIfNull(ex.target_heart_rate),
-						pace: undefinedIfNull(ex.pace),
-						rpe: undefinedIfNull(ex.rpe),
-						target_calories: undefinedIfNull(ex.target_calories),
-						target_mets: undefinedIfNull(ex.target_mets),
-						created_at: dayjs(ex.created_at).format('YYYY-MM-DD HH:mm:ss'),
-						updated_at: dayjs(ex.updated_at).format('YYYY-MM-DD HH:mm:ss'),
-					})
-				),
-			})),
-		}));
+		const workoutRoutines: WorkoutRoutine[] = routines
+			.sort((a, b) => a.routine_index - b.routine_index)
+			.map((routine) => ({
+				id: routine.id,
+				microcycle_id: routine.microcycle_id,
+				routine_index: routine.routine_index,
+				routine_name: undefinedIfNull(routine.routine_name),
+				isActive: routine.isActive,
+				created_at: dayjs.utc(routine.created_at).format('YYYY-MM-DD HH:mm:ss'),
+				updated_at: dayjs.utc(routine.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+				exercise_groups: routine.PlannedExerciseGroup.sort((a, b) => a.group_index - b.group_index).map((group) => ({
+					id: group.id,
+					routine_category: group.routine_category,
+					rest_between: undefinedIfNull(group.rest_between),
+					rest_after: undefinedIfNull(group.rest_after),
+					exercises: group.PlannedExercise.sort((a, b) => a.exercise_group_index - b.exercise_group_index).map(
+						(ex): PlannedExercise => ({
+							id: ex.id,
+							exercise_id: ex.exercise_id,
+							repetitions: undefinedIfNull(ex.repetitions),
+							exercise_sets: undefinedIfNull(ex.exercise_sets),
+							exercise_weight: undefinedIfNull(ex.exercise_weight),
+							exercise_duration: undefinedIfNull(ex.exercise_duration),
+							exercise_distance: undefinedIfNull(ex.exercise_distance?.toNumber()),
+							target_heart_rate: undefinedIfNull(ex.target_heart_rate),
+							pace: undefinedIfNull(ex.pace),
+							rpe: undefinedIfNull(ex.rpe),
+							target_calories: undefinedIfNull(ex.target_calories),
+							target_mets: undefinedIfNull(ex.target_mets),
+							created_at: dayjs.utc(ex.created_at).format('YYYY-MM-DD HH:mm:ss'),
+							updated_at: dayjs.utc(ex.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+						})
+					),
+				})),
+			}));
 
 		res.status(200).json(workoutRoutines);
 	} catch (error: unknown) {
@@ -230,13 +232,13 @@ async function getWorkoutRoutineById(id: string): Promise<WorkoutRoutine | undef
 					rpe: undefinedIfNull(ex.rpe),
 					target_calories: undefinedIfNull(ex.target_calories),
 					target_mets: undefinedIfNull(ex.target_mets),
-					created_at: dayjs(ex.created_at).format('YYYY-MM-DD HH:mm:ss'),
-					updated_at: dayjs(ex.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+					created_at: dayjs.utc(ex.created_at).format('YYYY-MM-DD HH:mm:ss'),
+					updated_at: dayjs.utc(ex.updated_at).format('YYYY-MM-DD HH:mm:ss'),
 				})
 			),
 		})),
-		created_at: dayjs(routine.created_at).format('YYYY-MM-DD HH:mm:ss'),
-		updated_at: dayjs(routine.updated_at).format('YYYY-MM-DD HH:mm:ss'),
+		created_at: dayjs.utc(routine.created_at).format('YYYY-MM-DD HH:mm:ss'),
+		updated_at: dayjs.utc(routine.updated_at).format('YYYY-MM-DD HH:mm:ss'),
 	};
 
 	return workoutRoutine;
@@ -264,7 +266,7 @@ export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promi
 		if (isActive) {
 			await prisma.workoutRoutine.updateMany({
 				where: {
-					microcycle_id,
+					Microcycle: { id: microcycle_id },
 					routine_index: { gte: routine_index },
 					id: { not: workoutRoutineId },
 					isActive: true,
@@ -297,7 +299,7 @@ export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promi
 				// Increment group indices for existing groups with same or higher index
 				await prisma.plannedExerciseGroup.updateMany({
 					where: {
-						workout_routine_id: workoutRoutineId,
+						WorkoutRoutine: { id: workoutRoutineId },
 						group_index: { gte: index },
 						id: { not: groupId },
 					},
@@ -347,11 +349,11 @@ export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promi
 						await prisma.plannedExercise.updateMany({
 							where: {
 								PlannedExerciseGroup: { id: groupId },
-								exercise_index: { gte: exIndex },
+								exercise_group_index: { gte: exIndex },
 								id: { not: createdExercise.id },
 							},
 							data: {
-								exercise_index: {
+								exercise_group_index: {
 									increment: 1,
 								},
 							},
@@ -374,7 +376,7 @@ export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promi
 export async function deactivateCycleRoutines(cycleId: number): Promise<void> {
 	try {
 		await prisma.workoutRoutine.updateMany({
-			where: { microcycle_id: cycleId },
+			where: { Microcycle: { id: cycleId } },
 			data: { isActive: false },
 		});
 	} catch (error: unknown) {
