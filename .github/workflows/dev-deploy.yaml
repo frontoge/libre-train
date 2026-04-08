@@ -40,6 +40,7 @@ jobs:
   deploy:
     runs-on: self-hosted
     environment: Test
+    depends-on: deploy-database
     
     steps:
       - uses: actions/checkout@v4
@@ -51,6 +52,9 @@ jobs:
 
       - name: Install dependencies
         run: bun install
+
+      - name: Generate Prisma client
+        run: bun run db:generate
       
       - name: Create Client env
         run: |
