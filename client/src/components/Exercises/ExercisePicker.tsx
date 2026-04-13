@@ -1,9 +1,8 @@
 import { Button, Popover, Select } from 'antd';
 import { useContext, useState } from 'react';
 import { MdFilterList } from 'react-icons/md';
-import { stringSimilarity } from 'string-similarity-js';
 import { AppContext } from '../../app-context';
-import { applyExerciseTableFilters } from '../../helpers/filter-helpers';
+import { applyExerciseTableFilters, compareStrings } from '../../helpers/filter-helpers';
 import { ExerciseFilterOptions, type ExerciseFilterOptionsValues } from './ExerciseFilterOptions';
 
 export interface ExercisePickerProps extends React.ComponentProps<typeof Select> {
@@ -46,9 +45,10 @@ export function ExercisePicker(props: ExercisePickerProps) {
 				placeholder="Search exercises..."
 				allowClear
 				options={selectOptions}
-				showSearch
-				filterOption={(input, option) => {
-					return stringSimilarity(option?.label ?? '', input) > 0.3;
+				showSearch={{
+					filterOption: (input, option) => {
+						return compareStrings(option?.label ?? '', input);
+					},
 				}}
 				{...selectProps}
 			/>

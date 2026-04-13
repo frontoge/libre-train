@@ -1,8 +1,8 @@
 import { AssessmentGroup } from '@libre-train/shared';
 import { Select, type SelectProps } from 'antd';
 import { useContext, useState } from 'react';
-import { stringSimilarity } from 'string-similarity-js';
 import { AppContext } from '../../app-context';
+import { compareStrings } from '../../helpers/filter-helpers';
 
 export interface AssessmentTypeSelectProps extends Omit<SelectProps, 'options' | 'onChange'> {
 	onAssessmentTypeSelect?: (assessmentTypeId: string) => void;
@@ -22,7 +22,7 @@ export function AssessmentTypeSelect(props: AssessmentTypeSelectProps) {
 		const postureOptions =
 			assessmentTypes
 				?.filter((type) => type.assessmentGroupId === AssessmentGroup.Posture)
-				.filter((type) => !search || stringSimilarity(search, type.name) > similarityThreshold)
+				.filter((type) => !search || compareStrings(search, type.name, similarityThreshold))
 				.map((type) => ({
 					label: type.name,
 					value: type.id,
@@ -31,7 +31,7 @@ export function AssessmentTypeSelect(props: AssessmentTypeSelectProps) {
 		const compositionOptions =
 			assessmentTypes
 				?.filter((type) => type.assessmentGroupId === AssessmentGroup.Composition)
-				.filter((type) => !search || stringSimilarity(search, type.name) > similarityThreshold)
+				.filter((type) => !search || compareStrings(search, type.name, similarityThreshold))
 				.map((type) => ({
 					label: type.name,
 					value: type.id,
@@ -40,7 +40,7 @@ export function AssessmentTypeSelect(props: AssessmentTypeSelectProps) {
 		const performanceOptions =
 			assessmentTypes
 				?.filter((type) => type.assessmentGroupId === AssessmentGroup.Performance)
-				.filter((type) => !search || stringSimilarity(search, type.name) > similarityThreshold)
+				.filter((type) => !search || compareStrings(search, type.name, similarityThreshold))
 				.map((type) => ({
 					label: type.name,
 					value: type.id,

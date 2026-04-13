@@ -1,7 +1,7 @@
 import { Select } from 'antd';
 import { useContext, useMemo, useState } from 'react';
-import { stringSimilarity } from 'string-similarity-js';
 import { AppContext } from '../../app-context';
+import { compareStrings } from '../../helpers/filter-helpers';
 import { formatClientFullName } from '../../helpers/label-formatters';
 
 export interface ClientSearchProps extends Omit<React.ComponentProps<typeof Select<string>>, 'fetchOptions'> {
@@ -26,8 +26,7 @@ export function ClientSearch(props: ClientSearchProps) {
 		return clients
 			.filter(
 				(client) =>
-					search.trim() === ''
-					|| stringSimilarity(search, formatClientFullName(client.first_name, client.last_name)) > 0.2
+					search.trim() === '' || compareStrings(search, formatClientFullName(client.first_name, client.last_name), 0.2)
 			)
 			.map((client) => ({
 				key: client.ClientId.toString(),
