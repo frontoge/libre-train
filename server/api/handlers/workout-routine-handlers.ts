@@ -253,7 +253,7 @@ export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promi
 		// Create the workout routine
 		const createdRoutine = await prisma.workoutRoutine.create({
 			data: {
-				microcycle_id,
+				Microcycle: { connect: { id: microcycle_id } },
 				routine_index,
 				routine_name,
 				isActive: isActive,
@@ -296,20 +296,6 @@ export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promi
 
 				const groupId = createdGroup.id;
 
-				// Increment group indices for existing groups with same or higher index
-				await prisma.plannedExerciseGroup.updateMany({
-					where: {
-						WorkoutRoutine: { id: workoutRoutineId },
-						group_index: { gte: index },
-						id: { not: groupId },
-					},
-					data: {
-						group_index: {
-							increment: 1,
-						},
-					},
-				});
-
 				// Create the exercises for the group
 				await Promise.all(
 					exercises.map(async (exercise, exIndex: number) => {
@@ -327,7 +313,7 @@ export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promi
 							target_mets,
 						} = exercise;
 
-						const createdExercise = await prisma.plannedExercise.create({
+						await prisma.plannedExercise.create({
 							data: {
 								exercise_id,
 								exercise_group_id: groupId,
@@ -342,20 +328,6 @@ export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promi
 								rpe: rpe ?? null,
 								target_calories: target_calories ?? null,
 								target_mets: target_mets ?? null,
-							},
-						});
-
-						// Increment exercise indices for existing exercises with same or higher index
-						await prisma.plannedExercise.updateMany({
-							where: {
-								PlannedExerciseGroup: { id: groupId },
-								exercise_group_index: { gte: exIndex },
-								id: { not: createdExercise.id },
-							},
-							data: {
-								exercise_group_index: {
-									increment: 1,
-								},
 							},
 						});
 					})

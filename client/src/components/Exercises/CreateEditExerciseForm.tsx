@@ -151,10 +151,15 @@ export function CreateEditExerciseForm(props: CreateEditExerciseFormProps) {
 				<Input placeholder="Video link" />
 			</Form.Item>
 			<Form.Item label="Description" name="description">
-				<Input.TextArea placeholder="Exercise description" autoSize={{ minRows: 3, maxRows: 6 }} maxLength={255} />
+				<Input.TextArea
+					placeholder="Exercise description"
+					autoSize={{ minRows: 3, maxRows: 6 }}
+					maxLength={512}
+					showCount
+				/>
 			</Form.Item>
 			<Form.Item label="Equipment Needed" name="equipmentNeeded">
-				<Input.TextArea placeholder="Equipment needed" autoSize={{ minRows: 2, maxRows: 4 }} maxLength={512} />
+				<Input.TextArea placeholder="Equipment needed" autoSize={{ minRows: 2, maxRows: 4 }} maxLength={512} showCount />
 			</Form.Item>
 			<Form.Item>
 				<div

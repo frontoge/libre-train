@@ -42,7 +42,9 @@ export function MicrocycleCard(props: MicrocycleCardProps) {
 		{
 			label: 'Notes',
 			children:
-				'Very long text that will wrap or mess up the user interface, if not properly handled. we should find a better way to test than doing this over and over again. This is why i hate frontend!',
+				props.microcycleData?.notes && props.microcycleData.notes.trim() !== ''
+					? props.microcycleData.notes
+					: 'No notes available',
 		},
 	];
 

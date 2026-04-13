@@ -7,7 +7,11 @@ export type AppState = {
 	clients: ClientContact[];
 	exerciseData?: Exercise[];
 	assessmentTypes: AssessmentType[];
-	showMessage: (type: 'success' | 'error' | 'info' | 'warning', content: string, duration?: number) => void;
+	showMessage: (
+		type: 'success' | 'error' | 'info' | 'warning' | 'loading' | 'destroy',
+		content: string,
+		duration?: number
+	) => void;
 	auth: Auth;
 };
 

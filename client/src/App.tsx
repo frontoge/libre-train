@@ -25,7 +25,11 @@ function App() {
 	const env = import.meta.env.VITE_ENV || 'local';
 	const [messageApi, contextHolder] = message.useMessage();
 
-	const showMessage = (type: 'success' | 'error' | 'info' | 'warning', content: string, duration?: number) => {
+	const showMessage = (
+		type: 'success' | 'error' | 'info' | 'warning' | 'loading' | 'destroy',
+		content: string,
+		duration?: number
+	) => {
 		return messageApi[type](content, duration);
 	};
 
