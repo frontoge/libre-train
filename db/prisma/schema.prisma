@@ -172,7 +172,7 @@ model Exercise {
   created_at              DateTime                 @default(now()) @db.Timestamp(0)
   updated_at              DateTime                 @default(now()) @db.Timestamp(0)
   video_link              String?                  @db.VarChar(512)
-  exercise_description    String?                  @default("NULL") @db.VarChar(255)
+  exercise_description    String?                  @default("NULL") @db.VarChar(512)
   equipment               String?                  @db.VarChar(512)
   exercise_form           Int?                     @db.UnsignedInt
   movement_pattern        Int?                     @db.UnsignedInt

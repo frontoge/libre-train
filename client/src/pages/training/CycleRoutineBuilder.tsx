@@ -84,12 +84,15 @@ export function CycleRoutineBuilder() {
 
 	const handleSave = async () => {
 		try {
+			showMessage('loading', 'Saving routines...', 0);
 			const result = await updateMicrocycleRoutines(Number(cycleId), routines);
 			if (result.ok) {
 				// Redirect to cycle browser?
+				showMessage('destroy', '');
 				navigate(`/training/`);
 			} else {
 				// Show error notification
+				showMessage('destroy', '');
 				showMessage('error', 'Failed to save routines');
 			}
 		} catch (error) {

@@ -33,7 +33,6 @@ export function ExercisePicker(props: ExercisePickerProps) {
 		label: exercise.exercise_name,
 		value: exercise.id,
 	}));
-
 	return (
 		<div
 			{...divProps}

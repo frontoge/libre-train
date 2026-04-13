@@ -108,8 +108,6 @@ export const handleGetMacrocycle = async (
 			return res.status(200).json([]);
 		}
 
-		console.log(macrocyclesResult);
-
 		const macrocycles: Macrocycle[] = macrocyclesResult.map((row) => ({
 			id: row.id,
 			client_id: row.client_id,
@@ -673,7 +671,6 @@ export const handleUpdateMicrocycleRoutines = async (
 				exercise_groups: routine.exercise_groups,
 			})
 		);
-
 		await deactivateCycleRoutines(microcycleId);
 		const results = [];
 		for (const routine of createRoutineBodies) {
