@@ -6,7 +6,7 @@ export default function ManageExercises() {
 	return (
 		<PageLayout
 			title="Browse Exercises"
-			style={{
+			contentStyle={{
 				display: 'flex',
 				flexDirection: 'row',
 				gap: '2rem',

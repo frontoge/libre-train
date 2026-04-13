@@ -108,7 +108,7 @@ export function CycleRoutineBuilder() {
 	return (
 		<PageLayout
 			title={microcycle?.cycle_name ? `Microcycle: ${microcycle.cycle_name}` : 'Cycle Routine Builder'}
-			style={{
+			contentStyle={{
 				display: 'flex',
 				flexDirection: 'column',
 				alignItems: 'center',

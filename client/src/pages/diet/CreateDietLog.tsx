@@ -86,7 +86,7 @@ export function CreateDietLog() {
 	return (
 		<PageLayout
 			title="New Diet Log"
-			style={{
+			contentStyle={{
 				display: 'flex',
 				justifyContent: 'center',
 				alignItems: 'center',

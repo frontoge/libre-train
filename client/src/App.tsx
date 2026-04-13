@@ -18,6 +18,7 @@ import { Signup } from './pages/Signup';
 import { TrainingRouter } from './pages/training/TrainingRouter';
 import './styles/app.css';
 import { darkTheme } from './config/themes';
+import { ClientCycleRoutineView } from './pages/clients/ClientCycleRoutineView';
 import { DietRouter } from './pages/diet/DietRouter';
 import { Logout } from './pages/Logout';
 
@@ -139,6 +140,7 @@ function App() {
 				>
 					{contextHolder}
 					<Routes>
+						<Route path="/clients/cycle/:microcycleId" element={<ClientCycleRoutineView />} />
 						<Route path="/" element={<RouterLayout />}>
 							<Route
 								index
