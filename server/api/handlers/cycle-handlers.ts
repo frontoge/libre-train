@@ -102,6 +102,7 @@ export const handleGetMacrocycle = async (
 						}
 					: {}),
 			},
+			orderBy: { cycle_start_date: 'desc' },
 		});
 
 		if (macrocyclesResult.length === 0) {
@@ -268,6 +269,7 @@ export const handleGetMesocycle = async (
 						}
 					: {}),
 			},
+			orderBy: { cycle_start_date: 'desc' },
 		});
 
 		if (mesocyclesResult.length === 0) {
@@ -483,6 +485,7 @@ export const handleGetMicrocycle = async (req: Request<{ id: string }, {}, {}, M
 						}
 					: {}),
 			},
+			orderBy: { cycle_start_date: 'desc' },
 		});
 
 		if (microcyclesResult.length === 0) {

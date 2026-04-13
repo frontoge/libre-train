@@ -47,11 +47,20 @@ export function secondsToTimeString(seconds: number): string {
 	const mins = Math.floor((seconds % 3600) / 60);
 	const secs = seconds % 60;
 
-	const hrsStr = hrs > 0 ? String(hrs).padStart(2, '0') + ':' : '';
-	const minsStr = String(mins).padStart(2, '0') + ':';
-	const secsStr = String(secs).padStart(2, '0');
+	if (hrs > 0) {
+		const hrsStr = String(hrs) + ':';
+		const minsStr = String(mins).padStart(2, '0') + ':';
+		const secsStr = String(secs).padStart(2, '0');
+		return `${hrsStr}${minsStr}${secsStr}`;
+	}
 
-	return `${hrsStr}${minsStr}${secsStr}`;
+	if (mins > 0) {
+		const minsStr = String(mins) + ':';
+		const secsStr = String(secs).padStart(2, '0');
+		return `${minsStr}${secsStr}`;
+	}
+
+	return String(secs);
 }
 
 export function getYearsSinceDate(date: string): number {

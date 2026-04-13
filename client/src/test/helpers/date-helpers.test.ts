@@ -51,11 +51,11 @@ describe('date-helpers', () => {
 
 	describe('timeStringToSeconds', () => {
 		it('converts hh:mm:ss to seconds', () => {
-			expect(timeStringToSeconds('01:02:03')).toBe(3723);
+			expect(timeStringToSeconds('1:02:03')).toBe(3723);
 		});
 
 		it('converts mm:ss to seconds', () => {
-			expect(timeStringToSeconds('02:03')).toBe(123);
+			expect(timeStringToSeconds('2:03')).toBe(123);
 		});
 
 		it('converts ss to seconds', () => {
@@ -65,11 +65,11 @@ describe('date-helpers', () => {
 
 	describe('secondsToTimeString', () => {
 		it('formats seconds into mm:ss when less than one hour', () => {
-			expect(secondsToTimeString(123)).toBe('02:03');
+			expect(secondsToTimeString(123)).toBe('2:03');
 		});
 
 		it('formats seconds into hh:mm:ss when one hour or more', () => {
-			expect(secondsToTimeString(3723)).toBe('01:02:03');
+			expect(secondsToTimeString(3723)).toBe('1:02:03');
 		});
 	});
 
