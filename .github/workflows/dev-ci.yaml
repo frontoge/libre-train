@@ -8,6 +8,7 @@ on:
 jobs:
   build-test-lint:
     runs-on: self-hosted
+    environment: Test
 
     steps:
       - uses: actions/checkout@v4
