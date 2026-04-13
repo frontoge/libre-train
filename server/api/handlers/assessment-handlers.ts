@@ -146,6 +146,7 @@ export const handleGetAssessmentLog = async (
 			},
 			skip: parsedPageSize * (parsedPage - 1),
 			take: parsedPageSize,
+			orderBy: { assessmentDate: 'desc' },
 		});
 
 		if (rows.length === 0) {

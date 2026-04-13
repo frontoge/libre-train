@@ -1,6 +1,7 @@
 import type { PlannedExercise } from '@libre-train/shared';
 import { useContext, useMemo } from 'react';
 import { AppContext } from '../../app-context';
+import { secondsToTimeString } from '../../helpers/date-helpers';
 
 export interface PlannedExerciseProps {
 	exercise: PlannedExercise;
@@ -22,7 +23,9 @@ export function PlannedExerciseDisplay(props: PlannedExerciseProps) {
 	const volumeParts = [
 		plannedExercise.exercise_sets ? `${plannedExercise.exercise_sets}x` : '',
 		plannedExercise.repetitions ?? '',
-		plannedExercise.exercise_duration ? `${plannedExercise.exercise_duration}s` : '',
+		plannedExercise.exercise_duration
+			? secondsToTimeString(plannedExercise.exercise_duration) + (plannedExercise.exercise_duration < 60 ? 's' : '')
+			: '',
 		plannedExercise.exercise_distance ? `${plannedExercise.exercise_distance}m` : '',
 		plannedExercise.target_calories ? `${plannedExercise.target_calories}kcal` : '',
 		plannedExercise.target_mets ? `${plannedExercise.target_mets}METs` : '',

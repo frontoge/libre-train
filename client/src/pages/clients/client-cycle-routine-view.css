@@ -1,0 +1,35 @@
+.client-cycle-view-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	width: 100%;
+	max-width: 72rem;
+	margin: 0 auto;
+}
+
+.client-cycle-meta-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.client-cycle-meta-row {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.client-cycle-notes {
+	margin: 0;
+	white-space: pre-wrap;
+}
+
+.client-cycle-day-picker::-webkit-scrollbar {
+	display: none;
+}
+
+@media (max-width: 480px) {
+	.client-cycle-view-wrapper {
+		gap: 0.75rem;
+	}
+}

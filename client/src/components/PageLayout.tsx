@@ -4,12 +4,15 @@ import { Content, Header } from 'antd/es/layout/layout';
 type PageLayoutProps = {
 	title?: string;
 	children?: React.ReactNode;
+	/** Applied to the outer Layout component */
 	style?: React.CSSProperties;
+	/** Applied to the inner Content component */
+	contentStyle?: React.CSSProperties;
 };
 
 export default function PageLayout(props: PageLayoutProps) {
 	return (
-		<Layout>
+		<Layout style={props.style}>
 			<Header style={{}}>
 				<h1
 					style={{
@@ -23,7 +26,7 @@ export default function PageLayout(props: PageLayoutProps) {
 			</Header>
 			<Content
 				style={
-					props.style || {
+					props.contentStyle || {
 						padding: '2rem 3rem',
 					}
 				}

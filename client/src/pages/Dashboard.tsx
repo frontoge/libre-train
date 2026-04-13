@@ -115,7 +115,7 @@ export function Dashboard() {
 	return (
 		<PageLayout
 			title="Trainer Dashboard"
-			style={{
+			contentStyle={{
 				height: '100%',
 				overflow: 'auto',
 				padding: '1.75rem 2rem',

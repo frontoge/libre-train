@@ -87,7 +87,7 @@ export function AddClient() {
 	return (
 		<PageLayout
 			title="Add Client"
-			style={{
+			contentStyle={{
 				padding: '2rem 3rem',
 				display: 'flex',
 				justifyContent: 'center',

@@ -1,7 +1,7 @@
 import { Routes } from '@libre-train/shared';
 import type { Exercise, ExerciseForm, ExerciseMovementPattern, MuscleGroup } from '@libre-train/shared';
 import { Button, Flex, Rate, Space, Table, type TableProps } from 'antd';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { IoAddCircle } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../../app-context';
@@ -52,6 +52,10 @@ export function ExerciseTable() {
 		setIsCreateEditModalOpen(false);
 	};
 
+	useEffect(() => {
+		stateRefreshers?.refreshExerciseData();
+	}, []);
+
 	const ExerciseTableColumns: TableProps<Exercise>['columns'] = [
 		{
 			title: 'Name',
@@ -93,7 +97,7 @@ export function ExerciseTable() {
 			key: 'progression_level',
 			width: 75,
 			render: (value) => {
-				return <Rate character={({ index = 0 }) => index + 1} allowClear disabled defaultValue={value} />;
+				return <Rate character={({ index = 0 }) => index + 1} allowClear disabled value={value} />;
 			},
 		},
 		{

@@ -2,9 +2,9 @@ import type { ClientDietPlan } from '@libre-train/shared';
 import { Button, Popconfirm, Table } from 'antd';
 import type { TableProps } from 'antd/es/table';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { stringSimilarity } from 'string-similarity-js';
 import { AppContext } from '../../app-context';
 import { createDietPlan, deleteDietPlan, fetchClientDietPlansForTrainer } from '../../helpers/api';
+import { compareStrings } from '../../helpers/filter-helpers';
 import { useMessage } from '../../hooks/useMessage';
 import type { ClientDietPlanTableData } from '../../types/types';
 import { ClientDietPlanSearch } from './ClientDietPlanSearch';
@@ -133,7 +133,7 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 
 	const filteredPlans = useMemo<ClientDietPlanTableData[]>(() => {
 		return tablePlanData.filter((plan) => {
-			if (searchParams.searchText.trim() !== '' && stringSimilarity(plan.name, searchParams.searchText) < 0.3) {
+			if (searchParams.searchText.trim() !== '' && !compareStrings(plan.name, searchParams.searchText, 0.3)) {
 				return false;
 			}
 

@@ -2,7 +2,7 @@ import type { Microcycle, WorkoutRoutine } from '@libre-train/shared';
 import { Card, Popconfirm, Result, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
 import { FaTrash } from 'react-icons/fa';
-import { MdEdit } from 'react-icons/md';
+import { MdContentCopy, MdEdit, MdOpenInNew } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import dayjs from '../../config/dayjs';
 import { deleteMicrocycle } from '../../helpers/api';
@@ -34,6 +34,23 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
 		navigate(`/training/cycle/${microcycle.id}/builder/`);
 	};
 
+	const handleOpenClientView = () => {
+		navigate(`/clients/cycle/${microcycle.id}`);
+	};
+
+	const handleCopyClientViewLink = async () => {
+		const clientViewPath = `/clients/cycle/${microcycle.id}`;
+		const clientViewUrl = `${window.location.origin}${clientViewPath}`;
+
+		try {
+			await navigator.clipboard.writeText(clientViewUrl);
+			showMessage('success', 'Client cycle link copied to clipboard');
+		} catch (error) {
+			console.error('Failed to copy client cycle link:', error);
+			showMessage('error', 'Failed to copy link to clipboard');
+		}
+	};
+
 	const handleDelete = async () => {
 		const result = await deleteMicrocycle(microcycle.id);
 		if (result.ok) {
@@ -57,8 +74,14 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
 	}, [props.microcycle]);
 
 	const cardActions = [
+		<div key="open-client-view" style={{ width: '100%' }} onClick={handleOpenClientView}>
+			<MdOpenInNew />
+		</div>,
+		<div key="copy-client-view-link" style={{ width: '100%' }} onClick={handleCopyClientViewLink}>
+			<MdContentCopy />
+		</div>,
 		<div key="edit" style={{ width: '100%' }} onClick={handleEdit}>
-			<MdEdit onClick={handleEdit} />
+			<MdEdit />
 		</div>,
 		<Popconfirm
 			key="delete"

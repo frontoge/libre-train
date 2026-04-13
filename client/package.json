@@ -8,7 +8,7 @@
 		"build": "tsc -b && vite build",
 		"clean": "rimraf dist",
 		"clean:all": "rimraf dist node_modules",
-		"lint": "eslint .",
+		"lint": "eslint . --max-warnings=21",
 		"lint:fix": "eslint . --fix",
 		"preview": "vite preview",
 		"test": "vitest",

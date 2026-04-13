@@ -4,7 +4,7 @@ export function TodaysPlan() {
 	return (
 		<PageLayout
 			title="Training Plan Snapshot"
-			style={{
+			contentStyle={{
 				display: 'flex',
 				flexDirection: 'column',
 				alignItems: 'center',

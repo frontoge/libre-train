@@ -6,7 +6,7 @@ export function CreateAssessment() {
 	return (
 		<PageLayout
 			title="New Assessment"
-			style={{
+			contentStyle={{
 				padding: '2rem 3rem',
 				display: 'flex',
 				justifyContent: 'center',

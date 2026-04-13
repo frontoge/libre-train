@@ -55,7 +55,7 @@ export function AssessmentHistory() {
 	return (
 		<PageLayout
 			title="Assessment History"
-			style={{
+			contentStyle={{
 				padding: '2rem 3rem',
 				display: 'flex',
 				justifyContent: 'center',

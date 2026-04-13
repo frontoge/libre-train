@@ -22,7 +22,7 @@
 		"build": "bun run typecheck && bun build index.ts --outdir=./dist --target=bun",
 		"clean": "rimraf dist",
 		"clean:all": "rimraf dist node_modules generated",
-		"lint": "eslint .",
+		"lint": "eslint . --max-warnings=3",
 		"lint:fix": "eslint . --fix",
 		"test": "vitest",
 		"test:run": "vitest run",
