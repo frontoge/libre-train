@@ -97,6 +97,7 @@ export function CycleRoutineBuilder() {
 			}
 		} catch (error) {
 			console.error('Error saving routines:', error);
+			showMessage('destroy', '');
 			showMessage('error', 'An error occurred while saving routines');
 		}
 	};
