@@ -325,10 +325,7 @@ export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promi
 	}
 }
 
-export async function deactivateCycleRoutines(
-	cycleId: number,
-	client: Prisma.TransactionClient = prisma
-): Promise<void> {
+export async function deactivateCycleRoutines(cycleId: number, client: Prisma.TransactionClient = prisma): Promise<void> {
 	try {
 		await client.workoutRoutine.updateMany({
 			where: { Microcycle: { id: cycleId } },
