@@ -14,8 +14,8 @@ import {
 } from '@libre-train/shared';
 import { Request, Response } from 'express';
 import dayjs from '../../config/dayjs';
-import { prisma } from '../../database/mysql-database';
-import { createWorkoutRoutine, deactivateCycleRoutines } from './workout-routine-handlers';
+import { Prisma, prisma } from '../../database/mysql-database';
+import { createWorkoutRoutineTx, deactivateCycleRoutines } from './workout-routine-handlers';
 
 const isValidDate = (value: Date): boolean => !Number.isNaN(value.getTime());
 
@@ -663,9 +663,7 @@ export const handleUpdateMicrocycleRoutines = async (
 			return res.status(400).json({ error: 'Invalid microcycle ID' });
 		}
 
-		const reqBody = req.body;
-
-		const createRoutineBodies = reqBody.routines.map(
+		const createRoutineBodies = req.body.routines.map(
 			(routine, index): CreateWorkoutRoutine => ({
 				microcycle_id: microcycleId,
 				routine_index: index,
@@ -674,26 +672,26 @@ export const handleUpdateMicrocycleRoutines = async (
 				exercise_groups: routine.exercise_groups,
 			})
 		);
-		await deactivateCycleRoutines(microcycleId);
-		const results = [];
-		for (const routine of createRoutineBodies) {
-			const result = await createWorkoutRoutine(routine);
-			results.push(result);
-		}
 
-		if (results.some((result) => result === undefined)) {
-			console.error('Failed to create one or more workout routines:', 'Failed to create one or more workout routines.');
-			res.status(500).json({ message: 'Failed to create workout routines.' });
-			return;
-		}
+		await prisma.$transaction(async (tx) => {
+			await deactivateCycleRoutines(microcycleId, tx);
+			for (const routine of createRoutineBodies) {
+				await createWorkoutRoutineTx(tx, routine, { shiftExistingIndices: false });
+			}
+		});
 
 		res.status(204).send();
 	} catch (error: unknown) {
-		let errorMessage = 'Internal server error';
-		if (error instanceof Error) {
-			errorMessage = error.message;
+		if (error instanceof Prisma.PrismaClientKnownRequestError) {
+			console.error('Prisma error updating microcycle routines:', {
+				code: error.code,
+				meta: error.meta,
+				message: error.message,
+			});
+		} else {
+			console.error('Error updating microcycle routines:', error);
 		}
-		console.error('Error updating microcycle routines:', error);
+		const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 		res.status(500).json({ error: errorMessage });
 	}
 };

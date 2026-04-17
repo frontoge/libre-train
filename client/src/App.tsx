@@ -31,6 +31,9 @@ function App() {
 		content: string,
 		duration?: number
 	) => {
+		if (type === 'destroy') {
+			return messageApi.destroy();
+		}
 		return messageApi[type](content, duration);
 	};
 

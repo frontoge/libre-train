@@ -1,5 +1,5 @@
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-import { PrismaClient } from '@libre-train/db/client';
+import { Prisma, PrismaClient } from '@libre-train/db/client';
 
 const adapter = new PrismaMariaDb({
 	host: process.env.DB_HOST!,
@@ -11,4 +11,4 @@ const adapter = new PrismaMariaDb({
 
 const prisma = new PrismaClient({ adapter });
 
-export { prisma };
+export { Prisma, prisma };

@@ -9,8 +9,10 @@ import {
 import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import dayjs from '../../config/dayjs';
-import { prisma } from '../../database/mysql-database';
+import { Prisma, prisma } from '../../database/mysql-database';
 import { CreateWorkoutRoutineSchema, IdParamSchema, UpdateWorkoutRoutineSchema } from '../validators/workout-routine-validators';
+
+type CreateWorkoutRoutineOptions = { shiftExistingIndices?: boolean };
 
 export async function handleCreateWorkoutRoutine(req: Request<{}, {}, CreateWorkoutRoutine>, res: Response) {
 	try {
@@ -244,98 +246,76 @@ async function getWorkoutRoutineById(id: string): Promise<WorkoutRoutine | undef
 	return workoutRoutine;
 }
 
-export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promise<number | undefined> {
-	try {
-		const { microcycle_id, routine_index, routine_name, isActive, exercise_groups } = CreateWorkoutRoutineSchema.parse(
-			routine
-		) as CreateWorkoutRoutine;
+export async function createWorkoutRoutineTx(
+	tx: Prisma.TransactionClient,
+	routine: CreateWorkoutRoutine,
+	options: CreateWorkoutRoutineOptions = {}
+): Promise<number> {
+	const { microcycle_id, routine_index, routine_name, isActive, exercise_groups } = CreateWorkoutRoutineSchema.parse(
+		routine
+	) as CreateWorkoutRoutine;
 
-		// Create the workout routine
-		const createdRoutine = await prisma.workoutRoutine.create({
+	const createdRoutine = await tx.workoutRoutine.create({
+		data: {
+			Microcycle: { connect: { id: microcycle_id } },
+			routine_index,
+			routine_name,
+			isActive,
+		},
+	});
+
+	const workoutRoutineId = createdRoutine.id;
+
+	if (isActive && options.shiftExistingIndices) {
+		await tx.workoutRoutine.updateMany({
+			where: {
+				Microcycle: { id: microcycle_id },
+				routine_index: { gte: routine_index },
+				id: { not: workoutRoutineId },
+				isActive: true,
+			},
+			data: { routine_index: { increment: 1 } },
+		});
+	}
+
+	// Serial per group to avoid deadlocks on the PlannedExerciseGroup (workout_routine_id, group_index)
+	// unique index; the nested PlannedExercise.create collapses each group + its exercises into one query.
+	for (let index = 0; index < exercise_groups.length; index++) {
+		const { rest_between, rest_after, routine_category, exercises } = exercise_groups[index];
+
+		await tx.plannedExerciseGroup.create({
 			data: {
-				Microcycle: { connect: { id: microcycle_id } },
-				routine_index,
-				routine_name,
-				isActive: isActive,
+				workout_routine_id: workoutRoutineId,
+				group_index: index,
+				rest_between: rest_between ?? null,
+				rest_after: rest_after ?? null,
+				routine_category,
+				PlannedExercise: {
+					create: exercises.map((exercise, exIndex) => ({
+						exercise_id: exercise.exercise_id,
+						exercise_group_index: exIndex,
+						repetitions: exercise.repetitions ?? null,
+						exercise_sets: exercise.exercise_sets ?? null,
+						exercise_weight: exercise.exercise_weight ?? null,
+						exercise_duration: exercise.exercise_duration ?? null,
+						exercise_distance: exercise.exercise_distance ?? null,
+						target_heart_rate: exercise.target_heart_rate ?? null,
+						pace: exercise.pace ?? null,
+						rpe: exercise.rpe ?? null,
+						target_calories: exercise.target_calories ?? null,
+						target_mets: exercise.target_mets ?? null,
+					})),
+				},
 			},
 		});
+	}
 
-		const workoutRoutineId = createdRoutine.id;
+	return workoutRoutineId;
+}
 
-		// If this is active, increment indices of other routines with same or higher index
-		if (isActive) {
-			await prisma.workoutRoutine.updateMany({
-				where: {
-					Microcycle: { id: microcycle_id },
-					routine_index: { gte: routine_index },
-					id: { not: workoutRoutineId },
-					isActive: true,
-				},
-				data: {
-					routine_index: {
-						increment: 1,
-					},
-				},
-			});
-		}
-
-		// Create the exercise groups for the routine
-		await Promise.all(
-			exercise_groups.map(async (group, index: number) => {
-				const { rest_between, rest_after, routine_category, exercises } = group;
-
-				const createdGroup = await prisma.plannedExerciseGroup.create({
-					data: {
-						workout_routine_id: workoutRoutineId,
-						group_index: index,
-						rest_between: rest_between ?? null,
-						rest_after: rest_after ?? null,
-						routine_category,
-					},
-				});
-
-				const groupId = createdGroup.id;
-
-				// Create the exercises for the group
-				await Promise.all(
-					exercises.map(async (exercise, exIndex: number) => {
-						const {
-							exercise_id,
-							repetitions,
-							exercise_sets,
-							exercise_weight,
-							exercise_duration,
-							exercise_distance,
-							target_heart_rate,
-							pace,
-							rpe,
-							target_calories,
-							target_mets,
-						} = exercise;
-
-						await prisma.plannedExercise.create({
-							data: {
-								exercise_id,
-								exercise_group_id: groupId,
-								exercise_group_index: exIndex,
-								repetitions: repetitions ?? null,
-								exercise_sets: exercise_sets ?? null,
-								exercise_weight: exercise_weight ?? null,
-								exercise_duration: exercise_duration ?? null,
-								exercise_distance: exercise_distance ?? null,
-								target_heart_rate: target_heart_rate ?? null,
-								pace: pace ?? null,
-								rpe: rpe ?? null,
-								target_calories: target_calories ?? null,
-								target_mets: target_mets ?? null,
-							},
-						});
-					})
-				);
-			})
-		);
-
-		return workoutRoutineId;
+export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promise<number | undefined> {
+	try {
+		return await prisma.$transaction((tx) => createWorkoutRoutineTx(tx, routine, { shiftExistingIndices: true }));
 	} catch (error) {
 		if (error instanceof ZodError) {
 			throw error;
@@ -345,9 +325,12 @@ export async function createWorkoutRoutine(routine: CreateWorkoutRoutine): Promi
 	}
 }
 
-export async function deactivateCycleRoutines(cycleId: number): Promise<void> {
+export async function deactivateCycleRoutines(
+	cycleId: number,
+	client: Prisma.TransactionClient = prisma
+): Promise<void> {
 	try {
-		await prisma.workoutRoutine.updateMany({
+		await client.workoutRoutine.updateMany({
 			where: { Microcycle: { id: cycleId } },
 			data: { isActive: false },
 		});
