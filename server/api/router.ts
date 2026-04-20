@@ -61,6 +61,13 @@ import {
 	handleUpdateExercise,
 } from './handlers/exercise-handlers';
 import {
+	handleCreateClientGoal,
+	handleDeleteClientGoal,
+	handleGetClientGoalById,
+	handleGetClientGoals,
+	handleUpdateClientGoal,
+} from './handlers/goal-handlers';
+import {
 	handleCreateWorkoutRoutine,
 	handleDeleteWorkoutRoutine,
 	handleGetCycleWorkoutRoutines,
@@ -130,6 +137,13 @@ router.post(Routes.WorkoutRoutine, handleCreateWorkoutRoutine);
 router.get(`${Routes.Microcycle}/:microcycleId${Routes.WorkoutRoutine}`, handleGetCycleWorkoutRoutines);
 router.delete(`${Routes.WorkoutRoutine}/:id`, handleDeleteWorkoutRoutine);
 router.put(`${Routes.WorkoutRoutine}/:id`, handleUpdateWorkoutRoutine); // Using the same handler for create and update for simplicity, can be separated if needed
+
+// Goal routes
+router.get(Routes.Goal, handleGetClientGoals);
+router.get(`${Routes.Goal}/:id`, handleGetClientGoalById);
+router.post(Routes.Goal, handleCreateClientGoal);
+router.put(`${Routes.Goal}/:id`, handleUpdateClientGoal);
+router.delete(`${Routes.Goal}/:id`, handleDeleteClientGoal);
 
 // Diet Plan and Log Routes
 router.post(`${Routes.DietPlan}`, handleCreateDietPlan);

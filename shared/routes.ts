@@ -11,6 +11,7 @@ export const Routes = {
 	ClientPlan: '/plan/client',
 	Contacts: '/contact',
 	Exercise: '/exercises',
+	Goal: '/goal',
 	Health: '/health',
 	Macrocycle: '/cycle/macro',
 	Mesocycle: '/cycle/meso',

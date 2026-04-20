@@ -11,6 +11,7 @@ import { AssessmentRouter } from './pages/assessments/AssessmentRouter';
 import { ClientRouter } from './pages/clients/ClientRouter';
 import { Dashboard } from './pages/Dashboard';
 import { ExerciseRouter } from './pages/exercises/ExerciseRouter';
+import { GoalsOverview } from './pages/goals/GoalsOverview';
 import { RouterLayout } from './pages/Layout';
 import { Login } from './pages/Login';
 import { NoPage } from './pages/NoPage';
@@ -166,6 +167,14 @@ function App() {
 								element={
 									<RequireAuth>
 										<ExerciseRouter />
+									</RequireAuth>
+								}
+							/>
+							<Route
+								path="goals"
+								element={
+									<RequireAuth>
+										<GoalsOverview />
 									</RequireAuth>
 								}
 							/>

@@ -37,14 +37,15 @@ model AssessmentGroup {
 }
 
 model AssessmentType {
-  id                  Int                   @id @db.UnsignedInt
-  name                String                @db.VarChar(255)
-  assessmentUnit      String?               @db.VarChar(255)
-  assessmentGroupId   Int?                  @db.UnsignedInt
-  created_at          DateTime              @default(now()) @db.Timestamp(0)
-  updated_at          DateTime              @default(now()) @db.Timestamp(0)
-  AssessmentClientLog AssessmentClientLog[]
-  AssessmentGroup     AssessmentGroup?      @relation(fields: [assessmentGroupId], references: [id], map: "AssessmentType_assessmentGroup_FK")
+  id                    Int                     @id @db.UnsignedInt
+  name                  String                  @db.VarChar(255)
+  assessmentUnit        String?                 @db.VarChar(255)
+  assessmentGroupId     Int?                    @db.UnsignedInt
+  created_at            DateTime                @default(now()) @db.Timestamp(0)
+  updated_at            DateTime                @default(now()) @db.Timestamp(0)
+  AssessmentClientLog   AssessmentClientLog[]
+  AssessmentGroup       AssessmentGroup?        @relation(fields: [assessmentGroupId], references: [id], map: "AssessmentType_assessmentGroup_FK")
+  ClientGoalAssessment  ClientGoalAssessment[]
 
   @@index([assessmentGroupId], map: "AssessmentType_assessmentGroup_FK")
 }
@@ -94,24 +95,48 @@ model ClientDailyLog {
 }
 
 model ClientGoal {
-  id             Int             @id @default(autoincrement()) @db.UnsignedInt
-  client_id      Int             @db.UnsignedInt
-  goal_id        Int?            @db.UnsignedInt
-  target_weight  Float?
-  target_bodyfat Float?
-  created_at     DateTime        @default(now()) @db.Timestamp(0)
-  updated_at     DateTime        @default(now()) @db.Timestamp(0)
-  Client         Client          @relation(fields: [client_id], references: [id], onDelete: Cascade, map: "FK_CLIENTGOAL_CLIENT")
-  ClientGoalType ClientGoalType? @relation(fields: [goal_id], references: [id], map: "FK_CLIENTGOAL_GOAL")
+  id                    Int                    @id @default(autoincrement()) @db.UnsignedInt
+  client_id             Int                    @db.UnsignedInt
+  macrocycle_id         Int?                   @db.UnsignedInt
+  mesocycle_id          Int?                   @db.UnsignedInt
+  microcycle_id         Int?                   @db.UnsignedInt
+  description           String?                @db.VarChar(512)
+  target_date           DateTime?              @db.Date
+  status                GoalStatus             @default(planned)
+  created_at            DateTime               @default(now()) @db.Timestamp(0)
+  updated_at            DateTime               @default(now()) @db.Timestamp(0)
+  Client                Client                 @relation(fields: [client_id], references: [id], onDelete: Cascade, map: "ClientGoal_client_FK")
+  Macrocycle            Macrocycle?            @relation(fields: [macrocycle_id], references: [id], onDelete: Cascade, map: "ClientGoal_macrocycle_FK")
+  Mesocycle             Mesocycle?             @relation(fields: [mesocycle_id], references: [id], onDelete: Cascade, map: "ClientGoal_mesocycle_FK")
+  Microcycle            Microcycle?            @relation(fields: [microcycle_id], references: [id], onDelete: Cascade, map: "ClientGoal_microcycle_FK")
+  ClientGoalAssessment  ClientGoalAssessment[]
 
-  @@index([client_id], map: "FK_CLIENTGOAL_CLIENT")
-  @@index([goal_id], map: "FK_CLIENTGOAL_GOAL")
+  @@index([client_id], map: "ClientGoal_client_FK")
+  @@index([macrocycle_id], map: "ClientGoal_macrocycle_FK")
+  @@index([mesocycle_id], map: "ClientGoal_mesocycle_FK")
+  @@index([microcycle_id], map: "ClientGoal_microcycle_FK")
 }
 
-model ClientGoalType {
-  id         Int          @id @default(autoincrement()) @db.UnsignedInt
-  goal       String       @db.VarChar(100)
-  ClientGoal ClientGoal[]
+model ClientGoalAssessment {
+  id                 Int            @id @default(autoincrement()) @db.UnsignedInt
+  client_goal_id     Int            @db.UnsignedInt
+  assessment_type_id Int            @db.UnsignedInt
+  target_value       String         @db.VarChar(500)
+  created_at         DateTime       @default(now()) @db.Timestamp(0)
+  updated_at         DateTime       @default(now()) @db.Timestamp(0)
+  ClientGoal         ClientGoal     @relation(fields: [client_goal_id], references: [id], onDelete: Cascade, map: "ClientGoalAssessment_goal_FK")
+  AssessmentType     AssessmentType @relation(fields: [assessment_type_id], references: [id], onDelete: Cascade, map: "ClientGoalAssessment_type_FK")
+
+  @@index([client_goal_id], map: "ClientGoalAssessment_goal_FK")
+  @@index([assessment_type_id], map: "ClientGoalAssessment_type_FK")
+}
+
+enum GoalStatus {
+  planned
+  in_progress
+  achieved
+  missed
+  abandoned
 }
 
 model Contact {
@@ -209,6 +234,7 @@ model Macrocycle {
   updated_at       DateTime    @default(now()) @db.Timestamp(0)
   Client           Client      @relation(fields: [client_id], references: [id], onUpdate: Restrict, map: "Macrocycle_ibfk_1")
   Mesocycle        Mesocycle[]
+  ClientGoal       ClientGoal[]
 
   @@index([client_id], map: "client_id")
 }
@@ -229,6 +255,7 @@ model Mesocycle {
   Client           Client       @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Mesocycle_ibfk_1")
   Macrocycle       Macrocycle   @relation(fields: [macrocycle_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Mesocycle_ibfk_2")
   Microcycle       Microcycle[]
+  ClientGoal       ClientGoal[]
 
   @@index([client_id], map: "client_id")
   @@index([macrocycle_id], map: "macrocycle_id")
@@ -248,6 +275,7 @@ model Microcycle {
   Mesocycle        Mesocycle        @relation(fields: [mesocycle_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Microcycle_ibfk_1")
   Client           Client           @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "Microcycle_ibfk_2")
   WorkoutRoutine   WorkoutRoutine[]
+  ClientGoal       ClientGoal[]
 
   @@index([client_id], map: "client_id")
   @@index([mesocycle_id], map: "mesocycle_id")
