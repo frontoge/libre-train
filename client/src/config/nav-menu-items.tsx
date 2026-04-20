@@ -1,5 +1,5 @@
 import { HomeFilled } from '@ant-design/icons';
-import { FaListAlt, FaPencilAlt } from 'react-icons/fa';
+import { FaBullseye, FaListAlt, FaPencilAlt } from 'react-icons/fa';
 import { FaCalendarXmark, FaGear, FaMagnifyingGlass, FaSquarePlus } from 'react-icons/fa6';
 import { GiWeightLiftingUp } from 'react-icons/gi';
 import { ImMap } from 'react-icons/im';
@@ -62,6 +62,12 @@ export const items: NavMenuItem[] = [
 				urlPath: '/assessments/',
 			},
 		],
+	},
+	{
+		key: 'goals',
+		label: 'Goals',
+		icon: <FaBullseye />,
+		urlPath: '/goals',
 	},
 	{
 		key: 'trainingMenu',

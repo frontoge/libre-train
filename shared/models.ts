@@ -3,6 +3,8 @@ import {
 	AssessmentTypeSchema,
 	ClientContactSchema,
 	ClientDietPlanSchema,
+	ClientGoalAssessmentSchema,
+	ClientGoalSchema,
 	ClientSchema,
 	ContactSchema,
 	DietPlanLogEntrySchema,
@@ -141,6 +143,19 @@ export type DietPlan = DataModel<typeof DietPlanSchema>;
 export type DietPlanLogEntry = DataModel<typeof DietPlanLogEntrySchema>;
 
 export type ClientDietPlan = DataModel<typeof ClientDietPlanSchema>;
+
+export type ClientGoal = DataModel<typeof ClientGoalSchema>;
+
+export type ClientGoalAssessment = DataModel<typeof ClientGoalAssessmentSchema>;
+
+export const GoalStatusValues = ['planned', 'in_progress', 'achieved', 'missed', 'abandoned'] as const;
+export type GoalStatus = (typeof GoalStatusValues)[number];
+
+export enum CycleLevel {
+	Macrocycle = 'macrocycle',
+	Mesocycle = 'mesocycle',
+	Microcycle = 'microcycle',
+}
 
 export interface ClientDietLogTodo {
 	clientId: number;

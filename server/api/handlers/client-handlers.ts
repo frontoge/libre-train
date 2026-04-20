@@ -213,17 +213,6 @@ export const handleGetDashboard = async (
 			},
 		});
 
-		// Fetch the latest goal for this client up to the specified date
-		const latestGoal = await prisma.clientGoal.findFirst({
-			where: {
-				client_id: parsedClientId,
-				created_at: { lte: parsedDate },
-			},
-			include: { ClientGoalType: true },
-			orderBy: { created_at: 'desc' },
-			take: 1,
-		});
-
 		const dashboardData: DashboardData = {
 			clientId: client.id,
 			first_name: client.Contact?.first_name ?? 'Unknown',
@@ -242,9 +231,6 @@ export const handleGetDashboard = async (
 			target_protein: numberOrUndefined(dailyLog?.target_protein),
 			target_carbs: numberOrUndefined(dailyLog?.target_carbs),
 			target_fats: numberOrUndefined(dailyLog?.target_fat),
-			goal: latestGoal?.ClientGoalType?.goal ?? undefined,
-			goal_weight: numberOrUndefined(latestGoal?.target_weight),
-			goal_bodyFat: numberOrUndefined(latestGoal?.target_bodyfat),
 		};
 
 		res.status(200).json(dashboardData);
