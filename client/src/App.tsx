@@ -21,8 +21,8 @@ import { darkTheme } from './config/themes';
 import { ClientCycleRoutineView } from './pages/clients/ClientCycleRoutineView';
 import { DietRouter } from './pages/diet/DietRouter';
 import { Logout } from './pages/Logout';
-import { fetchExercises, fetchAssessmentTypes } from './api/exercise';
-import { fetchClientContacts } from './api/client';
+import { fetchExercises as apiFetchExercises, fetchAssessmentTypes as apiFetchAssessmentTypes } from './api/exercise';
+import { fetchClientContacts as apiFetchClientContacts } from './api/client';
 
 function App() {
 	const env = import.meta.env.VITE_ENV || 'local';
@@ -68,9 +68,9 @@ function App() {
 		}));
 	};
 
-	const fetchExercisesData = async () => {
+	const fetchExercises = async () => {
 		try {
-			const data = await fetchExercises();
+			const data = await apiFetchExercises();
 			setAppState((prevState) => ({
 				...prevState,
 				exerciseData: data,
@@ -82,16 +82,16 @@ function App() {
 
 	const fetchClients = async () => {
 		try {
-			const data = await fetchClientContacts();
+			const data = await apiFetchClientContacts();
 			setAppState((prev) => ({ ...prev, clients: data }));
 		} catch (error) {
 			console.error('Error fetching client data:', error);
 		}
 	};
 
-	const fetchAssessmentTypesData = async () => {
+	const fetchAssessmentTypes = async () => {
 		try {
-			const data = await fetchAssessmentTypes();
+			const data = await apiFetchAssessmentTypes();
 			setAppState((prev) => ({ ...prev, assessmentTypes: data }));
 		} catch (error) {
 			console.error('Error fetching assessment types:', error);
@@ -99,16 +99,16 @@ function App() {
 	};
 
 	const stateRefreshers = {
-		refreshExerciseData: fetchExercisesData,
+		refreshExerciseData: fetchExercises,
 		refreshClients: fetchClients,
-		refreshAssessmentTypes: fetchAssessmentTypesData,
+		refreshAssessmentTypes: fetchAssessmentTypes,
 	};
 
 	useEffect(() => {
 		if (appState.auth.user !== undefined) {
-			fetchExercisesData();
+			fetchExercises();
 			fetchClients();
-			fetchAssessmentTypesData();
+			fetchAssessmentTypes();
 		}
 	}, [appState.auth]);
 
