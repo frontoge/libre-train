@@ -1,9 +1,8 @@
-import { Routes } from '@libre-train/shared';
 import { Button, Form, Input, Layout, type FormProps } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { getAppConfiguration } from '../config/app.config';
+import { signupUser } from '../api/auth';
 import { useAuth } from '../hooks/useAuth';
 
 export function Signup() {
@@ -19,28 +18,13 @@ export function Signup() {
 
 	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
 		try {
-			const res = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthSignup}`, {
-				method: 'POST',
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					username: values.username,
-					password: values.password,
-				}),
+			const { accessToken, user } = await signupUser({
+				username: values.username ?? '',
+				password: values.password ?? '',
 			});
-
-			if (!res.ok) {
-				const errorData = await res.json();
-				throw new Error(errorData.message || 'Signup failed');
-			}
-
-			const { accessToken, user } = await res.json();
 
 			setAuth({ authToken: accessToken, user });
 			setShouldRedirect(true);
-			// window.location.href = "/"; // Redirect to home page after signup
 		} catch (e: any) {
 			console.log('Signup error:', e);
 		}

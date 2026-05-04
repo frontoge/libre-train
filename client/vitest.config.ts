@@ -1,4 +1,5 @@
 import react from '@vitejs/plugin-react';
+import path from 'path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
@@ -18,7 +19,9 @@ export default defineConfig({
 
 	resolve: {
 		alias: {
-			'@libre-train/shared': '../shared',
+			'@libre-train/shared': path.resolve(__dirname, '../shared'),
+			'@libre-train/db/zod': path.resolve(__dirname, 'src/test/__mocks__/db-zod.ts'),
+			'@libre-train/db/client': path.resolve(__dirname, 'src/test/__mocks__/db-client.ts'),
 		},
 	},
 });

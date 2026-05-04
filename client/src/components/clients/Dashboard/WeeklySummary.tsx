@@ -12,11 +12,10 @@
 
 import { Alert, Card, DatePicker, Statistic } from 'antd';
 import '../../../styles/ClientDashboard/weekly-summary.css';
-import { Routes, type DashboardWeeklySummaryResponse } from '@libre-train/shared';
 import { Dayjs } from 'dayjs';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { getAppConfiguration } from '../../../config/app.config';
+import { fetchClientWeeklySummary } from '../../../api/client';
 import { formatStatisticDiff } from '../../../helpers/client-formatters';
 import { getWeekRange } from '../../../helpers/date-helpers';
 import { mapDashboardSummaryResponse } from '../../../helpers/mappers';
@@ -33,25 +32,16 @@ export function WeeklySummary() {
 				return;
 			}
 			const weekRange = getWeekRange(selectedWeek);
-			const requestOptions = {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			};
-			const response = await fetch(
-				`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard/summary?startDate=${weekRange.start}&endDate=${weekRange.end}&clientId=${id}`,
-				requestOptions
-			);
-
-			const data: DashboardWeeklySummaryResponse = await response.json();
-
-			if ('message' in data) {
-				console.error(data.message);
-				return;
+			try {
+				const data = await fetchClientWeeklySummary({
+					clientId: id!,
+					startDate: weekRange.start,
+					endDate: weekRange.end,
+				});
+				setSummaryState(mapDashboardSummaryResponse(data));
+			} catch (error) {
+				console.error('Error fetching weekly summary:', error);
 			}
-
-			setSummaryState(mapDashboardSummaryResponse(data));
 		};
 
 		getSummaryData();

@@ -1,7 +1,7 @@
-import { AssessmentGroup, Routes } from '@libre-train/shared';
+import { AssessmentGroup } from '@libre-train/shared';
 import { useContext, useState, type JSX } from 'react';
 import { AppContext } from '../../app-context';
-import { getAppConfiguration } from '../../config/app.config';
+import { createAssessmentLog, updateAssessmentLog } from '../../api/assessment';
 import { useMessage } from '../../hooks/useMessage';
 import type { AssessmentFormValues } from '../../types/types';
 import { ClientSearch } from '../clients/ClientSearch';
@@ -49,30 +49,21 @@ export function AssessmentCreateEditForm(props: AssessmentCreateEditFormProps) {
 	};
 
 	const createNewAssessmentRequest = async (result: AssessmentFormValues) => {
-		const requestOptions = {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				clientId: selectedClient,
+		try {
+			await createAssessmentLog({
+				clientId: selectedClient!,
 				assessments: [
 					{
-						assessmentTypeId: assessmentType,
+						assessmentTypeId: assessmentType!,
 						assessmentDate: result.date?.format('YYYY-MM-DD'),
 						assessmentValue: result.result,
 						notes: result.notes,
 					},
 				],
-			}),
-		};
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AssessmentLog}`, requestOptions);
-		if (response.ok) {
-			// handle success, maybe show a message or redirect
+			});
 			showMessage('success', 'Assessment log created successfully');
 			resetFields();
-		} else {
-			// handle error, maybe show an error message
+		} catch {
 			showMessage('error', 'Failed to create assessment log');
 			console.error('Failed to create assessment log');
 		}
@@ -83,29 +74,19 @@ export function AssessmentCreateEditForm(props: AssessmentCreateEditFormProps) {
 			console.error('No log ID provided for update');
 			return;
 		}
-		const requestOptions = {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				clientId: selectedClient,
-				assessmentTypeId: assessmentType,
+		try {
+			await updateAssessmentLog(props.initialValues.logId, {
+				clientId: selectedClient ?? undefined,
+				assessmentTypeId: assessmentType ?? undefined,
 				assessmentDate: result.date?.format('YYYY-MM-DD'),
 				assessmentValue: result.result,
 				notes: result.notes,
-			}),
-		};
-		const response = await fetch(
-			`${getAppConfiguration().apiUrl}${Routes.AssessmentLog}/${props.initialValues.logId}`,
-			requestOptions
-		);
-		if (!response.ok) {
+			});
+			showMessage('success', 'Assessment log updated successfully');
+		} catch {
 			showMessage('error', 'Failed to update assessment log');
 			console.error('Failed to update assessment log');
-			return;
 		}
-		showMessage('success', 'Assessment log updated successfully');
 	};
 
 	const handleSubmit = (result: AssessmentFormValues) => {

@@ -1,5 +1,4 @@
 /// <reference types="vite/client" />
-import { Routes as ApiRoutes } from '@libre-train/shared';
 import { ConfigProvider, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
@@ -22,6 +21,8 @@ import { darkTheme } from './config/themes';
 import { ClientCycleRoutineView } from './pages/clients/ClientCycleRoutineView';
 import { DietRouter } from './pages/diet/DietRouter';
 import { Logout } from './pages/Logout';
+import { fetchExercises, fetchAssessmentTypes } from './api/exercise';
+import { fetchClientContacts } from './api/client';
 
 function App() {
 	const env = import.meta.env.VITE_ENV || 'local';
@@ -67,16 +68,9 @@ function App() {
 		}));
 	};
 
-	const fetchExercises = async () => {
+	const fetchExercisesData = async () => {
 		try {
-			const requestOptions = {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			};
-			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.Exercise}`, requestOptions);
-			const data = await response.json();
+			const data = await fetchExercises();
 			setAppState((prevState) => ({
 				...prevState,
 				exerciseData: data,
@@ -88,30 +82,16 @@ function App() {
 
 	const fetchClients = async () => {
 		try {
-			const requestOptions = {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			};
-			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.ClientContact}`, requestOptions);
-			const data = await response.json();
+			const data = await fetchClientContacts();
 			setAppState((prev) => ({ ...prev, clients: data }));
 		} catch (error) {
 			console.error('Error fetching client data:', error);
 		}
 	};
 
-	const fetchAssessmentTypes = async () => {
+	const fetchAssessmentTypesData = async () => {
 		try {
-			const requestOptions = {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			};
-			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.Assessment}`, requestOptions);
-			const data = await response.json();
+			const data = await fetchAssessmentTypes();
 			setAppState((prev) => ({ ...prev, assessmentTypes: data }));
 		} catch (error) {
 			console.error('Error fetching assessment types:', error);
@@ -119,16 +99,16 @@ function App() {
 	};
 
 	const stateRefreshers = {
-		refreshExerciseData: fetchExercises,
+		refreshExerciseData: fetchExercisesData,
 		refreshClients: fetchClients,
-		refreshAssessmentTypes: fetchAssessmentTypes,
+		refreshAssessmentTypes: fetchAssessmentTypesData,
 	};
 
 	useEffect(() => {
 		if (appState.auth.user !== undefined) {
-			fetchExercises();
+			fetchExercisesData();
 			fetchClients();
-			fetchAssessmentTypes();
+			fetchAssessmentTypesData();
 		}
 	}, [appState.auth]);
 

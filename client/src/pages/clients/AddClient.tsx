@@ -1,12 +1,11 @@
-import { Routes } from '@libre-train/shared';
-import Divider from 'antd/es/divider';
 import { useContext, useState } from 'react';
+import Divider from 'antd/es/divider';
 import { AppContext } from '../../app-context';
 import { ClientEditCreateForm } from '../../components/clients/ClientEditCreateForm';
 import { ContactEditCreateForm } from '../../components/Contacts/ContactEditCreateForm';
 import PageLayout from '../../components/PageLayout';
 import { Panel } from '../../components/Panel';
-import { getAppConfiguration } from '../../config/app.config';
+import { createClient } from '../../api/client';
 import { useAuth } from '../../hooks/useAuth';
 import { useMessage } from '../../hooks/useMessage';
 import type { ClientEditCreateFormValues, ContactEditCreateFormValues } from '../../types/types';
@@ -53,28 +52,16 @@ export function AddClient() {
 
 	const submitAddClientForm = async () => {
 		try {
-			const requestOptions = {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					firstName: contactFormValues?.firstName,
-					lastName: contactFormValues?.lastName,
-					email: contactFormValues?.email,
-					phoneNumber: contactFormValues?.phoneNumber,
-					dob: contactFormValues?.dob?.format('YYYY-MM-DD'),
-					height: clientFormValues?.height,
-					notes: clientFormValues?.notes,
-					trainerId: user,
-				}),
-			};
-			const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}`, requestOptions);
-			if (!response.ok) {
-				showMessage('error', 'Failed to add client.');
-				return;
-			}
-			await response.json();
+			await createClient({
+				firstName: contactFormValues?.firstName,
+				lastName: contactFormValues?.lastName,
+				email: contactFormValues?.email,
+				phoneNumber: contactFormValues?.phoneNumber,
+				dob: contactFormValues?.dob?.format('YYYY-MM-DD'),
+				height: clientFormValues?.height,
+				notes: clientFormValues?.notes,
+				trainerId: user!,
+			});
 			showMessage('success', 'Client added successfully.');
 			resetFormValues();
 			stateRefreshers?.refreshClients();

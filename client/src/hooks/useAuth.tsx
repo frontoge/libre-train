@@ -1,8 +1,8 @@
-import { Routes } from '@libre-train/shared';
 import { jwtDecode } from 'jwt-decode';
 import { useCallback, useContext } from 'react';
 import { AppContext } from '../app-context';
 import { getAppConfiguration } from '../config/app.config';
+import { refreshToken } from '../api/auth';
 
 export function useAuth() {
 	const {
@@ -56,21 +56,7 @@ export function useAuth() {
 	 */
 	const refreshAuthentication = useCallback(async () => {
 		try {
-			const requestOptions = {
-				method: 'POST',
-				credentials: 'include' as RequestCredentials,
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			};
-			const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthRefresh}`, requestOptions);
-
-			if (!response.ok) {
-				clearAuth();
-				return false;
-			}
-
-			const data = await response.json();
+			const data = await refreshToken();
 			setAuth({ authToken: data.accessToken, user: data.user });
 			return true;
 		} catch (error) {

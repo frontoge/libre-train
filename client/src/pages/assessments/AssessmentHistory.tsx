@@ -1,4 +1,3 @@
-import { Routes } from '@libre-train/shared';
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../app-context';
 import {
@@ -8,8 +7,7 @@ import {
 import { AssessmentHistoryTable, type AssessmentHistoryTableEntry } from '../../components/Assessments/AssessmentHistoryTable';
 import PageLayout from '../../components/PageLayout';
 import { Panel } from '../../components/Panel';
-import { getAppConfiguration } from '../../config/app.config';
-import { createSearchParams } from '../../helpers/fetch-helpers';
+import { fetchAssessmentLogs } from '../../api/assessment';
 import { mapAssessmentLogToDataTableEntry } from '../../helpers/mappers';
 import { useMessage } from '../../hooks/useMessage';
 
@@ -26,19 +24,8 @@ export function AssessmentHistory() {
 			if (!searchQuery) return;
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { clientId, ...parameters } = searchQuery;
-			const requestOptions = {
-				method: 'GET',
-				headers: { 'Content-Type': 'application/json' },
-			};
-			const url = new URL(`${getAppConfiguration().apiUrl}${Routes.AssessmentLog}/${searchQuery.clientId}`);
-			url.search = createSearchParams(parameters).toString();
 
-			const response = await fetch(url, requestOptions);
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const data = await response.json();
+			const data = await fetchAssessmentLogs(parseInt(searchQuery.clientId, 10), parameters);
 
 			const mappedData = data ? mapAssessmentLogToDataTableEntry(data, clients, assessmentTypes) : [];
 			setTableData(mappedData);

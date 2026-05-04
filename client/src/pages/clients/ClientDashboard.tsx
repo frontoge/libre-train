@@ -1,4 +1,3 @@
-import { Routes } from '@libre-train/shared';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AppContext } from '../../app-context';
@@ -6,8 +5,8 @@ import { ClientDataViewer } from '../../components/clients/ClientDataViewer';
 import { ClientLists } from '../../components/clients/ClientLists';
 import { ClientOverview } from '../../components/clients/ClientOverview';
 import PageLayout from '../../components/PageLayout';
-import { getAppConfiguration } from '../../config/app.config';
 import { ClientDashboardContext, defaultDashboardState, type DashboardState } from '../../contexts/ClientDashboardContext';
+import { fetchClientDashboardData } from '../../api/client';
 import { useMessage } from '../../hooks/useMessage';
 
 export function ClientDashboard() {
@@ -27,17 +26,11 @@ export function ClientDashboard() {
 					return;
 				}
 
-				const requestOptions = {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				};
-				const response = await fetch(
-					`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard?clientId=${selectedClient.ClientId}&date=${dashboardState.selectedDate.format('YYYY-MM-DD')}`,
-					requestOptions
-				);
-				const data = await response.json();
+				const data = await fetchClientDashboardData({
+					clientId: selectedClient.ClientId.toString(),
+					date: dashboardState.selectedDate.format('YYYY-MM-DD'),
+				});
+
 				setDashboardState((prev) => ({
 					...prev,
 					data,
