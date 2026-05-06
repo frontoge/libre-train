@@ -1,240 +1,56 @@
-import { Routes, TrainingCycleType } from '@libre-train/shared';
-import type { Macrocycle, Mesocycle, Microcycle } from '@libre-train/shared';
+import { TrainingCycleType } from '@libre-train/shared';
+import { createMacrocycle, createMesocycle, createMicrocycle } from '../api/training';
 import type { CreateEditTrainingPlanFormValues } from '../components/Training/CreateEditTrainingPlan';
-import { getAppConfiguration } from '../config/app.config';
-import { createSearchParams } from './fetch-helpers';
 
-async function createMacrocycle(values: CreateEditTrainingPlanFormValues): Promise<number | undefined> {
-	const requestBody = {
-		cycle_name: values.cycleName,
+// Re-export training API functions for backward compatibility
+export {
+	fetchClientMacrocycles,
+	fetchClientMesocycles,
+	fetchClientMicrocycles,
+	fetchChildMesocycles,
+	fetchChildMicrocycles,
+	fetchMicrocycleById,
+} from '../api/training';
+
+async function createMacrocycleFromForm(values: CreateEditTrainingPlanFormValues): Promise<number | undefined> {
+	return createMacrocycle({
+		cycle_name: values.cycleName ?? '',
 		client_id: Number(values.selectedClient),
 		cycle_start_date: values.dateRange[0].format('YYYY-MM-DD'),
 		cycle_end_date: values.dateRange[1].format('YYYY-MM-DD'),
 		isActive: values.isActive,
 		notes: values.notes,
-	};
-
-	const requestOptions = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(requestBody),
-	};
-
-	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Macrocycle}`, requestOptions);
-		if (!response.ok) {
-			throw new Error(`Failed to create macrocycle: ${response.statusText}`);
-		}
-		const data = await response.json();
-		return data.macrocycleId;
-	} catch (error: Error | unknown) {
-		console.error('Error creating macrocycle:', error instanceof Error ? error.message : error);
-	}
-
-	return undefined;
+	});
 }
 
-async function createMesocycle(values: CreateEditTrainingPlanFormValues): Promise<number | undefined> {
-	const requestBody = {
+async function createMesocycleFromForm(values: CreateEditTrainingPlanFormValues): Promise<number | undefined> {
+	return createMesocycle({
 		macrocycle_id: values.parentCycle,
-		cycle_name: values.cycleName,
+		cycle_name: values.cycleName ?? '',
 		cycle_start_date: values.dateRange[0].format('YYYY-MM-DD'),
 		cycle_end_date: values.dateRange[1].format('YYYY-MM-DD'),
 		is_active: values.isActive,
 		opt_levels: values.optLevels,
 		cardio_levels: values.cardioLevels,
 		notes: values.notes,
-	};
-
-	const requestOptions = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(requestBody),
-	};
-
-	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Mesocycle}`, requestOptions);
-		if (!response.ok) {
-			throw new Error(`Failed to create mesocycle: ${response.statusText}`);
-		}
-		const data = await response.json();
-		return data.mesocycleId;
-	} catch (error: Error | unknown) {
-		console.error('Error creating mesocycle:', error instanceof Error ? error.message : error);
-	}
-
-	return undefined;
+	});
 }
 
-async function createMicrocycle(values: CreateEditTrainingPlanFormValues): Promise<number | undefined> {
-	const requestBody = {
+async function createMicrocycleFromForm(values: CreateEditTrainingPlanFormValues): Promise<number | undefined> {
+	return createMicrocycle({
 		mesocycle_id: values.parentCycle,
-		cycle_name: values.cycleName,
+		cycle_name: values.cycleName ?? '',
 		cycle_start_date: values.dateRange[0].format('YYYY-MM-DD'),
 		cycle_end_date: values.dateRange[1].format('YYYY-MM-DD'),
 		isActive: values.isActive,
 		notes: values.notes,
-	};
-	const requestOptions = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(requestBody),
-	};
-
-	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}`, requestOptions);
-		if (!response.ok) {
-			throw new Error(`Failed to create microcycle: ${response.statusText}`);
-		}
-		const data = await response.json();
-		return data.microcycleId;
-	} catch (error: Error | unknown) {
-		console.error('Error creating microcycle:', error instanceof Error ? error.message : error);
-	}
-	return undefined;
+	});
 }
 
 export const cycleCreateHelpers = {
-	[TrainingCycleType.Macrocycle]: createMacrocycle,
-	[TrainingCycleType.Mesocycle]: createMesocycle,
-	[TrainingCycleType.Microcycle]: createMicrocycle,
-};
-
-export async function fetchClientMacrocycles(clientId: number): Promise<Macrocycle[]> {
-	const requestOptions = {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	};
-
-	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Macrocycle}/${clientId}`, requestOptions);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch parent macrocycles: ${response.statusText}`);
-		}
-		const data = await response.json();
-		return data as Macrocycle[];
-	} catch (error: Error | unknown) {
-		console.error('Error fetching parent macrocycles:', error instanceof Error ? error.message : error);
-		return [];
-	}
-}
-
-export async function fetchClientMesocycles(clientId: number): Promise<Mesocycle[]> {
-	const requestOptions = {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	};
-
-	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Mesocycle}/${clientId}`, requestOptions);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch parent mesocycles: ${response.statusText}`);
-		}
-		const data = await response.json();
-		return data as Mesocycle[];
-	} catch (error: Error | unknown) {
-		console.error('Error fetching parent mesocycles:', error instanceof Error ? error.message : error);
-		return [];
-	}
-}
-
-export const fetchClientMicrocycles = async (clientId: number): Promise<Microcycle[]> => {
-	const requestOptions = {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	};
-	try {
-		const searchParams = createSearchParams({ clientId });
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}?${searchParams}`, requestOptions);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch parent microcycles: ${response.statusText}`);
-		}
-		const data = await response.json();
-		return data as Microcycle[];
-	} catch (error: Error | unknown) {
-		console.error('Error fetching parent microcycles:', error instanceof Error ? error.message : error);
-		return [];
-	}
-};
-
-export const fetchChildMesocycles = async (macrocycleId: number, clientId: number): Promise<Mesocycle[]> => {
-	const requestOptions = {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	};
-	const searchParams = createSearchParams({ macrocycleId, active: true });
-	try {
-		const response = await fetch(
-			`${getAppConfiguration().apiUrl}${Routes.Mesocycle}/${clientId}?${searchParams}`,
-			requestOptions
-		);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch child mesocycles: ${response.statusText}`);
-		}
-		const data = await response.json();
-		return data;
-	} catch (error: Error | unknown) {
-		console.error('Error fetching child mesocycles:', error instanceof Error ? error.message : error);
-		return [];
-	}
-};
-
-export const fetchChildMicrocycles = async (mesocycleId: number, clientId: number): Promise<Microcycle[]> => {
-	const requestOptions = {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	};
-	const searchParams = createSearchParams({ clientId, mesocycleId, active: true });
-	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}?${searchParams}`, requestOptions);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch child microcycles: ${response.statusText}`);
-		}
-		const data = await response.json();
-		return data;
-	} catch (error: Error | unknown) {
-		console.error('Error fetching child microcycles:', error instanceof Error ? error.message : error);
-		return [];
-	}
-};
-
-export const fetchMicrocycleById = async (microcycleId: number): Promise<Microcycle | undefined> => {
-	const requestOptions = {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	};
-	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}/${microcycleId}`, requestOptions);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch microcycle: ${response.statusText}`);
-		}
-		const data = await response.json();
-		if (data.length === 0) {
-			return undefined;
-		}
-		return data[0] as Microcycle;
-	} catch (error: Error | unknown) {
-		console.error('Error fetching microcycle:', error instanceof Error ? error.message : error);
-		return undefined;
-	}
+	[TrainingCycleType.Macrocycle]: createMacrocycleFromForm,
+	[TrainingCycleType.Mesocycle]: createMesocycleFromForm,
+	[TrainingCycleType.Microcycle]: createMicrocycleFromForm,
 };
 
 export const optLevelTagColors: Record<number, string> = {

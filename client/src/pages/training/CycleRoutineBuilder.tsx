@@ -85,20 +85,13 @@ export function CycleRoutineBuilder() {
 	const handleSave = async () => {
 		try {
 			showMessage('loading', 'Saving routines...', 0);
-			const result = await updateMicrocycleRoutines(Number(cycleId), routines);
-			if (result.ok) {
-				// Redirect to cycle browser?
-				showMessage('destroy', '');
-				navigate(`/training/`);
-			} else {
-				// Show error notification
-				showMessage('destroy', '');
-				showMessage('error', 'Failed to save routines');
-			}
+			await updateMicrocycleRoutines(Number(cycleId), routines);
+			showMessage('destroy', '');
+			navigate(`/training/`);
 		} catch (error) {
 			console.error('Error saving routines:', error);
 			showMessage('destroy', '');
-			showMessage('error', 'An error occurred while saving routines');
+			showMessage('error', 'Failed to save routines');
 		}
 	};
 

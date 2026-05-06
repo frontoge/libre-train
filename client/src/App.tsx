@@ -1,5 +1,4 @@
 /// <reference types="vite/client" />
-import { Routes as ApiRoutes } from '@libre-train/shared';
 import { ConfigProvider, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
@@ -18,6 +17,8 @@ import { NoPage } from './pages/NoPage';
 import { Signup } from './pages/Signup';
 import { TrainingRouter } from './pages/training/TrainingRouter';
 import './styles/app.css';
+import { fetchClientContacts as apiFetchClientContacts } from './api/client';
+import { fetchAssessmentTypes as apiFetchAssessmentTypes, fetchExercises as apiFetchExercises } from './api/exercise';
 import { darkTheme } from './config/themes';
 import { ClientCycleRoutineView } from './pages/clients/ClientCycleRoutineView';
 import { DietRouter } from './pages/diet/DietRouter';
@@ -69,14 +70,7 @@ function App() {
 
 	const fetchExercises = async () => {
 		try {
-			const requestOptions = {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			};
-			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.Exercise}`, requestOptions);
-			const data = await response.json();
+			const data = await apiFetchExercises();
 			setAppState((prevState) => ({
 				...prevState,
 				exerciseData: data,
@@ -88,14 +82,7 @@ function App() {
 
 	const fetchClients = async () => {
 		try {
-			const requestOptions = {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			};
-			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.ClientContact}`, requestOptions);
-			const data = await response.json();
+			const data = await apiFetchClientContacts();
 			setAppState((prev) => ({ ...prev, clients: data }));
 		} catch (error) {
 			console.error('Error fetching client data:', error);
@@ -104,14 +91,7 @@ function App() {
 
 	const fetchAssessmentTypes = async () => {
 		try {
-			const requestOptions = {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			};
-			const response = await fetch(`${getAppConfiguration().apiUrl}${ApiRoutes.Assessment}`, requestOptions);
-			const data = await response.json();
+			const data = await apiFetchAssessmentTypes();
 			setAppState((prev) => ({ ...prev, assessmentTypes: data }));
 		} catch (error) {
 			console.error('Error fetching assessment types:', error);

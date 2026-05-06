@@ -1,9 +1,9 @@
-import { Routes, undefinedIfNull, type DailyUpdateData } from '@libre-train/shared';
+import { undefinedIfNull, type DailyUpdateData } from '@libre-train/shared';
 import { Alert, Button, Calendar, Card, Divider, InputNumber, Statistic } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { getAppConfiguration } from '../../../config/app.config';
+import { submitClientDailyUpdate } from '../../../api/client';
 import { ClientDashboardContext } from '../../../contexts/ClientDashboardContext';
 import { useMessage } from '../../../hooks/useMessage';
 import { NutritionSummary } from '../../Nutrition/NutritionSummary';
@@ -65,22 +65,12 @@ export function DailyUpdate() {
 		}
 		dashboardState.setIsLoading(true);
 		try {
-			const requestOptions = {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					clientId: parseInt(id ?? '0'), // Ensure id is a number
-					date: dashboardState.selectedDate.format('YYYY-MM-DD'),
-					data: dailyData,
-				}),
-			};
-			const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}/daily-update`, requestOptions);
-			if (!response.ok) {
-				showMessage('error', 'Failed to submit daily update.');
-				throw new Error('Failed to submit daily update');
-			}
+			await submitClientDailyUpdate({
+				clientId: parseInt(id ?? '0'),
+				date: dashboardState.selectedDate.format('YYYY-MM-DD'),
+				data: dailyData,
+			});
+
 			setDashboardState((prev) => ({
 				...prev,
 				data: {

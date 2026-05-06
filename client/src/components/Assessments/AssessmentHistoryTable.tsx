@@ -1,8 +1,7 @@
-import { Routes } from '@libre-train/shared';
 import { Button, Popconfirm, Space, Table, type TableProps } from 'antd';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import { getAppConfiguration } from '../../config/app.config';
+import { deleteAssessmentLog } from '../../api/assessment';
 import { useMessage } from '../../hooks/useMessage';
 import type { AssessmentCreateEditInitialValues } from './AssessmentCreateEditForm';
 import { AssessmentModal } from './AssessmentModal';
@@ -29,19 +28,8 @@ export function AssessmentHistoryTable(props: AssessmentHistoryTableProps) {
 	const [initialFormValues, setInitialFormValues] = useState<AssessmentCreateEditInitialValues | undefined>(undefined);
 
 	const handleDeleteEntry = async (entryId: string) => {
-		// Make delete request to backend to delete the assessment log entry
 		try {
-			const requestOptions = {
-				method: 'DELETE',
-				headers: { 'Content-Type': 'application/json' },
-			};
-
-			const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AssessmentLog}/${entryId}`, requestOptions);
-
-			if (!response.ok) {
-				showMessage('error', 'Failed to delete assessment log entry');
-				throw new Error('Failed to delete assessment log entry');
-			}
+			await deleteAssessmentLog(Number(entryId));
 			props.onAction?.();
 			showMessage('success', 'Assessment log entry deleted successfully');
 		} catch (error) {

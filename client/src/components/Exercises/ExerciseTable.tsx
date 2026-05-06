@@ -1,11 +1,10 @@
-import { Routes } from '@libre-train/shared';
 import type { Exercise, ExerciseForm, ExerciseMovementPattern, MuscleGroup } from '@libre-train/shared';
 import { Button, Flex, Rate, Space, Table, type TableProps } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import { IoAddCircle } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
+import { deleteExercise } from '../../api/exercise';
 import { AppContext } from '../../app-context';
-import { getAppConfiguration } from '../../config/app.config';
 import { applyExerciseTableFilters } from '../../helpers/filter-helpers';
 import { ExerciseTypeLabels, MovementPatternLabels, MuscleGroupLabels } from '../../helpers/label-formatters';
 import { useMessage } from '../../hooks/useMessage';
@@ -24,14 +23,11 @@ export function ExerciseTable() {
 	const showMessage = useMessage();
 
 	const handleDelete = async (key: string | number) => {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Exercise}/${key}`, {
-			method: 'DELETE',
-		});
-
-		if (response.ok) {
+		try {
+			await deleteExercise(Number(key));
 			stateRefreshers?.refreshExerciseData();
 			showMessage('success', 'Exercise deleted successfully');
-		} else {
+		} catch {
 			console.error('Failed to delete exercise');
 			showMessage('error', 'Failed to delete exercise');
 		}

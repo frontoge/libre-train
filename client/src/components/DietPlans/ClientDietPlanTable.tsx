@@ -86,25 +86,22 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 			return;
 		}
 
-		const response = await createDietPlan({
-			clientId: parseInt(values.clientId),
-			trainerId: user,
-			planName: values.planName ?? '',
-			notes: values.notes,
-			targetCalories: values.targetCalories,
-			targetProtein: values.targetProtein,
-			targetCarbs: values.targetCarbs,
-			targetFats: values.targetFats,
-		});
-
-		if (response.ok) {
-			// handle successful creation
+		try {
+			await createDietPlan({
+				clientId: parseInt(values.clientId),
+				trainerId: user,
+				planName: values.planName ?? '',
+				notes: values.notes,
+				targetCalories: values.targetCalories,
+				targetProtein: values.targetProtein,
+				targetCarbs: values.targetCarbs,
+				targetFats: values.targetFats,
+			});
 			showMessage('success', 'Diet plan created successfully');
 			fetchClientPlans();
 			handleCloseModal();
-		} else {
-			// handle error
-			console.error('Failed to create diet plan');
+		} catch (error) {
+			console.error('Failed to create diet plan', error);
 			showMessage('error', 'Failed to create diet plan');
 		}
 	};
@@ -115,14 +112,12 @@ export function ClientDietPlanTable(props: ClientDietPlanTableProps) {
 			return;
 		}
 
-		const response = await deleteDietPlan(dietPlanId);
-		if (response.ok) {
-			// handle successful deletion
+		try {
+			await deleteDietPlan(dietPlanId);
 			fetchClientPlans();
 			showMessage('success', 'Diet plan deleted successfully');
-		} else {
-			// handle error
-			console.error('Failed to delete diet plan');
+		} catch (error) {
+			console.error('Failed to delete diet plan', error);
 			showMessage('error', 'Failed to delete diet plan');
 		}
 	};

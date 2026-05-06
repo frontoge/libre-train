@@ -137,7 +137,7 @@ export function GoalForm(props: GoalFormProps) {
 					? (await fetchClientMacrocycles(activeClientId)).map(toCycleOption)
 					: currentCycleLevel === CycleLevel.Mesocycle
 						? (await fetchClientMesocycles(activeClientId)).map(toCycleOption)
-						: (await fetchClientMicrocycles(activeClientId)).map(toCycleOption);
+						: (await fetchClientMicrocycles({ clientId: activeClientId })).map(toCycleOption);
 			if (!cancelled) setCycleOptions(cycles);
 		};
 		loadCycles();

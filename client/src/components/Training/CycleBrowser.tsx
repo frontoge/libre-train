@@ -20,7 +20,7 @@ export function CycleBrowser(props: CycleBrowserProps) {
 		const responses = await Promise.all([
 			fetchClientMacrocycles(clientId),
 			fetchClientMesocycles(clientId),
-			fetchClientMicrocycles(clientId),
+			fetchClientMicrocycles({ clientId }),
 		]);
 		setCycleData(responses);
 	};

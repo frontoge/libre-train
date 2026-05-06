@@ -1,8 +1,8 @@
-import { Routes, type MuscleGroup } from '@libre-train/shared';
+import type { MuscleGroup } from '@libre-train/shared';
 import { Button, Form, Input, Rate, Select } from 'antd';
 import { useContext } from 'react';
+import { createExercise, updateExercise } from '../../api/exercise';
 import { AppContext } from '../../app-context';
-import { getAppConfiguration } from '../../config/app.config';
 import { exerciseFormOptions, exerciseMovementPatternOptions } from '../../helpers/enum-select-options';
 import { useMessage } from '../../hooks/useMessage';
 import { MuscleGroupSearch } from './MuscleGroupSearch';
@@ -48,25 +48,16 @@ export function CreateEditExerciseForm(props: CreateEditExerciseFormProps) {
 
 	const createNewExercise = async (values: CreateEditExerciseFormValues) => {
 		try {
-			const requestOptions = {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					exercise_name: values.exerciseName,
-					muscle_groups: values.muscleGroups,
-					exercise_description: values.description,
-					video_link: values.videoLink,
-					equipment: values.equipmentNeeded,
-					exercise_form: values.exerciseType,
-					movement_pattern: values.movementPattern,
-					progression_level: values.progressionLevel,
-				}),
-			};
-
-			const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Exercise}`, requestOptions);
-			if (!response.ok) {
-				throw new Error(`Error creating exercise: ${response.statusText}`);
-			}
+			await createExercise({
+				exercise_name: values.exerciseName,
+				muscle_groups: values.muscleGroups,
+				exercise_description: values.description,
+				video_link: values.videoLink,
+				equipment: values.equipmentNeeded,
+				exercise_form: values.exerciseType,
+				movement_pattern: values.movementPattern,
+				progression_level: values.progressionLevel,
+			});
 
 			stateRefreshers?.refreshExerciseData();
 			showMessage('success', 'Exercise created successfully');
@@ -79,28 +70,16 @@ export function CreateEditExerciseForm(props: CreateEditExerciseFormProps) {
 
 	const updateExistingExercise = async (values: CreateEditExerciseFormValues) => {
 		try {
-			const requestOptions = {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					exercise_name: values.exerciseName,
-					muscle_groups: values.muscleGroups ?? [],
-					exercise_description: values.description ?? '',
-					video_link: values.videoLink ?? '',
-					equipment: values.equipmentNeeded ?? '',
-					exercise_form: values.exerciseType,
-					movement_pattern: values.movementPattern,
-					progression_level: values.progressionLevel,
-				}),
-			};
-
-			const response = await fetch(
-				`${getAppConfiguration().apiUrl}${Routes.Exercise}/${props.initialExerciseId}`,
-				requestOptions
-			);
-			if (!response.ok) {
-				throw new Error(`Error updating exercise: ${response.statusText}`);
-			}
+			await updateExercise(props.initialExerciseId!, {
+				exercise_name: values.exerciseName,
+				muscle_groups: values.muscleGroups ?? [],
+				exercise_description: values.description ?? '',
+				video_link: values.videoLink ?? '',
+				equipment: values.equipmentNeeded ?? '',
+				exercise_form: values.exerciseType,
+				movement_pattern: values.movementPattern,
+				progression_level: values.progressionLevel,
+			});
 			stateRefreshers?.refreshExerciseData();
 			showMessage('success', 'Exercise updated successfully');
 			props.onComplete?.();

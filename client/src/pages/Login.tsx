@@ -1,11 +1,10 @@
 /// <reference types="vite/client" />
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Routes } from '@libre-train/shared';
 import { Alert, Button, Card, Col, Divider, Form, Input, Layout, Row, Space, theme, Typography, type FormProps } from 'antd';
 import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { loginUser } from '../api/auth';
 import logo from '../assets/logo.svg';
-import { getAppConfiguration } from '../config/app.config';
 import { useAuth } from '../hooks/useAuth';
 
 const BRANDING = {
@@ -61,24 +60,10 @@ export function Login() {
 		setLoginError(null);
 
 		try {
-			const res = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthLogin}`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				credentials: 'include',
-				body: JSON.stringify({
-					username: values.username,
-					password: values.password,
-				}),
+			const { accessToken, user } = await loginUser({
+				username: values.username ?? '',
+				password: values.password ?? '',
 			});
-
-			if (!res.ok) {
-				const errorData = await res.json();
-				throw new Error(errorData.message || 'Login failed');
-			}
-
-			const { accessToken, user } = await res.json();
 			setAuth({ authToken: accessToken, user });
 		} catch (e: any) {
 			setLoginError(e?.message ?? 'Unable to sign in. Please verify your credentials and try again.');
