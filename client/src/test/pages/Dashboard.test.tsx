@@ -82,6 +82,7 @@ const defaultClients: ClientContact[] = [
 
 const createState = (overrides?: Partial<AppState>): AppState => ({
 	clients: defaultClients,
+	contacts: [],
 	assessmentTypes: [
 		{
 			id: 1,

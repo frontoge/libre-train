@@ -54,6 +54,7 @@ const defaultClients: ClientContact[] = [
 
 const createState = (clients: ClientContact[]): AppState => ({
 	clients,
+	contacts: [],
 	assessmentTypes: [],
 	showMessage: () => {},
 	auth: {
