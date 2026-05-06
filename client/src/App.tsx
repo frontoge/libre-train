@@ -17,12 +17,12 @@ import { NoPage } from './pages/NoPage';
 import { Signup } from './pages/Signup';
 import { TrainingRouter } from './pages/training/TrainingRouter';
 import './styles/app.css';
+import { fetchClientContacts as apiFetchClientContacts } from './api/client';
+import { fetchAssessmentTypes as apiFetchAssessmentTypes, fetchExercises as apiFetchExercises } from './api/exercise';
 import { darkTheme } from './config/themes';
 import { ClientCycleRoutineView } from './pages/clients/ClientCycleRoutineView';
 import { DietRouter } from './pages/diet/DietRouter';
 import { Logout } from './pages/Logout';
-import { fetchExercises as apiFetchExercises, fetchAssessmentTypes as apiFetchAssessmentTypes } from './api/exercise';
-import { fetchClientContacts as apiFetchClientContacts } from './api/client';
 
 function App() {
 	const env = import.meta.env.VITE_ENV || 'local';

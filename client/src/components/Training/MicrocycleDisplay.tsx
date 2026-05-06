@@ -52,12 +52,12 @@ export function MicrocycleDisplay(props: MicrocycleDisplayProps) {
 	};
 
 	const handleDelete = async () => {
-		const result = await deleteMicrocycle(microcycle.id);
-		if (result.ok) {
+		try {
+			await deleteMicrocycle(microcycle.id);
 			showMessage('success', 'Microcycle deleted successfully');
 			onChange?.();
-		} else {
-			// show error notification
+		} catch (error) {
+			console.error('Error deleting microcycle:', error);
 			showMessage('error', 'Failed to delete microcycle');
 		}
 	};

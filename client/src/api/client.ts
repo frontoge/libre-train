@@ -1,15 +1,14 @@
 import type {
 	AddClientFormValues,
 	ClientContact,
+	DailyUpdateRequest,
 	DashboardData,
 	DashboardWeeklySummary,
-	DailyUpdateRequest,
 	UpdateClientRequest,
 	UpdateContactRequest,
 } from '@libre-train/shared';
 import { Routes } from '@libre-train/shared';
-import { getAppConfiguration } from '../config/app.config';
-import { createSearchParams } from '../helpers/fetch-helpers';
+import { apiFetch } from '../helpers/fetch-helpers';
 
 export type ClientDashboardSearchParams = {
 	clientId: string;
@@ -23,43 +22,27 @@ export type ClientWeeklySummarySearchParams = {
 };
 
 export async function createClient(data: AddClientFormValues): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}`, {
+	await apiFetch<void, AddClientFormValues>(Routes.Clients, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(data),
+		body: data,
+		errorMessage: 'Failed to add client',
 	});
-
-	if (!response.ok) {
-		const errorData = await response.json().catch(() => ({}));
-		throw new Error(errorData.errorMessage || 'Failed to add client');
-	}
 }
 
 export async function updateClient(clientId: number, data: UpdateClientRequest): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}/${clientId}`, {
+	await apiFetch<void, UpdateClientRequest>(`${Routes.Clients}/${clientId}`, {
 		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(data),
+		body: data,
+		errorMessage: 'Failed to update client',
 	});
-
-	if (!response.ok) {
-		const errorData = await response.json().catch(() => ({}));
-		throw new Error(errorData.errorMessage || 'Failed to update client');
-	}
 }
 
 export async function deleteClient(clientId: number): Promise<boolean> {
 	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}/${clientId}`, {
+		await apiFetch<void>(`${Routes.Clients}/${clientId}`, {
 			method: 'DELETE',
-			headers: { 'Content-Type': 'application/json' },
+			errorMessage: 'Failed to delete client',
 		});
-
-		if (!response.ok) {
-			const errorData = await response.json().catch(() => ({}));
-			throw new Error(errorData.errorMessage || 'Failed to delete client');
-		}
-
 		return true;
 	} catch (error) {
 		console.error('Error deleting client:', error);
@@ -69,12 +52,10 @@ export async function deleteClient(clientId: number): Promise<boolean> {
 
 export async function fetchClientContacts(clientId?: number): Promise<ClientContact[]> {
 	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.ClientContact}/${clientId ?? ''}`, {
+		return await apiFetch<ClientContact[]>(`${Routes.ClientContact}/${clientId ?? ''}`, {
 			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
+			errorMessage: 'Failed to fetch client contacts',
 		});
-		const data = await response.json();
-		return data as ClientContact[];
 	} catch (error) {
 		console.error('Error fetching client contacts:', error);
 		return [];
@@ -82,42 +63,29 @@ export async function fetchClientContacts(clientId?: number): Promise<ClientCont
 }
 
 export async function updateContact(contactId: number, data: UpdateContactRequest): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Contacts}/${contactId}`, {
+	await apiFetch<void, UpdateContactRequest>(`${Routes.Contacts}/${contactId}`, {
 		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(data),
+		body: data,
+		errorMessage: 'Failed to update contact',
 	});
-
-	if (!response.ok) {
-		const errorData = await response.json().catch(() => ({}));
-		throw new Error(errorData.errorMessage || 'Failed to update contact');
-	}
 }
 
 export async function fetchClientDashboardData(params: ClientDashboardSearchParams): Promise<DashboardData> {
-	const searchParams = createSearchParams(params);
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard?${searchParams}`, {
+	return apiFetch<DashboardData>(`${Routes.Clients}/dashboard`, {
 		method: 'GET',
-		headers: { 'Content-Type': 'application/json' },
+		searchParams: params,
+		errorMessage: 'Failed to fetch client dashboard data',
 	});
-
-	if (!response.ok) {
-		throw new Error(`Failed to fetch client dashboard data: ${response.statusText}`);
-	}
-
-	return response.json() as Promise<DashboardData>;
 }
 
 export async function fetchClientWeeklySummary(params: ClientWeeklySummarySearchParams): Promise<DashboardWeeklySummary[]> {
-	const searchParams = createSearchParams(params);
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}/dashboard/summary?${searchParams}`, {
+	const data = await apiFetch<DashboardWeeklySummary[] | { message: string }>(`${Routes.Clients}/dashboard/summary`, {
 		method: 'GET',
-		headers: { 'Content-Type': 'application/json' },
+		searchParams: params,
+		errorMessage: 'Failed to fetch client weekly summary',
 	});
 
-	const data = await response.json();
-
-	if ('message' in data) {
+	if (data && !Array.isArray(data) && 'message' in data) {
 		throw new Error(data.message);
 	}
 
@@ -125,13 +93,9 @@ export async function fetchClientWeeklySummary(params: ClientWeeklySummarySearch
 }
 
 export async function submitClientDailyUpdate(data: DailyUpdateRequest): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Clients}/daily-update`, {
+	await apiFetch<void, DailyUpdateRequest>(`${Routes.Clients}/daily-update`, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(data),
+		body: data,
+		errorMessage: 'Failed to submit daily update',
 	});
-
-	if (!response.ok) {
-		throw new Error('Failed to submit daily update');
-	}
 }

@@ -1,6 +1,6 @@
 import { TrainingCycleType } from '@libre-train/shared';
-import type { CreateEditTrainingPlanFormValues } from '../components/Training/CreateEditTrainingPlan';
 import { createMacrocycle, createMesocycle, createMicrocycle } from '../api/training';
+import type { CreateEditTrainingPlanFormValues } from '../components/Training/CreateEditTrainingPlan';
 
 // Re-export training API functions for backward compatibility
 export {

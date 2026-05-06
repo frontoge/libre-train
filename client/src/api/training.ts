@@ -1,7 +1,6 @@
 import type { Macrocycle, Mesocycle, Microcycle, WorkoutRoutine } from '@libre-train/shared';
 import { Routes } from '@libre-train/shared';
-import { getAppConfiguration } from '../config/app.config';
-import { createSearchParams } from '../helpers/fetch-helpers';
+import { apiFetch } from '../helpers/fetch-helpers';
 import type { WorkoutRoutineEdit } from '../types/types';
 
 export type CreateMacrocycleRequest = {
@@ -39,21 +38,22 @@ export type MicrocycleFetchParams = {
 	active?: boolean;
 };
 
+export type UpdateMicrocycleRoutinesRequest = {
+	routines: Array<{
+		routine_name?: string;
+		exercise_groups: WorkoutRoutineEdit['exercise_groups'];
+	}>;
+};
+
 export async function createMacrocycle(data: CreateMacrocycleRequest): Promise<number | undefined> {
 	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Macrocycle}`, {
+		const result = await apiFetch<{ macrocycleId: number }, CreateMacrocycleRequest>(Routes.Macrocycle, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(data),
+			body: data,
+			errorMessage: 'Failed to create macrocycle',
 		});
-
-		if (!response.ok) {
-			throw new Error(`Failed to create macrocycle: ${response.statusText}`);
-		}
-
-		const result = await response.json();
-		return result.macrocycleId as number;
-	} catch (error: Error | unknown) {
+		return result.macrocycleId;
+	} catch (error) {
 		console.error('Error creating macrocycle:', error instanceof Error ? error.message : error);
 		return undefined;
 	}
@@ -61,19 +61,13 @@ export async function createMacrocycle(data: CreateMacrocycleRequest): Promise<n
 
 export async function createMesocycle(data: CreateMesocycleRequest): Promise<number | undefined> {
 	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Mesocycle}`, {
+		const result = await apiFetch<{ mesocycleId: number }, CreateMesocycleRequest>(Routes.Mesocycle, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(data),
+			body: data,
+			errorMessage: 'Failed to create mesocycle',
 		});
-
-		if (!response.ok) {
-			throw new Error(`Failed to create mesocycle: ${response.statusText}`);
-		}
-
-		const result = await response.json();
-		return result.mesocycleId as number;
-	} catch (error: Error | unknown) {
+		return result.mesocycleId;
+	} catch (error) {
 		console.error('Error creating mesocycle:', error instanceof Error ? error.message : error);
 		return undefined;
 	}
@@ -81,19 +75,13 @@ export async function createMesocycle(data: CreateMesocycleRequest): Promise<num
 
 export async function createMicrocycle(data: CreateMicrocycleRequest): Promise<number | undefined> {
 	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}`, {
+		const result = await apiFetch<{ microcycleId: number }, CreateMicrocycleRequest>(Routes.Microcycle, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(data),
+			body: data,
+			errorMessage: 'Failed to create microcycle',
 		});
-
-		if (!response.ok) {
-			throw new Error(`Failed to create microcycle: ${response.statusText}`);
-		}
-
-		const result = await response.json();
-		return result.microcycleId as number;
-	} catch (error: Error | unknown) {
+		return result.microcycleId;
+	} catch (error) {
 		console.error('Error creating microcycle:', error instanceof Error ? error.message : error);
 		return undefined;
 	}
@@ -101,18 +89,11 @@ export async function createMicrocycle(data: CreateMicrocycleRequest): Promise<n
 
 export async function fetchClientMacrocycles(clientId: number): Promise<Macrocycle[]> {
 	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Macrocycle}/${clientId}`, {
+		return await apiFetch<Macrocycle[]>(`${Routes.Macrocycle}/${clientId}`, {
 			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
+			errorMessage: 'Failed to fetch parent macrocycles',
 		});
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch parent macrocycles: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data as Macrocycle[];
-	} catch (error: Error | unknown) {
+	} catch (error) {
 		console.error('Error fetching parent macrocycles:', error instanceof Error ? error.message : error);
 		return [];
 	}
@@ -120,18 +101,11 @@ export async function fetchClientMacrocycles(clientId: number): Promise<Macrocyc
 
 export async function fetchClientMesocycles(clientId: number): Promise<Mesocycle[]> {
 	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Mesocycle}/${clientId}`, {
+		return await apiFetch<Mesocycle[]>(`${Routes.Mesocycle}/${clientId}`, {
 			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
+			errorMessage: 'Failed to fetch parent mesocycles',
 		});
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch parent mesocycles: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data as Mesocycle[];
-	} catch (error: Error | unknown) {
+	} catch (error) {
 		console.error('Error fetching parent mesocycles:', error instanceof Error ? error.message : error);
 		return [];
 	}
@@ -139,19 +113,12 @@ export async function fetchClientMesocycles(clientId: number): Promise<Mesocycle
 
 export async function fetchClientMicrocycles(params: MicrocycleFetchParams): Promise<Microcycle[]> {
 	try {
-		const searchParams = createSearchParams(params);
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}?${searchParams}`, {
+		return await apiFetch<Microcycle[]>(Routes.Microcycle, {
 			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
+			searchParams: params,
+			errorMessage: 'Failed to fetch parent microcycles',
 		});
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch parent microcycles: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data as Microcycle[];
-	} catch (error: Error | unknown) {
+	} catch (error) {
 		console.error('Error fetching parent microcycles:', error instanceof Error ? error.message : error);
 		return [];
 	}
@@ -159,19 +126,12 @@ export async function fetchClientMicrocycles(params: MicrocycleFetchParams): Pro
 
 export async function fetchChildMesocycles(macrocycleId: number, clientId: number): Promise<Mesocycle[]> {
 	try {
-		const searchParams = createSearchParams({ macrocycleId, active: true });
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Mesocycle}/${clientId}?${searchParams}`, {
+		return await apiFetch<Mesocycle[]>(`${Routes.Mesocycle}/${clientId}`, {
 			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
+			searchParams: { macrocycleId, active: true },
+			errorMessage: 'Failed to fetch child mesocycles',
 		});
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch child mesocycles: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data as Mesocycle[];
-	} catch (error: Error | unknown) {
+	} catch (error) {
 		console.error('Error fetching child mesocycles:', error instanceof Error ? error.message : error);
 		return [];
 	}
@@ -179,19 +139,12 @@ export async function fetchChildMesocycles(macrocycleId: number, clientId: numbe
 
 export async function fetchChildMicrocycles(mesocycleId: number, clientId: number): Promise<Microcycle[]> {
 	try {
-		const searchParams = createSearchParams({ clientId, mesocycleId, active: true });
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}?${searchParams}`, {
+		return await apiFetch<Microcycle[]>(Routes.Microcycle, {
 			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
+			searchParams: { clientId, mesocycleId, active: true },
+			errorMessage: 'Failed to fetch child microcycles',
 		});
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch child microcycles: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data as Microcycle[];
-	} catch (error: Error | unknown) {
+	} catch (error) {
 		console.error('Error fetching child microcycles:', error instanceof Error ? error.message : error);
 		return [];
 	}
@@ -199,99 +152,61 @@ export async function fetchChildMicrocycles(mesocycleId: number, clientId: numbe
 
 export async function fetchMicrocycleById(microcycleId: number): Promise<Microcycle | undefined> {
 	try {
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}/${microcycleId}`, {
+		const data = await apiFetch<Microcycle[]>(`${Routes.Microcycle}/${microcycleId}`, {
 			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
+			errorMessage: 'Failed to fetch microcycle',
 		});
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch microcycle: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-
-		if (data.length === 0) {
-			return undefined;
-		}
-
-		return data[0] as Microcycle;
-	} catch (error: Error | unknown) {
+		return data[0];
+	} catch (error) {
 		console.error('Error fetching microcycle:', error instanceof Error ? error.message : error);
 		return undefined;
 	}
 }
 
-export async function deleteMacrocycle(macrocycleId: number): Promise<Response> {
-	try {
-		return await fetch(`${getAppConfiguration().apiUrl}${Routes.Macrocycle}/${macrocycleId}`, {
-			method: 'DELETE',
-		});
-	} catch (error) {
-		console.error('Error deleting macrocycle:', error);
-		throw error;
-	}
+export async function deleteMacrocycle(macrocycleId: number): Promise<void> {
+	await apiFetch<void>(`${Routes.Macrocycle}/${macrocycleId}`, {
+		method: 'DELETE',
+		errorMessage: 'Failed to delete macrocycle',
+	});
 }
 
-export async function deleteMesocycle(mesocycleId: number): Promise<Response> {
-	try {
-		return await fetch(`${getAppConfiguration().apiUrl}${Routes.Mesocycle}/${mesocycleId}`, {
-			method: 'DELETE',
-		});
-	} catch (error) {
-		console.error('Error deleting mesocycle:', error);
-		throw error;
-	}
+export async function deleteMesocycle(mesocycleId: number): Promise<void> {
+	await apiFetch<void>(`${Routes.Mesocycle}/${mesocycleId}`, {
+		method: 'DELETE',
+		errorMessage: 'Failed to delete mesocycle',
+	});
 }
 
-export async function deleteMicrocycle(microcycleId: number): Promise<Response> {
-	try {
-		return await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}/${microcycleId}`, {
-			method: 'DELETE',
-		});
-	} catch (error) {
-		console.error('Error deleting microcycle:', error);
-		throw error;
-	}
+export async function deleteMicrocycle(microcycleId: number): Promise<void> {
+	await apiFetch<void>(`${Routes.Microcycle}/${microcycleId}`, {
+		method: 'DELETE',
+		errorMessage: 'Failed to delete microcycle',
+	});
 }
 
 export async function fetchMicrocycleRoutines(microcycleId: number): Promise<WorkoutRoutine[]> {
 	try {
-		const response = await fetch(
-			`${getAppConfiguration().apiUrl}${Routes.Microcycle}/${microcycleId}${Routes.WorkoutRoutine}`,
-			{
-				method: 'GET',
-				headers: { 'Content-Type': 'application/json' },
-			}
-		);
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch routines for microcycle ${microcycleId}: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data as WorkoutRoutine[];
-	} catch (error: Error | unknown) {
+		return await apiFetch<WorkoutRoutine[]>(`${Routes.Microcycle}/${microcycleId}${Routes.WorkoutRoutine}`, {
+			method: 'GET',
+			errorMessage: `Failed to fetch routines for microcycle ${microcycleId}`,
+		});
+	} catch (error) {
 		console.error(`Error fetching routines for microcycle ${microcycleId}:`, error instanceof Error ? error.message : error);
 		return [];
 	}
 }
 
-export async function updateMicrocycleRoutines(microcycleId: number, routines: WorkoutRoutineEdit[]): Promise<Response> {
-	const body = JSON.stringify({
+export async function updateMicrocycleRoutines(microcycleId: number, routines: WorkoutRoutineEdit[]): Promise<void> {
+	const body: UpdateMicrocycleRoutinesRequest = {
 		routines: routines.map((routine) => ({
 			routine_name: routine?.routine_name ?? undefined,
 			exercise_groups: routine?.exercise_groups ?? [],
 		})),
-	});
+	};
 
-	try {
-		return await fetch(`${getAppConfiguration().apiUrl}${Routes.Microcycle}/${microcycleId}${Routes.WorkoutRoutine}`, {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
-			body,
-		});
-	} catch (error) {
-		console.error('Error updating microcycle routines:', error);
-		throw error;
-	}
+	await apiFetch<void, UpdateMicrocycleRoutinesRequest>(`${Routes.Microcycle}/${microcycleId}${Routes.WorkoutRoutine}`, {
+		method: 'PUT',
+		body,
+		errorMessage: 'Failed to update microcycle routines',
+	});
 }

@@ -1,5 +1,5 @@
 import { Routes } from '@libre-train/shared';
-import { getAppConfiguration } from '../config/app.config';
+import { apiFetch } from '../helpers/fetch-helpers';
 
 export type LoginRequest = {
 	username: string;
@@ -12,59 +12,35 @@ export type AuthResponse = {
 };
 
 export async function loginUser(body: LoginRequest): Promise<AuthResponse> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthLogin}`, {
+	return apiFetch<AuthResponse, LoginRequest>(Routes.AuthLogin, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
+		body,
 		credentials: 'include',
-		body: JSON.stringify(body),
+		errorMessage: 'Login failed',
 	});
-
-	if (!response.ok) {
-		const errorData = await response.json();
-		throw new Error(errorData.message || 'Login failed');
-	}
-
-	return response.json() as Promise<AuthResponse>;
 }
 
 export async function signupUser(body: LoginRequest): Promise<AuthResponse> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthSignup}`, {
+	return apiFetch<AuthResponse, LoginRequest>(Routes.AuthSignup, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
+		body,
 		credentials: 'include',
-		body: JSON.stringify(body),
+		errorMessage: 'Signup failed',
 	});
-
-	if (!response.ok) {
-		const errorData = await response.json();
-		throw new Error(errorData.message || 'Signup failed');
-	}
-
-	return response.json() as Promise<AuthResponse>;
 }
 
 export async function refreshToken(): Promise<AuthResponse> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthRefresh}`, {
+	return apiFetch<AuthResponse>(Routes.AuthRefresh, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
 		credentials: 'include',
+		errorMessage: 'Token refresh failed',
 	});
-
-	if (!response.ok) {
-		throw new Error('Token refresh failed');
-	}
-
-	return response.json() as Promise<AuthResponse>;
 }
 
 export async function logoutUser(): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AuthLogout}`, {
+	await apiFetch<void>(Routes.AuthLogout, {
 		method: 'GET',
-		headers: { 'Content-Type': 'application/json' },
 		credentials: 'include',
+		errorMessage: 'Logout failed',
 	});
-
-	if (!response.ok) {
-		throw new Error('Logout failed');
-	}
 }

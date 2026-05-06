@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
+import { fetchAssessmentLogs } from '../../api/assessment';
 import { AppContext } from '../../app-context';
 import {
 	AssessmentHistoryFilters,
@@ -7,7 +8,6 @@ import {
 import { AssessmentHistoryTable, type AssessmentHistoryTableEntry } from '../../components/Assessments/AssessmentHistoryTable';
 import PageLayout from '../../components/PageLayout';
 import { Panel } from '../../components/Panel';
-import { fetchAssessmentLogs } from '../../api/assessment';
 import { mapAssessmentLogToDataTableEntry } from '../../helpers/mappers';
 import { useMessage } from '../../hooks/useMessage';
 

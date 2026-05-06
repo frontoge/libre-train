@@ -59,19 +59,14 @@ export function CreateDietLog() {
 			fats,
 		};
 		try {
-			const response = await createDietLogEntry(requestBody);
-			if (response.ok) {
-				form.resetFields();
-				setClientPlan(undefined);
-				setSelectedClient(undefined);
-				showMessage('success', 'Diet log entry created successfully');
-			} else {
-				console.error('Failed to create diet log entry:', response.statusText);
-				showMessage('error', 'Failed to create diet log entry');
-			}
+			await createDietLogEntry(requestBody);
+			form.resetFields();
+			setClientPlan(undefined);
+			setSelectedClient(undefined);
+			showMessage('success', 'Diet log entry created successfully');
 		} catch (error) {
 			console.error('Error creating diet log entry:', error);
-			showMessage('error', 'Error creating diet log entry');
+			showMessage('error', 'Failed to create diet log entry');
 		}
 	};
 

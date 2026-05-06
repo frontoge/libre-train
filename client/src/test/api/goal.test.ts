@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createClientGoal, deleteClientGoal, fetchClientGoals, fetchGoalById, fetchTrainerGoals, updateClientGoal } from '../../api/goal';
+import {
+	createClientGoal,
+	deleteClientGoal,
+	fetchClientGoals,
+	fetchGoalById,
+	fetchTrainerGoals,
+	updateClientGoal,
+} from '../../api/goal';
 
 vi.mock('../../config/app.config', () => ({
 	getAppConfiguration: () => ({ apiUrl: 'http://test-api' }),
@@ -20,9 +27,7 @@ describe('goal api', () => {
 
 			const result = await fetchClientGoals(5);
 
-			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining('/goal')
-			);
+			expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/goal'), expect.objectContaining({ method: 'GET' }));
 			expect(result).toEqual(goals);
 		});
 
@@ -60,7 +65,7 @@ describe('goal api', () => {
 
 			const result = await fetchGoalById(3);
 
-			expect(mockFetch).toHaveBeenCalledWith('http://test-api/goal/3');
+			expect(mockFetch).toHaveBeenCalledWith('http://test-api/goal/3', expect.objectContaining({ method: 'GET' }));
 			expect(result).toEqual(goal);
 		});
 
@@ -124,7 +129,7 @@ describe('goal api', () => {
 
 			await deleteClientGoal(7);
 
-			expect(mockFetch).toHaveBeenCalledWith('http://test-api/goal/7', { method: 'DELETE' });
+			expect(mockFetch).toHaveBeenCalledWith('http://test-api/goal/7', expect.objectContaining({ method: 'DELETE' }));
 		});
 
 		it('throws when deletion fails', async () => {

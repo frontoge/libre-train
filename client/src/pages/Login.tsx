@@ -3,8 +3,8 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Alert, Button, Card, Col, Divider, Form, Input, Layout, Row, Space, theme, Typography, type FormProps } from 'antd';
 import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import logo from '../assets/logo.svg';
 import { loginUser } from '../api/auth';
+import logo from '../assets/logo.svg';
 import { useAuth } from '../hooks/useAuth';
 
 const BRANDING = {

@@ -1,24 +1,23 @@
-import type { ClientDietLogTodo, ClientDietPlan, ClientTrainingPlanTodo, CreateDietPlan, DietPlanLogEntry } from '@libre-train/shared';
+import type {
+	ClientDietLogTodo,
+	ClientDietPlan,
+	ClientTrainingPlanTodo,
+	CreateDietPlan,
+	DietPlanLogEntry,
+} from '@libre-train/shared';
 import { Routes } from '@libre-train/shared';
-import { getAppConfiguration } from '../config/app.config';
-import { createSearchParams } from '../helpers/fetch-helpers';
+import { apiFetch } from '../helpers/fetch-helpers';
 
 export type DietLogEntryCreateRequest = Omit<DietPlanLogEntry, 'id' | 'dietPlanId'>;
 
 export async function fetchClientDietPlan(clientId: number): Promise<ClientDietPlan> {
 	try {
-		const searchParams = createSearchParams({ clientId: clientId.toString() });
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.DietPlan}?${searchParams}`, {
+		const data = await apiFetch<ClientDietPlan[]>(Routes.DietPlan, {
 			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
+			searchParams: { clientId },
+			errorMessage: 'Error fetching client diet plan',
 		});
-
-		if (!response.ok) {
-			throw new Error(`Error fetching client diet plan: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data[0] as ClientDietPlan;
+		return data[0] ?? ({} as ClientDietPlan);
 	} catch (error) {
 		console.error('Error fetching client diet plan:', error);
 		return {} as ClientDietPlan;
@@ -26,108 +25,56 @@ export async function fetchClientDietPlan(clientId: number): Promise<ClientDietP
 }
 
 export async function fetchClientDietPlansForTrainer(trainerId: number): Promise<ClientDietPlan[]> {
-	try {
-		const searchParams = createSearchParams({ trainerId: trainerId.toString() });
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.DietPlan}${Routes.Clients}?${searchParams}`, {
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
-		});
-		const data = await response.json();
-		return data as ClientDietPlan[];
-	} catch (error) {
-		console.error('Error fetching client diet plans for trainer:', error);
-		throw error;
-	}
+	return apiFetch<ClientDietPlan[]>(`${Routes.DietPlan}${Routes.Clients}`, {
+		method: 'GET',
+		searchParams: { trainerId },
+		errorMessage: 'Error fetching client diet plans for trainer',
+	});
 }
 
 export async function fetchDietPlanLogEntries(dietPlanId: number): Promise<DietPlanLogEntry[]> {
-	try {
-		const searchParams = createSearchParams({ dietPlanId: dietPlanId.toString() });
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.DietLog}?${searchParams}`, {
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
-		});
-		const data = await response.json();
-		return data as DietPlanLogEntry[];
-	} catch (error) {
-		console.error('Error fetching diet plan log entries:', error);
-		throw error;
-	}
+	return apiFetch<DietPlanLogEntry[]>(Routes.DietLog, {
+		method: 'GET',
+		searchParams: { dietPlanId },
+		errorMessage: 'Error fetching diet plan log entries',
+	});
 }
 
 export async function fetchDietLogTodos(trainerId: number): Promise<ClientDietLogTodo[]> {
-	try {
-		const searchParams = createSearchParams({ trainerId: trainerId.toString() });
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.DietLogTodos}?${searchParams}`, {
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
-		});
-
-		if (!response.ok) {
-			throw new Error(`Error fetching diet log todos: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data as ClientDietLogTodo[];
-	} catch (error) {
-		console.error('Error fetching diet log todos:', error);
-		throw error;
-	}
+	return apiFetch<ClientDietLogTodo[]>(Routes.DietLogTodos, {
+		method: 'GET',
+		searchParams: { trainerId },
+		errorMessage: 'Error fetching diet log todos',
+	});
 }
 
 export async function fetchTrainingPlanTodos(trainerId: number): Promise<ClientTrainingPlanTodo[]> {
-	try {
-		const searchParams = createSearchParams({ trainerId: trainerId.toString() });
-		const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.TrainingPlanTodos}?${searchParams}`, {
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
-		});
-
-		if (!response.ok) {
-			throw new Error(`Error fetching training plan todos: ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return data as ClientTrainingPlanTodo[];
-	} catch (error) {
-		console.error('Error fetching training plan todos:', error);
-		throw error;
-	}
+	return apiFetch<ClientTrainingPlanTodo[]>(Routes.TrainingPlanTodos, {
+		method: 'GET',
+		searchParams: { trainerId },
+		errorMessage: 'Error fetching training plan todos',
+	});
 }
 
-export async function createDietPlan(dietPlan: CreateDietPlan): Promise<Response> {
-	try {
-		return await fetch(`${getAppConfiguration().apiUrl}${Routes.DietPlan}`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(dietPlan),
-		});
-	} catch (error) {
-		console.error('Error creating diet plan:', error);
-		throw error;
-	}
+export async function createDietPlan(dietPlan: CreateDietPlan): Promise<void> {
+	await apiFetch<void, CreateDietPlan>(Routes.DietPlan, {
+		method: 'POST',
+		body: dietPlan,
+		errorMessage: 'Failed to create diet plan',
+	});
 }
 
-export async function deleteDietPlan(dietPlanId: number): Promise<Response> {
-	try {
-		return await fetch(`${getAppConfiguration().apiUrl}${Routes.DietPlan}/${dietPlanId}`, {
-			method: 'DELETE',
-		});
-	} catch (error) {
-		console.error('Error deleting diet plan:', error);
-		throw error;
-	}
+export async function deleteDietPlan(dietPlanId: number): Promise<void> {
+	await apiFetch<void>(`${Routes.DietPlan}/${dietPlanId}`, {
+		method: 'DELETE',
+		errorMessage: 'Failed to delete diet plan',
+	});
 }
 
-export async function createDietLogEntry(dietLogEntry: DietLogEntryCreateRequest): Promise<Response> {
-	try {
-		return await fetch(`${getAppConfiguration().apiUrl}${Routes.DietLog}`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(dietLogEntry),
-		});
-	} catch (error) {
-		console.error('Error creating diet log entry:', error);
-		throw error;
-	}
+export async function createDietLogEntry(dietLogEntry: DietLogEntryCreateRequest): Promise<void> {
+	await apiFetch<void, DietLogEntryCreateRequest>(Routes.DietLog, {
+		method: 'POST',
+		body: dietLogEntry,
+		errorMessage: 'Failed to create diet log entry',
+	});
 }

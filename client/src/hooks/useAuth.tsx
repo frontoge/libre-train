@@ -1,8 +1,8 @@
 import { jwtDecode } from 'jwt-decode';
 import { useCallback, useContext } from 'react';
+import { refreshToken } from '../api/auth';
 import { AppContext } from '../app-context';
 import { getAppConfiguration } from '../config/app.config';
-import { refreshToken } from '../api/auth';
 
 export function useAuth() {
 	const {

@@ -1,7 +1,8 @@
 import { AssessmentGroup } from '@libre-train/shared';
+import dayjs from 'dayjs';
 import { useContext, useState, type JSX } from 'react';
-import { AppContext } from '../../app-context';
 import { createAssessmentLog, updateAssessmentLog } from '../../api/assessment';
+import { AppContext } from '../../app-context';
 import { useMessage } from '../../hooks/useMessage';
 import type { AssessmentFormValues } from '../../types/types';
 import { ClientSearch } from '../clients/ClientSearch';
@@ -55,7 +56,7 @@ export function AssessmentCreateEditForm(props: AssessmentCreateEditFormProps) {
 				assessments: [
 					{
 						assessmentTypeId: assessmentType!,
-						assessmentDate: result.date?.format('YYYY-MM-DD'),
+						assessmentDate: result.date?.format('YYYY-MM-DD') ?? dayjs().format('YYYY-MM-DD'),
 						assessmentValue: result.result,
 						notes: result.notes,
 					},

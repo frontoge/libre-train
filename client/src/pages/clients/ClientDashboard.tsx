@@ -1,12 +1,12 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { fetchClientDashboardData } from '../../api/client';
 import { AppContext } from '../../app-context';
 import { ClientDataViewer } from '../../components/clients/ClientDataViewer';
 import { ClientLists } from '../../components/clients/ClientLists';
 import { ClientOverview } from '../../components/clients/ClientOverview';
 import PageLayout from '../../components/PageLayout';
 import { ClientDashboardContext, defaultDashboardState, type DashboardState } from '../../contexts/ClientDashboardContext';
-import { fetchClientDashboardData } from '../../api/client';
 import { useMessage } from '../../hooks/useMessage';
 
 export function ClientDashboard() {

@@ -1,6 +1,6 @@
 import type { AssessmentType, Exercise, ExerciseForm, ExerciseMovementPattern, MuscleGroup } from '@libre-train/shared';
 import { Routes } from '@libre-train/shared';
-import { getAppConfiguration } from '../config/app.config';
+import { apiFetch } from '../helpers/fetch-helpers';
 
 export type CreateExerciseRequest = {
 	exercise_name: string;
@@ -25,61 +25,38 @@ export type UpdateExerciseRequest = {
 };
 
 export async function fetchExercises(): Promise<Exercise[]> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Exercise}`, {
+	return apiFetch<Exercise[]>(Routes.Exercise, {
 		method: 'GET',
-		headers: { 'Content-Type': 'application/json' },
+		errorMessage: 'Failed to fetch exercises',
 	});
-
-	if (!response.ok) {
-		throw new Error(`Failed to fetch exercises: ${response.statusText}`);
-	}
-
-	return response.json() as Promise<Exercise[]>;
 }
 
 export async function fetchAssessmentTypes(): Promise<AssessmentType[]> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Assessment}`, {
+	return apiFetch<AssessmentType[]>(Routes.Assessment, {
 		method: 'GET',
-		headers: { 'Content-Type': 'application/json' },
+		errorMessage: 'Failed to fetch assessment types',
 	});
-
-	if (!response.ok) {
-		throw new Error(`Failed to fetch assessment types: ${response.statusText}`);
-	}
-
-	return response.json() as Promise<AssessmentType[]>;
 }
 
 export async function createExercise(data: CreateExerciseRequest): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Exercise}`, {
+	await apiFetch<void, CreateExerciseRequest>(Routes.Exercise, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(data),
+		body: data,
+		errorMessage: 'Error creating exercise',
 	});
-
-	if (!response.ok) {
-		throw new Error(`Error creating exercise: ${response.statusText}`);
-	}
 }
 
 export async function updateExercise(exerciseId: number, data: UpdateExerciseRequest): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Exercise}/${exerciseId}`, {
+	await apiFetch<void, UpdateExerciseRequest>(`${Routes.Exercise}/${exerciseId}`, {
 		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(data),
+		body: data,
+		errorMessage: 'Error updating exercise',
 	});
-
-	if (!response.ok) {
-		throw new Error(`Error updating exercise: ${response.statusText}`);
-	}
 }
 
 export async function deleteExercise(exerciseId: number): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Exercise}/${exerciseId}`, {
+	await apiFetch<void>(`${Routes.Exercise}/${exerciseId}`, {
 		method: 'DELETE',
+		errorMessage: 'Failed to delete exercise',
 	});
-
-	if (!response.ok) {
-		throw new Error(`Failed to delete exercise: ${response.statusText}`);
-	}
 }

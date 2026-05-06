@@ -1,7 +1,10 @@
-import type { AssessmentClientLog, AssessmentClientLogCreateRequest, AssessmentClientLogSearchOptions } from '@libre-train/shared';
+import type {
+	AssessmentClientLog,
+	AssessmentClientLogCreateRequest,
+	AssessmentClientLogSearchOptions,
+} from '@libre-train/shared';
 import { Routes } from '@libre-train/shared';
-import { getAppConfiguration } from '../config/app.config';
-import { createSearchParams } from '../helpers/fetch-helpers';
+import { apiFetch } from '../helpers/fetch-helpers';
 
 export type UpdateAssessmentLogRequest = {
 	clientId?: number;
@@ -15,55 +18,32 @@ export async function fetchAssessmentLogs(
 	clientId: number,
 	params?: AssessmentClientLogSearchOptions
 ): Promise<AssessmentClientLog[]> {
-	const url = new URL(`${getAppConfiguration().apiUrl}${Routes.AssessmentLog}/${clientId}`);
-
-	if (params) {
-		url.search = createSearchParams(params).toString();
-	}
-
-	const response = await fetch(url, {
+	return apiFetch<AssessmentClientLog[]>(`${Routes.AssessmentLog}/${clientId}`, {
 		method: 'GET',
-		headers: { 'Content-Type': 'application/json' },
+		searchParams: params as Record<string, unknown> | undefined,
+		errorMessage: 'Failed to fetch assessment logs',
 	});
-
-	if (!response.ok) {
-		throw new Error(`HTTP error! status: ${response.status}`);
-	}
-
-	return response.json() as Promise<AssessmentClientLog[]>;
 }
 
 export async function createAssessmentLog(data: AssessmentClientLogCreateRequest): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AssessmentLog}`, {
+	await apiFetch<void, AssessmentClientLogCreateRequest>(Routes.AssessmentLog, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(data),
+		body: data,
+		errorMessage: 'Failed to create assessment log',
 	});
-
-	if (!response.ok) {
-		throw new Error(`Failed to create assessment log: ${response.statusText}`);
-	}
 }
 
 export async function updateAssessmentLog(logId: number, data: UpdateAssessmentLogRequest): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AssessmentLog}/${logId}`, {
+	await apiFetch<void, UpdateAssessmentLogRequest>(`${Routes.AssessmentLog}/${logId}`, {
 		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(data),
+		body: data,
+		errorMessage: 'Failed to update assessment log',
 	});
-
-	if (!response.ok) {
-		throw new Error(`Failed to update assessment log: ${response.statusText}`);
-	}
 }
 
 export async function deleteAssessmentLog(logId: number): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.AssessmentLog}/${logId}`, {
+	await apiFetch<void>(`${Routes.AssessmentLog}/${logId}`, {
 		method: 'DELETE',
-		headers: { 'Content-Type': 'application/json' },
+		errorMessage: 'Failed to delete assessment log entry',
 	});
-
-	if (!response.ok) {
-		throw new Error('Failed to delete assessment log entry');
-	}
 }

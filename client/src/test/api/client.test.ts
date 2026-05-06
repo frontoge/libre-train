@@ -1,5 +1,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createClient, deleteClient, fetchClientContacts, fetchClientDashboardData, fetchClientWeeklySummary, submitClientDailyUpdate, updateClient, updateContact } from '../../api/client';
+import {
+	createClient,
+	deleteClient,
+	fetchClientContacts,
+	fetchClientDashboardData,
+	fetchClientWeeklySummary,
+	submitClientDailyUpdate,
+	updateClient,
+	updateContact,
+} from '../../api/client';
 
 vi.mock('../../config/app.config', () => ({
 	getAppConfiguration: () => ({ apiUrl: 'http://test-api' }),
@@ -92,10 +101,7 @@ describe('client api', () => {
 
 			const result = await fetchClientContacts();
 
-			expect(mockFetch).toHaveBeenCalledWith(
-				'http://test-api/clientcontact/',
-				expect.objectContaining({ method: 'GET' })
-			);
+			expect(mockFetch).toHaveBeenCalledWith('http://test-api/clientcontact/', expect.objectContaining({ method: 'GET' }));
 			expect(result).toEqual(contacts);
 		});
 
@@ -105,10 +111,7 @@ describe('client api', () => {
 
 			const result = await fetchClientContacts(7);
 
-			expect(mockFetch).toHaveBeenCalledWith(
-				'http://test-api/clientcontact/7',
-				expect.objectContaining({ method: 'GET' })
-			);
+			expect(mockFetch).toHaveBeenCalledWith('http://test-api/clientcontact/7', expect.objectContaining({ method: 'GET' }));
 			expect(result).toEqual(contacts);
 		});
 	});
@@ -171,9 +174,9 @@ describe('client api', () => {
 				json: async () => ({ message: 'No data found' }),
 			});
 
-			await expect(fetchClientWeeklySummary({ clientId: '5', startDate: '2026-01-01', endDate: '2026-01-07' })).rejects.toThrow(
-				'No data found'
-			);
+			await expect(
+				fetchClientWeeklySummary({ clientId: '5', startDate: '2026-01-01', endDate: '2026-01-07' })
+			).rejects.toThrow('No data found');
 		});
 	});
 

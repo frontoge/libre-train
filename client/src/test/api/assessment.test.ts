@@ -21,7 +21,7 @@ describe('assessment api', () => {
 			const result = await fetchAssessmentLogs(5);
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				expect.objectContaining({ href: expect.stringContaining('/assessment/log/5') }),
+				expect.stringContaining('/assessment/log/5'),
 				expect.objectContaining({ method: 'GET' })
 			);
 			expect(result).toEqual(logs);
@@ -30,7 +30,7 @@ describe('assessment api', () => {
 		it('throws when response is not ok', async () => {
 			mockFetch.mockResolvedValueOnce({ ok: false, status: 500 });
 
-			await expect(fetchAssessmentLogs(1)).rejects.toThrow('HTTP error! status: 500');
+			await expect(fetchAssessmentLogs(1)).rejects.toThrow('Failed to fetch assessment logs');
 		});
 	});
 

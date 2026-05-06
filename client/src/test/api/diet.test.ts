@@ -104,48 +104,60 @@ describe('diet api', () => {
 	});
 
 	describe('createDietPlan', () => {
-		it('posts diet plan data and returns response', async () => {
-			const mockResponse = { ok: true };
-			mockFetch.mockResolvedValueOnce(mockResponse);
+		it('posts diet plan data', async () => {
+			mockFetch.mockResolvedValueOnce({ ok: true });
 
 			const data = { clientId: 5, trainerId: 1, planName: 'New Plan' };
-			const result = await createDietPlan(data as any);
+			await createDietPlan(data as any);
 
 			expect(mockFetch).toHaveBeenCalledWith('http://test-api/diet/plan', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(data),
 			});
-			expect(result).toMatchObject({ ok: true });
+		});
+
+		it('throws when response is not ok', async () => {
+			mockFetch.mockResolvedValueOnce({ ok: false, statusText: 'Bad Request' });
+
+			await expect(createDietPlan({} as any)).rejects.toThrow('Failed to create diet plan');
 		});
 	});
 
 	describe('deleteDietPlan', () => {
-		it('sends DELETE request and returns response', async () => {
-			const mockResponse = { ok: true };
-			mockFetch.mockResolvedValueOnce(mockResponse);
+		it('sends DELETE request', async () => {
+			mockFetch.mockResolvedValueOnce({ ok: true });
 
-			const result = await deleteDietPlan(4);
+			await deleteDietPlan(4);
 
-			expect(mockFetch).toHaveBeenCalledWith('http://test-api/diet/plan/4', { method: 'DELETE' });
-			expect(result).toMatchObject({ ok: true });
+			expect(mockFetch).toHaveBeenCalledWith('http://test-api/diet/plan/4', expect.objectContaining({ method: 'DELETE' }));
+		});
+
+		it('throws when response is not ok', async () => {
+			mockFetch.mockResolvedValueOnce({ ok: false, statusText: 'Not Found' });
+
+			await expect(deleteDietPlan(99)).rejects.toThrow('Failed to delete diet plan');
 		});
 	});
 
 	describe('createDietLogEntry', () => {
-		it('posts diet log entry and returns response', async () => {
-			const mockResponse = { ok: true };
-			mockFetch.mockResolvedValueOnce(mockResponse);
+		it('posts diet log entry', async () => {
+			mockFetch.mockResolvedValueOnce({ ok: true });
 
 			const entry = { logDate: '2026-01-01', calories: 2000, protein: 150, carbs: 200, fats: 70 };
-			const result = await createDietLogEntry(entry as any);
+			await createDietLogEntry(entry as any);
 
 			expect(mockFetch).toHaveBeenCalledWith('http://test-api/diet/log', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(entry),
 			});
-			expect(result).toMatchObject({ ok: true });
+		});
+
+		it('throws when response is not ok', async () => {
+			mockFetch.mockResolvedValueOnce({ ok: false, statusText: 'Bad Request' });
+
+			await expect(createDietLogEntry({} as any)).rejects.toThrow('Failed to create diet log entry');
 		});
 	});
 });

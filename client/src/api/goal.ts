@@ -5,101 +5,64 @@ import type {
 	UpdateClientGoalRequest,
 } from '@libre-train/shared';
 import { Routes } from '@libre-train/shared';
-import { getAppConfiguration } from '../config/app.config';
-import { createSearchParams } from '../helpers/fetch-helpers';
+import { apiFetch } from '../helpers/fetch-helpers';
 
-export async function fetchClientGoals(
-	clientId: number,
-	options?: Omit<ClientGoalSearchParams, 'clientId' | 'trainerId'>
-): Promise<ClientGoalWithRelations[]> {
-	const params = createSearchParams({ clientId, ...options });
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Goal}?${params}`);
+type GoalSearchOptions = Omit<ClientGoalSearchParams, 'clientId' | 'trainerId'>;
 
-	if (!response.ok) {
-		throw new Error(`Failed to fetch client goals: ${response.statusText}`);
-	}
-
-	const data = await response.json();
-
+function ensureNoErrorEnvelope<T>(data: T, fallback: string): T {
 	if (data && typeof data === 'object' && 'hasError' in data) {
-		throw new Error(data.errorMessage ?? 'Failed to fetch client goals');
+		const errorMessage = (data as { errorMessage?: string }).errorMessage ?? fallback;
+		throw new Error(errorMessage);
 	}
-
-	return data as ClientGoalWithRelations[];
+	return data;
 }
 
-export async function fetchTrainerGoals(
-	trainerId: number,
-	options?: Omit<ClientGoalSearchParams, 'clientId' | 'trainerId'>
-): Promise<ClientGoalWithRelations[]> {
-	const params = createSearchParams({ trainerId, ...options });
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Goal}?${params}`);
+export async function fetchClientGoals(clientId: number, options?: GoalSearchOptions): Promise<ClientGoalWithRelations[]> {
+	const data = await apiFetch<ClientGoalWithRelations[]>(Routes.Goal, {
+		method: 'GET',
+		searchParams: { clientId, ...options },
+		errorMessage: 'Failed to fetch client goals',
+	});
+	return ensureNoErrorEnvelope(data, 'Failed to fetch client goals');
+}
 
-	if (!response.ok) {
-		throw new Error(`Failed to fetch trainer goals: ${response.statusText}`);
-	}
-
-	const data = await response.json();
-
-	if (data && typeof data === 'object' && 'hasError' in data) {
-		throw new Error(data.errorMessage ?? 'Failed to fetch trainer goals');
-	}
-
-	return data as ClientGoalWithRelations[];
+export async function fetchTrainerGoals(trainerId: number, options?: GoalSearchOptions): Promise<ClientGoalWithRelations[]> {
+	const data = await apiFetch<ClientGoalWithRelations[]>(Routes.Goal, {
+		method: 'GET',
+		searchParams: { trainerId, ...options },
+		errorMessage: 'Failed to fetch trainer goals',
+	});
+	return ensureNoErrorEnvelope(data, 'Failed to fetch trainer goals');
 }
 
 export async function fetchGoalById(goalId: number): Promise<ClientGoalWithRelations> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Goal}/${goalId}`);
-
-	if (!response.ok) {
-		throw new Error(`Failed to fetch goal: ${response.statusText}`);
-	}
-
-	const data = await response.json();
-
-	if (data && typeof data === 'object' && 'hasError' in data) {
-		throw new Error(data.errorMessage ?? 'Failed to fetch goal');
-	}
-
-	return data as ClientGoalWithRelations;
+	const data = await apiFetch<ClientGoalWithRelations>(`${Routes.Goal}/${goalId}`, {
+		method: 'GET',
+		errorMessage: 'Failed to fetch goal',
+	});
+	return ensureNoErrorEnvelope(data, 'Failed to fetch goal');
 }
 
 export async function createClientGoal(body: CreateClientGoalRequest): Promise<number> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Goal}`, {
+	const data = await apiFetch<{ goalId: number }, CreateClientGoalRequest>(Routes.Goal, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(body),
+		body,
+		errorMessage: 'Failed to create goal',
 	});
-
-	if (!response.ok) {
-		const data = await response.json().catch(() => ({}));
-		throw new Error(data.error ?? `Failed to create goal: ${response.statusText}`);
-	}
-
-	const data = await response.json();
-	return data.goalId as number;
+	return data.goalId;
 }
 
 export async function updateClientGoal(goalId: number, body: UpdateClientGoalRequest): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Goal}/${goalId}`, {
+	await apiFetch<void, UpdateClientGoalRequest>(`${Routes.Goal}/${goalId}`, {
 		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(body),
+		body,
+		errorMessage: 'Failed to update goal',
 	});
-
-	if (!response.ok) {
-		const data = await response.json().catch(() => ({}));
-		throw new Error(data.error ?? `Failed to update goal: ${response.statusText}`);
-	}
 }
 
 export async function deleteClientGoal(goalId: number): Promise<void> {
-	const response = await fetch(`${getAppConfiguration().apiUrl}${Routes.Goal}/${goalId}`, {
+	await apiFetch<void>(`${Routes.Goal}/${goalId}`, {
 		method: 'DELETE',
+		errorMessage: 'Failed to delete goal',
 	});
-
-	if (!response.ok) {
-		const data = await response.json().catch(() => ({}));
-		throw new Error(data.error ?? `Failed to delete goal: ${response.statusText}`);
-	}
 }

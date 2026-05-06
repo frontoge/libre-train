@@ -130,9 +130,7 @@ describe('exercise api', () => {
 
 			await deleteExercise(10);
 
-			expect(mockFetch).toHaveBeenCalledWith('http://test-api/exercises/10', {
-				method: 'DELETE',
-			});
+			expect(mockFetch).toHaveBeenCalledWith('http://test-api/exercises/10', expect.objectContaining({ method: 'DELETE' }));
 		});
 
 		it('throws when response is not ok', async () => {
@@ -142,4 +140,3 @@ describe('exercise api', () => {
 		});
 	});
 });
-

@@ -50,7 +50,13 @@ describe('training api', () => {
 
 		it('returns undefined on error', async () => {
 			mockFetch.mockResolvedValueOnce({ ok: false, statusText: 'Error' });
-			const result = await createMacrocycle({ cycle_name: 'X', client_id: 1, cycle_start_date: '', cycle_end_date: '', isActive: false });
+			const result = await createMacrocycle({
+				cycle_name: 'X',
+				client_id: 1,
+				cycle_start_date: '',
+				cycle_end_date: '',
+				isActive: false,
+			});
 			expect(result).toBeUndefined();
 		});
 	});
@@ -92,10 +98,7 @@ describe('training api', () => {
 
 			const result = await fetchClientMacrocycles(5);
 
-			expect(mockFetch).toHaveBeenCalledWith(
-				'http://test-api/cycle/macro/5',
-				expect.objectContaining({ method: 'GET' })
-			);
+			expect(mockFetch).toHaveBeenCalledWith('http://test-api/cycle/macro/5', expect.objectContaining({ method: 'GET' }));
 			expect(result).toEqual(cycles);
 		});
 
@@ -113,10 +116,7 @@ describe('training api', () => {
 
 			const result = await fetchClientMesocycles(5);
 
-			expect(mockFetch).toHaveBeenCalledWith(
-				'http://test-api/cycle/meso/5',
-				expect.objectContaining({ method: 'GET' })
-			);
+			expect(mockFetch).toHaveBeenCalledWith('http://test-api/cycle/meso/5', expect.objectContaining({ method: 'GET' }));
 			expect(result).toEqual(cycles);
 		});
 	});
@@ -165,10 +165,7 @@ describe('training api', () => {
 
 			const result = await fetchMicrocycleById(5);
 
-			expect(mockFetch).toHaveBeenCalledWith(
-				'http://test-api/cycle/micro/5',
-				expect.objectContaining({ method: 'GET' })
-			);
+			expect(mockFetch).toHaveBeenCalledWith('http://test-api/cycle/micro/5', expect.objectContaining({ method: 'GET' }));
 			expect(result).toEqual(micro);
 		});
 
@@ -186,7 +183,10 @@ describe('training api', () => {
 
 			await deleteMacrocycle(1);
 
-			expect(mockFetch).toHaveBeenCalledWith('http://test-api/cycle/macro/1', { method: 'DELETE' });
+			expect(mockFetch).toHaveBeenCalledWith(
+				'http://test-api/cycle/macro/1',
+				expect.objectContaining({ method: 'DELETE' })
+			);
 		});
 	});
 
@@ -197,7 +197,7 @@ describe('training api', () => {
 
 			await deleteMesocycle(2);
 
-			expect(mockFetch).toHaveBeenCalledWith('http://test-api/cycle/meso/2', { method: 'DELETE' });
+			expect(mockFetch).toHaveBeenCalledWith('http://test-api/cycle/meso/2', expect.objectContaining({ method: 'DELETE' }));
 		});
 	});
 
@@ -208,7 +208,10 @@ describe('training api', () => {
 
 			await deleteMicrocycle(3);
 
-			expect(mockFetch).toHaveBeenCalledWith('http://test-api/cycle/micro/3', { method: 'DELETE' });
+			expect(mockFetch).toHaveBeenCalledWith(
+				'http://test-api/cycle/micro/3',
+				expect.objectContaining({ method: 'DELETE' })
+			);
 		});
 	});
 
