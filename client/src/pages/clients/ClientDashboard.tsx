@@ -5,7 +5,7 @@ import { AppContext } from '../../app-context';
 import { ClientDataViewer } from '../../components/clients/ClientDataViewer';
 import { ClientLists } from '../../components/clients/ClientLists';
 import { ClientOverview } from '../../components/clients/ClientOverview';
-import PageLayout from '../../components/PageLayout';
+import PageLayout, { type BreadcrumbItem } from '../../components/PageLayout';
 import { ClientDashboardContext, defaultDashboardState, type DashboardState } from '../../contexts/ClientDashboardContext';
 import { useMessage } from '../../hooks/useMessage';
 
@@ -18,6 +18,14 @@ export function ClientDashboard() {
 	const clientId = id ? parseInt(id, 10) : undefined;
 
 	const selectedClient = useMemo(() => state.clients.find((client) => client.ClientId === clientId), [state.clients, id]);
+
+	const breadcrumbs = useMemo<BreadcrumbItem[]>(() => {
+		const trail: BreadcrumbItem[] = [{ label: 'Clients', to: '/clients/browse' }];
+		if (selectedClient) {
+			trail.push({ label: `${selectedClient.first_name} ${selectedClient.last_name}` });
+		}
+		return trail;
+	}, [selectedClient]);
 
 	useEffect(() => {
 		const fetchDashboardData = async () => {
@@ -50,7 +58,11 @@ export function ClientDashboard() {
 
 	return (
 		<ClientDashboardContext value={{ dashboardState, setDashboardState }}>
-			<PageLayout title="Client Dashboard" contentStyle={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+			<PageLayout
+				title="Client Dashboard"
+				breadcrumbs={breadcrumbs}
+				contentStyle={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}
+			>
 				<div
 					id="client-dash-left"
 					style={{

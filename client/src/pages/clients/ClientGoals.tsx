@@ -7,7 +7,7 @@ import { AppContext } from '../../app-context';
 import { GoalCard } from '../../components/Goals/GoalCard';
 import { GoalModal } from '../../components/Goals/GoalModal';
 import { useClientGoals } from '../../components/Goals/useClientGoals';
-import PageLayout from '../../components/PageLayout';
+import PageLayout, { type BreadcrumbItem } from '../../components/PageLayout';
 import { deleteClientGoal } from '../../helpers/goals-api';
 import { useMessage } from '../../hooks/useMessage';
 
@@ -30,6 +30,15 @@ export function ClientGoals() {
 		const client = state.clients.find((c) => c.ClientId === clientId);
 		return client ? `${client.first_name} ${client.last_name}` : undefined;
 	}, [state.clients, clientId]);
+
+	const breadcrumbs = useMemo<BreadcrumbItem[]>(() => {
+		const trail: BreadcrumbItem[] = [{ label: 'Clients', to: '/clients/browse' }];
+		if (clientName && clientId !== undefined) {
+			trail.push({ label: clientName, to: `/clients/${clientId}` });
+		}
+		trail.push({ label: 'Goals' });
+		return trail;
+	}, [clientName, clientId]);
 
 	const { present, past } = useMemo(() => {
 		const present: ClientGoalWithRelations[] = [];
@@ -100,7 +109,7 @@ export function ClientGoals() {
 	);
 
 	return (
-		<PageLayout title={clientName ? `Goals — ${clientName}` : 'Client Goals'}>
+		<PageLayout title={clientName ? `Goals — ${clientName}` : 'Client Goals'} breadcrumbs={breadcrumbs}>
 			<div
 				style={{
 					maxWidth: '1280px',

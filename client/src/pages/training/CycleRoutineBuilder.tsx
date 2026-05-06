@@ -3,7 +3,7 @@ import type { Microcycle } from '@libre-train/shared';
 import { Button, Popconfirm } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import PageLayout from '../../components/PageLayout';
+import PageLayout, { type BreadcrumbItem } from '../../components/PageLayout';
 import { Panel } from '../../components/Panel';
 import { RoutineEditor } from '../../components/Routines/RoutineEditor';
 import { MicrocycleRoutinePicker } from '../../components/Training/MicrocycleRoutinePicker';
@@ -99,9 +99,15 @@ export function CycleRoutineBuilder() {
 		fetchBuilderData();
 	}, [cycleId]);
 
+	const breadcrumbs: BreadcrumbItem[] = [
+		{ label: 'Training', to: '/training' },
+		{ label: microcycle?.cycle_name ?? 'Builder' },
+	];
+
 	return (
 		<PageLayout
 			title={microcycle?.cycle_name ? `Microcycle: ${microcycle.cycle_name}` : 'Cycle Routine Builder'}
+			breadcrumbs={breadcrumbs}
 			contentStyle={{
 				display: 'flex',
 				flexDirection: 'column',
