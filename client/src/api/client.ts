@@ -5,7 +5,6 @@ import type {
 	DashboardData,
 	DashboardWeeklySummary,
 	UpdateClientRequest,
-	UpdateContactRequest,
 } from '@libre-train/shared';
 import { Routes } from '@libre-train/shared';
 import { apiFetch } from '../helpers/fetch-helpers';
@@ -21,8 +20,8 @@ export type ClientWeeklySummarySearchParams = {
 	endDate: string;
 };
 
-export async function createClient(data: AddClientFormValues): Promise<void> {
-	await apiFetch<void, AddClientFormValues>(Routes.Clients, {
+export async function createClient(data: AddClientFormValues): Promise<{ id: number }> {
+	return apiFetch<{ id: number }, AddClientFormValues>(Routes.Clients, {
 		method: 'POST',
 		body: data,
 		errorMessage: 'Failed to add client',
@@ -60,14 +59,6 @@ export async function fetchClientContacts(clientId?: number): Promise<ClientCont
 		console.error('Error fetching client contacts:', error);
 		return [];
 	}
-}
-
-export async function updateContact(contactId: number, data: UpdateContactRequest): Promise<void> {
-	await apiFetch<void, UpdateContactRequest>(`${Routes.Contacts}/${contactId}`, {
-		method: 'PUT',
-		body: data,
-		errorMessage: 'Failed to update contact',
-	});
 }
 
 export async function fetchClientDashboardData(params: ClientDashboardSearchParams): Promise<DashboardData> {

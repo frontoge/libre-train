@@ -7,7 +7,6 @@ import {
 	fetchClientWeeklySummary,
 	submitClientDailyUpdate,
 	updateClient,
-	updateContact,
 } from '../../api/client';
 
 vi.mock('../../config/app.config', () => ({
@@ -113,21 +112,6 @@ describe('client api', () => {
 
 			expect(mockFetch).toHaveBeenCalledWith('http://test-api/clientcontact/7', expect.objectContaining({ method: 'GET' }));
 			expect(result).toEqual(contacts);
-		});
-	});
-
-	describe('updateContact', () => {
-		it('sends PUT request for contact update', async () => {
-			mockFetch.mockResolvedValueOnce({ ok: true });
-			const data = { email: 'new@example.com' };
-
-			await updateContact(10, data as any);
-
-			expect(mockFetch).toHaveBeenCalledWith('http://test-api/contact/10', {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(data),
-			});
 		});
 	});
 

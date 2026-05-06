@@ -2,16 +2,19 @@ import type { ClientContact } from '@libre-train/shared';
 import { Avatar, Button, Col, Input, Row, Space, Table, Tag, theme, Typography } from 'antd';
 import type { TableProps } from 'antd/es/table';
 import { useContext, useMemo, useState } from 'react';
-import { FaPlus, FaSearchengin, FaUserAlt } from 'react-icons/fa';
+import { FaPlus, FaSearchengin } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../../app-context';
 import PageLayout from '../../components/PageLayout';
 import { getYearsSinceDate } from '../../helpers/date-helpers';
+import { getInitials } from '../../helpers/label-formatters';
 
 interface ClientTableData {
 	key: string;
 	id: number;
 	avatar: string | undefined;
+	firstName: string;
+	lastName: string;
 	name: string;
 	email?: string;
 	phone?: string;
@@ -43,6 +46,8 @@ export function ClientBrowser() {
 				key: client.ClientId.toString(),
 				id: client.ClientId,
 				avatar: client.img,
+				firstName: client.first_name,
+				lastName: client.last_name,
 				name: `${client.first_name} ${client.last_name}`,
 				email: client.email,
 				phone: client.phone,
@@ -68,14 +73,9 @@ export function ClientBrowser() {
 			width: 180,
 			render: (_, record) => (
 				<Space>
-					<Avatar
-						size={32}
-						src={record.avatar || undefined}
-						icon={<FaUserAlt />}
-						style={{
-							backgroundColor: token.colorPrimary,
-						}}
-					/>
+					<Avatar size={32} src={record.avatar || undefined}>
+						{record.avatar ? null : getInitials(record.firstName, record.lastName)}
+					</Avatar>
 					<div>
 						<div style={{ fontWeight: 500 }}>{record.name}</div>
 						{record.age !== undefined && (
