@@ -1,10 +1,11 @@
-import type { AssessmentType, ClientContact, Exercise } from '@libre-train/shared';
+import type { AssessmentType, ClientContact, ContactWithFlags, Exercise } from '@libre-train/shared';
 import React, { createContext } from 'react';
 import type { Auth } from './auth/authorization';
 import { getAppConfiguration } from './config/app.config';
 
 export type AppState = {
 	clients: ClientContact[];
+	contacts: ContactWithFlags[];
 	exerciseData?: Exercise[];
 	assessmentTypes: AssessmentType[];
 	showMessage: (
@@ -18,6 +19,7 @@ export type AppState = {
 export type StateRefreshers = {
 	refreshExerciseData: () => void;
 	refreshClients: () => void;
+	refreshContacts: () => void;
 	refreshAssessmentTypes: () => void;
 };
 
@@ -32,6 +34,7 @@ const initialContext: AppContext = {
 	state: {
 		assessmentTypes: [],
 		clients: [],
+		contacts: [],
 		showMessage: () => {},
 		auth: {
 			authToken: '',

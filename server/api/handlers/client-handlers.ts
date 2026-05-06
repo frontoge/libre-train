@@ -59,9 +59,10 @@ export const handleGetClientContacts = async (
 	}
 };
 
-// This should not all be handled on this endpoint. This should only take a contact ID and client create data
-// TODO: Fix this
-export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValues>, res: Response<MessageResponse>) => {
+export const handleCreateClient = async (
+	req: Request<{}, {}, AddClientFormValues>,
+	res: Response<{ id: number } | MessageResponse>
+) => {
 	if (!req.body) {
 		res.status(400).json({ message: 'Request body is required' });
 		return;
@@ -70,44 +71,61 @@ export const handleCreateClient = async (req: Request<{}, {}, AddClientFormValue
 	const body = req.body;
 
 	try {
-		// Create contact in database
-		const contact = await prisma.contact.create({
-			data: {
-				first_name: body.firstName ?? 'Unknown',
-				last_name: body.lastName ?? 'Unknown',
-				email: body.email ?? 'unknown@unknown.com',
-				phone: body.phoneNumber ?? null,
-				date_of_birth: body.dob ? new Date(body.dob) : null,
-				img: body.img64 ?? null,
-			},
+		const newClient = await prisma.$transaction(async (tx) => {
+			let contactId: number;
+
+			if (body.contactId !== undefined) {
+				const existing = await tx.contact.findUnique({
+					where: { id: body.contactId },
+					include: { Client: { select: { id: true } } },
+				});
+
+				if (!existing) throw new Error('Contact not found.');
+				if (existing.Client.length > 0) throw new Error('Contact already has a client.');
+
+				await tx.contact.update({
+					where: { id: body.contactId },
+					data: {
+						first_name: body.firstName ?? existing.first_name,
+						last_name: body.lastName ?? existing.last_name,
+						email: body.email ?? existing.email,
+						phone: body.phoneNumber ?? existing.phone,
+						date_of_birth: body.dob ? new Date(body.dob) : existing.date_of_birth,
+						img: body.img64 ?? existing.img,
+					},
+				});
+
+				contactId = body.contactId;
+			} else {
+				const contact = await tx.contact.create({
+					data: {
+						first_name: body.firstName ?? 'Unknown',
+						last_name: body.lastName ?? 'Unknown',
+						email: body.email ?? 'unknown@unknown.com',
+						phone: body.phoneNumber ?? null,
+						date_of_birth: body.dob ? new Date(body.dob) : null,
+						img: body.img64 ?? null,
+					},
+				});
+
+				if (!contact?.id) throw new Error('Failed to create contact.');
+				contactId = contact.id;
+			}
+
+			const client = await tx.client.create({
+				data: {
+					contactId,
+					trainerId: body.trainerId,
+					height: body.height ?? null,
+					notes: body.notes ?? null,
+				},
+			});
+
+			if (!client?.id) throw new Error('Failed to create client.');
+			return client;
 		});
 
-		if (!contact?.id) {
-			console.error('Failed to create client:', 'Failed to create contact.');
-			res.status(500).json({ message: 'Failed to create client.' });
-			return;
-		}
-
-		// Create client linked to contact
-		const client = await prisma.client.create({
-			data: {
-				contactId: contact.id,
-				trainerId: body.trainerId,
-				height: body.height ?? null,
-				notes: body.notes ?? null,
-			},
-		});
-
-		if (!client?.id) {
-			console.error('Failed to create client:', 'Failed to create client.');
-			res.status(500).json({ message: 'Failed to create client.' });
-			return;
-		}
-
-		// Gonna need this in the create client daily log handler. have to check if it is already there
-		// let d = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
-
-		res.status(201).json({ message: 'Client created successfully.' });
+		res.status(201).json({ id: newClient.id });
 	} catch (error) {
 		if (error instanceof Error) {
 			console.error('Error creating client:', error.message);

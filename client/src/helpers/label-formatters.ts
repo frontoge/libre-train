@@ -10,6 +10,12 @@ export const formatClientFullName = (firstName?: string, lastName?: string) => {
 	return `${firstName ?? ''} ${lastName ?? ''}`.trim();
 };
 
+export const getInitials = (firstName?: string, lastName?: string) => {
+	const first = firstName?.trim().charAt(0) ?? '';
+	const last = lastName?.trim().charAt(0) ?? '';
+	return `${first}${last}`.toUpperCase() || 'CL';
+};
+
 export const MuscleGroupLabels: Record<MuscleGroup, string> = {
 	[MuscleGroup.Chest]: 'Chest',
 	[MuscleGroup.Back]: 'Back',

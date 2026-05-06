@@ -1,14 +1,16 @@
 import { Prisma } from '@libre-train/db/client';
-import { Contact, CreateContactRequest, ResponseWithError, UpdateContactRequest } from '@libre-train/shared';
+import { Contact, ContactWithFlags, CreateContactRequest, ResponseWithError, UpdateContactRequest } from '@libre-train/shared';
 import { Request, Response } from 'express';
 import dayjs from '../../config/dayjs';
 import { prisma } from '../../database/mysql-database';
 
-export const handleGetContacts = async (req: Request, res: Response<ResponseWithError<Contact[]>>) => {
+export const handleGetContacts = async (req: Request, res: Response<ResponseWithError<ContactWithFlags[]>>) => {
 	try {
-		const results = await prisma.contact.findMany();
+		const results = await prisma.contact.findMany({
+			include: { _count: { select: { Client: true, User: true } } },
+		});
 
-		const contacts: Contact[] = results.map((row) => ({
+		const contacts: ContactWithFlags[] = results.map((row) => ({
 			id: row.id,
 			first_name: row.first_name,
 			last_name: row.last_name,
@@ -18,6 +20,8 @@ export const handleGetContacts = async (req: Request, res: Response<ResponseWith
 			date_of_birth: row.date_of_birth ? dayjs.utc(row.date_of_birth).format('YYYY-MM-DD') : undefined,
 			created_at: dayjs.utc(row.created_at).format('YYYY-MM-DD'),
 			updated_at: dayjs.utc(row.updated_at).format('YYYY-MM-DD'),
+			isTrainer: row._count.User > 0,
+			hasClient: row._count.Client > 0,
 		}));
 
 		res.json(contacts);

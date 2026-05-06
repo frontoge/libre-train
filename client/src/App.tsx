@@ -8,6 +8,7 @@ import { RequireAuth } from './auth/RequireAuth';
 import { getAppConfiguration } from './config/app.config';
 import { AssessmentRouter } from './pages/assessments/AssessmentRouter';
 import { ClientRouter } from './pages/clients/ClientRouter';
+import { ContactsBrowser } from './pages/contacts/ContactsBrowser';
 import { Dashboard } from './pages/Dashboard';
 import { ExerciseRouter } from './pages/exercises/ExerciseRouter';
 import { GoalsOverview } from './pages/goals/GoalsOverview';
@@ -18,6 +19,7 @@ import { Signup } from './pages/Signup';
 import { TrainingRouter } from './pages/training/TrainingRouter';
 import './styles/app.css';
 import { fetchClientContacts as apiFetchClientContacts } from './api/client';
+import { listContacts as apiListContacts } from './api/contacts';
 import { fetchAssessmentTypes as apiFetchAssessmentTypes, fetchExercises as apiFetchExercises } from './api/exercise';
 import { darkTheme } from './config/themes';
 import { ClientCycleRoutineView } from './pages/clients/ClientCycleRoutineView';
@@ -41,6 +43,7 @@ function App() {
 
 	const [appState, setAppState] = useState<AppState>({
 		clients: [],
+		contacts: [],
 		assessmentTypes: [],
 		exerciseData: [],
 		showMessage,
@@ -89,6 +92,15 @@ function App() {
 		}
 	};
 
+	const fetchContacts = async () => {
+		try {
+			const data = await apiListContacts();
+			setAppState((prev) => ({ ...prev, contacts: data }));
+		} catch (error) {
+			console.error('Error fetching contact data:', error);
+		}
+	};
+
 	const fetchAssessmentTypes = async () => {
 		try {
 			const data = await apiFetchAssessmentTypes();
@@ -101,6 +113,7 @@ function App() {
 	const stateRefreshers = {
 		refreshExerciseData: fetchExercises,
 		refreshClients: fetchClients,
+		refreshContacts: fetchContacts,
 		refreshAssessmentTypes: fetchAssessmentTypes,
 	};
 
@@ -108,6 +121,7 @@ function App() {
 		if (appState.auth.user !== undefined) {
 			fetchExercises();
 			fetchClients();
+			fetchContacts();
 			fetchAssessmentTypes();
 		}
 	}, [appState.auth]);
@@ -179,6 +193,14 @@ function App() {
 								element={
 									<RequireAuth>
 										<DietRouter />
+									</RequireAuth>
+								}
+							/>
+							<Route
+								path="contacts"
+								element={
+									<RequireAuth>
+										<ContactsBrowser />
 									</RequireAuth>
 								}
 							/>

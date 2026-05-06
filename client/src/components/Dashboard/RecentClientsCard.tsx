@@ -1,17 +1,12 @@
 import type { ClientContact } from '@libre-train/shared';
 import { Avatar, Button, Card, Divider, List, Space, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { getInitials } from '../../helpers/label-formatters';
 
 interface RecentClientsCardProps {
 	clients: ClientContact[];
 	onMessage: (clientName: string) => void;
 }
-
-const getInitials = (firstName?: string, lastName?: string) => {
-	const first = firstName?.trim().charAt(0) ?? '';
-	const last = lastName?.trim().charAt(0) ?? '';
-	return `${first}${last}`.toUpperCase() || 'CL';
-};
 
 const getReadableDate = (date: Date | string | undefined) => {
 	if (!date) {

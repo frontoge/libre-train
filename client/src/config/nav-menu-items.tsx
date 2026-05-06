@@ -1,5 +1,5 @@
 import { HomeFilled } from '@ant-design/icons';
-import { FaBullseye, FaListAlt, FaPencilAlt } from 'react-icons/fa';
+import { FaAddressBook, FaBullseye, FaHandshake, FaListAlt, FaPencilAlt } from 'react-icons/fa';
 import { FaCalendarXmark, FaGear, FaMagnifyingGlass, FaSquarePlus } from 'react-icons/fa6';
 import { GiWeightLiftingUp } from 'react-icons/gi';
 import { ImMap } from 'react-icons/im';
@@ -117,6 +117,19 @@ export const items: NavMenuItem[] = [
 				label: 'New Diet Log',
 				icon: <SiMealie />,
 				urlPath: '/diet/log',
+			},
+		],
+	},
+	{
+		key: 'salesMenu',
+		label: 'Sales',
+		icon: <FaHandshake />,
+		children: [
+			{
+				key: 'contacts_browse',
+				label: 'Contacts',
+				icon: <FaAddressBook />,
+				urlPath: '/contacts',
 			},
 		],
 	},
