@@ -83,6 +83,7 @@ const defaultClients: ClientContact[] = [
 const createState = (overrides?: Partial<AppState>): AppState => ({
 	clients: defaultClients,
 	contacts: [],
+	branding: { brand_name: 'Libre Train' },
 	assessmentTypes: [
 		{
 			id: 1,

@@ -1,6 +1,7 @@
 import {
 	AssessmentClientLogSchema,
 	AssessmentTypeSchema,
+	BrandingSchema,
 	ClientContactSchema,
 	ClientDietPlanSchema,
 	ClientGoalAssessmentSchema,
@@ -47,6 +48,8 @@ export type ClientContact = DataModel<typeof ClientContactSchema>;
 export type AssessmentType = DataModel<typeof AssessmentTypeSchema>;
 
 export type AssessmentClientLog = DataModel<typeof AssessmentClientLogSchema>;
+
+export type Branding = DataModel<typeof BrandingSchema>;
 
 export enum AssessmentGroup {
 	Posture = 1,

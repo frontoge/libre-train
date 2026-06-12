@@ -46,8 +46,24 @@ bun run --filter @libre-train/db db:migrate:reset     # reset dev database
 ## Required environment
 
 - `db/.env` — `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (checked by `db/prisma.config.ts`; also used by the server via `@prisma/adapter-mariadb`)
-- `server/.env` — the DB vars above, plus `JWT_SECRET`, `REFRESH_TOKEN_SECRET`, `FRONTEND_URL` (CORS origin). Server exits on startup if the JWT secrets are missing.
+- `server/.env` — the DB vars above, plus `JWT_SECRET`, `REFRESH_TOKEN_SECRET`, `FRONTEND_URL` (CORS origin). Server exits on startup if the JWT secrets are missing. Optionally `GARAGE_ENDPOINT`, `GARAGE_REGION`, `GARAGE_ACCESS_KEY`, `GARAGE_SECRET_KEY`, `GARAGE_BUCKET` for object storage — if absent the server still boots, but branding logo upload/serving returns 503.
 - `client/.env` — `VITE_API_URL` (base for fetches; `/api` is appended by `getAppConfiguration`), `VITE_ENV` (`local` | `dev` | `prod`).
+
+### Object storage (Garage)
+
+Branding logos are stored in a [Garage](https://garagehq.deuxfleurs.fr/) (S3-compatible) bucket, coupled into `docker-compose.yaml` with persisted `garage_meta` / `garage_data` volumes. The server reaches it via `@aws-sdk/client-s3` (`server/storage/garage-storage.ts`, path-style). Logos are **served by proxying** through the public `GET /api/branding/logo` route — only the object key is stored in the DB, so the bucket stays internal. One-time bootstrap:
+
+```bash
+docker compose up -d garage
+docker compose exec garage /garage status                                   # copy the node ID
+docker compose exec garage /garage layout assign -z dc1 -c 1G <node-id>
+docker compose exec garage /garage layout apply --version 1
+docker compose exec garage /garage bucket create libre-train-logos
+docker compose exec garage /garage key create libre-train-app               # copy Key ID + Secret
+docker compose exec garage /garage bucket allow --read --write libre-train-logos --key libre-train-app
+```
+
+Put the Key ID / Secret into `GARAGE_ACCESS_KEY` / `GARAGE_SECRET_KEY` in `server/.env`. Regenerate `rpc_secret` / `admin_token` in `garage.toml` for non-local deployments (`openssl rand -hex 32`).
 
 Local auth bypass: when `VITE_ENV=local` and `getAppConfiguration().disableAuth` is true, the client pins itself to user id 10 and skips login. `disableAuth` is currently hardcoded to `false` in `client/src/config/app.config.ts` — flip it locally if needed, but never commit that change.
 

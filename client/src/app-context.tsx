@@ -1,13 +1,16 @@
-import type { AssessmentType, ClientContact, ContactWithFlags, Exercise } from '@libre-train/shared';
+import type { AssessmentType, BrandingResponse, ClientContact, ContactWithFlags, Exercise } from '@libre-train/shared';
 import React, { createContext } from 'react';
 import type { Auth } from './auth/authorization';
 import { getAppConfiguration } from './config/app.config';
+
+export const DEFAULT_BRAND_NAME = 'Libre Train';
 
 export type AppState = {
 	clients: ClientContact[];
 	contacts: ContactWithFlags[];
 	exerciseData?: Exercise[];
 	assessmentTypes: AssessmentType[];
+	branding: BrandingResponse;
 	showMessage: (
 		type: 'success' | 'error' | 'info' | 'warning' | 'loading' | 'destroy',
 		content: string,
@@ -21,6 +24,7 @@ export type StateRefreshers = {
 	refreshClients: () => void;
 	refreshContacts: () => void;
 	refreshAssessmentTypes: () => void;
+	refreshBranding: () => void;
 };
 
 export type AppContext = {
@@ -35,6 +39,7 @@ const initialContext: AppContext = {
 		assessmentTypes: [],
 		clients: [],
 		contacts: [],
+		branding: { brand_name: DEFAULT_BRAND_NAME },
 		showMessage: () => {},
 		auth: {
 			authToken: '',

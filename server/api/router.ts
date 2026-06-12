@@ -1,5 +1,6 @@
 import { Routes } from '@libre-train/shared';
 import { Router } from 'express';
+import multer from 'multer';
 import { handleHealthCheck } from './handlers';
 import {
 	handleCreateAssessmentLog,
@@ -10,6 +11,7 @@ import {
 	handleUpdateAssessmentLog,
 } from './handlers/assessment-handlers';
 import { handleAuthLogin, handleAuthLogout, handleAuthRefresh, handleAuthSignup } from './handlers/auth-handlers';
+import { handleGetBranding, handleGetLogo, handleUpdateBranding, handleUploadLogo } from './handlers/branding-handlers';
 import {
 	handleCreateClient,
 	handleDailyUpdate,
@@ -76,7 +78,16 @@ import {
 
 const router = Router();
 
+// In-memory multipart parsing for small logo uploads (max 2 MB).
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 2 * 1024 * 1024 } });
+
 router.get(Routes.Health, handleHealthCheck);
+
+// Branding routes (GET endpoints are public so the login screen / public pages can theme)
+router.get(Routes.Branding, handleGetBranding);
+router.put(Routes.Branding, handleUpdateBranding);
+router.get(`${Routes.Branding}/logo`, handleGetLogo);
+router.post(`${Routes.Branding}/logo`, upload.single('file'), handleUploadLogo);
 
 // Client routes
 router.post(Routes.Clients, handleCreateClient);

@@ -56,6 +56,7 @@ const createState = (clients: ClientContact[]): AppState => ({
 	clients,
 	contacts: [],
 	assessmentTypes: [],
+	branding: { brand_name: 'Libre Train' },
 	showMessage: () => {},
 	auth: {
 		authToken: undefined,

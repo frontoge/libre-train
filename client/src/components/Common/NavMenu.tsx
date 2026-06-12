@@ -1,7 +1,7 @@
 import { Menu } from 'antd';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { items } from '../../config/nav-menu-items';
+import { getParentSubmenuKey, items } from '../../config/nav-menu-items';
 import { getNavigationUrl } from '../../helpers/navigation-helpers';
 
 type NavEntry = {
@@ -80,6 +80,16 @@ export function NavMenu() {
 		return [];
 	}, [location.pathname]);
 
+	// Keep the submenu containing the active route open (without locking the user out of toggling).
+	const [openKeys, setOpenKeys] = useState<string[]>([]);
+
+	useEffect(() => {
+		const parentKey = selectedKeys[0] ? getParentSubmenuKey(selectedKeys[0]) : undefined;
+		if (parentKey) {
+			setOpenKeys((prev) => (prev.includes(parentKey) ? prev : [...prev, parentKey]));
+		}
+	}, [selectedKeys]);
+
 	const onClick = (item: { key: string }) => {
 		// Navigate to the selected menu item
 		navigate(getNavigationUrl(item.key));
@@ -88,11 +98,12 @@ export function NavMenu() {
 	return (
 		<Menu
 			mode="inline"
-			theme="light"
+			theme="dark"
 			selectedKeys={selectedKeys}
+			openKeys={openKeys}
+			onOpenChange={(keys) => setOpenKeys(keys as string[])}
 			style={{
-				height: '100%',
-				overflowY: 'auto',
+				borderInlineEnd: 'none',
 			}}
 			onClick={onClick}
 			items={items}

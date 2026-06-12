@@ -10,6 +10,12 @@ if (!process.env.JWT_SECRET || !process.env.REFRESH_TOKEN_SECRET) {
 	process.exit(1);
 }
 
+// Object storage (Garage) is optional at boot — the app runs without it, but logo upload/
+// serving will return 503 until GARAGE_ENDPOINT / GARAGE_ACCESS_KEY / GARAGE_SECRET_KEY are set.
+if (!process.env.GARAGE_ENDPOINT || !process.env.GARAGE_ACCESS_KEY || !process.env.GARAGE_SECRET_KEY) {
+	console.warn('Object storage (Garage) is not fully configured; logo upload/serving will be unavailable.');
+}
+
 const app = express();
 const port = 3000;
 
