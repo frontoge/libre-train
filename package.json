@@ -27,14 +27,14 @@
 	},
 	"devDependencies": {
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-		"@types/node": "^25.5.2",
-		"prettier": "^3.8.1",
-		"prisma": "^7.6.0",
+		"@types/node": "^25.9.3",
+		"prettier": "^3.8.4",
+		"prisma": "^7.8.0",
 		"rimraf": "^6.1.3",
-		"typescript": "^6.0.2"
+		"typescript": "^6.0.3"
 	},
 	"dependencies": {
 		"prisma-zod-generator": "^2.1.4",
-		"zod": "^4.3.6"
+		"zod": "^4.4.3"
 	}
 }
