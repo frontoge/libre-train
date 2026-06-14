@@ -4,9 +4,9 @@
 }
 
 .client-list-item-selected {
-	background-color: #2e2e2ea1;
+	background-color: var(--list-selected-bg, #2e2e2ea1);
 }
 
 .client-list-item:hover {
-	background-color: #1d1d1d5e;
+	background-color: var(--list-hover-bg, #1d1d1d5e);
 }

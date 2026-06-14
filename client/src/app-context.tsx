@@ -32,11 +32,15 @@ export type StateRefreshers = {
 	refreshBranding: () => void;
 };
 
+export type ColorMode = 'light' | 'dark';
+
 export type AppContext = {
 	state: AppState;
 	setState: React.Dispatch<React.SetStateAction<AppState>>;
 	setAuth: (auth: Auth) => void;
 	stateRefreshers?: StateRefreshers;
+	colorMode: ColorMode;
+	toggleColorMode: () => void;
 };
 
 const initialContext: AppContext = {
@@ -53,6 +57,8 @@ const initialContext: AppContext = {
 	},
 	setState: () => {},
 	setAuth: () => {},
+	colorMode: 'dark',
+	toggleColorMode: () => {},
 };
 
 export const AppContext = createContext<AppContext>(initialContext);

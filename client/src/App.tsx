@@ -1,8 +1,8 @@
 /// <reference types="vite/client" />
-import { ConfigProvider, message } from 'antd';
+import { ConfigProvider, message, theme } from 'antd';
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { AppContext, DEFAULT_BRAND_NAME, type AppState } from './app-context';
+import { AppContext, DEFAULT_BRAND_NAME, type AppState, type ColorMode } from './app-context';
 import type { Auth } from './auth/authorization';
 import { RequireAuth } from './auth/RequireAuth';
 import { getAppConfiguration } from './config/app.config';
@@ -28,9 +28,33 @@ import { DietRouter } from './pages/diet/DietRouter';
 import { Logout } from './pages/Logout';
 import { SettingsRouter } from './pages/settings/SettingsRouter';
 
+// Mirrors active theme tokens onto CSS variables so plain-CSS consumers (page base, list
+// rows) follow light/dark mode instead of hardcoded colors.
+function BackgroundSync() {
+	const { token } = theme.useToken();
+	useEffect(() => {
+		const root = document.documentElement.style;
+		root.setProperty('--app-bg', token.colorBgLayout);
+		root.setProperty('--list-hover-bg', token.controlItemBgHover);
+		root.setProperty('--list-selected-bg', token.controlItemBgActive);
+	}, [token.colorBgLayout, token.controlItemBgHover, token.controlItemBgActive]);
+	return null;
+}
+
 function App() {
 	const env = import.meta.env.VITE_ENV || 'local';
 	const [messageApi, contextHolder] = message.useMessage();
+
+	// Light/dark UI preference, persisted across sessions.
+	const [colorMode, setColorMode] = useState<ColorMode>(() =>
+		localStorage.getItem('colorMode') === 'light' ? 'light' : 'dark'
+	);
+	const toggleColorMode = () =>
+		setColorMode((prev) => {
+			const next = prev === 'dark' ? 'light' : 'dark';
+			localStorage.setItem('colorMode', next);
+			return next;
+		});
 
 	const showMessage = (
 		type: 'success' | 'error' | 'info' | 'warning' | 'loading' | 'destroy',
@@ -150,17 +174,20 @@ function App() {
 
 	const appTheme = useMemo(
 		() =>
-			buildTheme({
-				primaryColor: appState.branding.primary_color,
-				secondaryColor: appState.branding.secondary_color,
-			}),
-		[appState.branding.primary_color, appState.branding.secondary_color]
+			buildTheme(
+				{
+					primaryColor: appState.branding.primary_color,
+					secondaryColor: appState.branding.secondary_color,
+				},
+				colorMode
+			),
+		[appState.branding.primary_color, appState.branding.secondary_color, colorMode]
 	);
 
 	const secondaryColor = appState.branding.secondary_color || DEFAULT_BRANDING.secondaryColor;
 
 	return (
-		<AppContext value={{ state: appState, setState: setAppState, setAuth, stateRefreshers }}>
+		<AppContext value={{ state: appState, setState: setAppState, setAuth, stateRefreshers, colorMode, toggleColorMode }}>
 			<ConfigProvider theme={appTheme}>
 				<div
 					style={
@@ -174,6 +201,7 @@ function App() {
 					}
 				>
 					{contextHolder}
+					<BackgroundSync />
 					<Routes>
 						<Route path="/clients/cycle/:microcycleId" element={<ClientCycleRoutineView />} />
 						<Route path="/" element={<RouterLayout />}>

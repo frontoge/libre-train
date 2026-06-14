@@ -72,6 +72,8 @@ const renderClientBrowser = (clients: ClientContact[] = defaultClients) => {
 					state: createState(clients),
 					setState: vi.fn(),
 					setAuth: vi.fn(),
+					colorMode: 'dark',
+					toggleColorMode: vi.fn(),
 				}}
 			>
 				<ClientBrowser />

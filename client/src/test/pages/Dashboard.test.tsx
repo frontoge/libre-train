@@ -138,6 +138,8 @@ const renderDashboard = (stateOverrides?: Partial<AppState>) => {
 					state,
 					setState: vi.fn(),
 					setAuth: vi.fn(),
+					colorMode: 'dark',
+					toggleColorMode: vi.fn(),
 				}}
 			>
 				<Dashboard />
