@@ -4,6 +4,11 @@ import type { Auth } from './auth/authorization';
 import { getAppConfiguration } from './config/app.config';
 
 export const DEFAULT_BRAND_NAME = 'Libre Train';
+// Default marketing copy for the public login / signup screens (used when branding is unset
+// and as the target for the "reset to default" controls on the customization page).
+export const DEFAULT_AUTH_TAGLINE = 'Coach smarter. Track better.';
+export const DEFAULT_AUTH_DESCRIPTION =
+	'Configure this area for your organization with logos, product messaging, release notes, or seasonal campaign content.';
 
 export type AppState = {
 	clients: ClientContact[];

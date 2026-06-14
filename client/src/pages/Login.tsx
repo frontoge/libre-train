@@ -4,15 +4,13 @@ import { Alert, Button, Card, Col, Divider, Form, Input, Layout, Row, Space, the
 import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { loginUser } from '../api/auth';
+import { AppContext, DEFAULT_AUTH_DESCRIPTION, DEFAULT_AUTH_TAGLINE, DEFAULT_BRAND_NAME } from '../app-context';
 import logo from '../assets/logo.svg';
 import { useAuth } from '../hooks/useAuth';
 
-const BRANDING = {
-	productName: 'LibreTrain',
-	tagline: 'Coach smarter. Track better.',
-	description:
-		'Configure this area for your organization with logos, product messaging, release notes, or seasonal campaign content.',
-	logoText: 'Your Logo',
+// Non-configurable copy/links on the login screen (brand name, tagline, description, and logo
+// come from branding configured on the customization page).
+const STATIC = {
 	helpText: 'Need access? Contact your admin or support team.',
 	links: [
 		{ label: 'Docs', href: '#' },
@@ -28,6 +26,14 @@ export function Login() {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const { refreshAuthentication, auth, setAuth } = useAuth();
+	const {
+		state: { branding },
+	} = React.useContext(AppContext);
+
+	const productName = branding.brand_name || DEFAULT_BRAND_NAME;
+	const tagline = branding.auth_tagline || DEFAULT_AUTH_TAGLINE;
+	const description = branding.auth_description || DEFAULT_AUTH_DESCRIPTION;
+	const logoSrc = branding.logoUrl ?? logo;
 	const hasAttemptedRefresh = React.useRef(false);
 	const [isSubmitting, setIsSubmitting] = React.useState(false);
 	const [loginError, setLoginError] = React.useState<string | null>(null);
@@ -139,8 +145,8 @@ export function Login() {
 											}}
 										>
 											<img
-												src={logo}
-												alt={`${BRANDING.productName} logo`}
+												src={logoSrc}
+												alt={`${productName} logo`}
 												style={{ width: '100%', height: '170%' }}
 											/>
 										</div>
@@ -150,21 +156,21 @@ export function Login() {
 												Welcome to
 											</Typography.Text>
 											<Typography.Title level={2} style={{ margin: 0, color: token.colorTextHeading }}>
-												{BRANDING.productName}
+												{productName}
 											</Typography.Title>
 											<Typography.Text style={{ fontSize: 16, color: token.colorText }}>
-												{BRANDING.tagline}
+												{tagline}
 											</Typography.Text>
 										</Space>
 
 										<Typography.Paragraph style={{ marginBottom: 0, color: token.colorTextDescription }}>
-											{BRANDING.description}
+											{description}
 										</Typography.Paragraph>
 
 										<Divider style={{ margin: '4px 0' }} />
 
 										<Space size={[8, 8]} wrap>
-											{BRANDING.links.map((item) => (
+											{STATIC.links.map((item) => (
 												<Button
 													key={item.label}
 													type="link"
@@ -176,7 +182,7 @@ export function Login() {
 											))}
 										</Space>
 
-										<Typography.Text type="secondary">{BRANDING.helpText}</Typography.Text>
+										<Typography.Text type="secondary">{STATIC.helpText}</Typography.Text>
 									</Space>
 								</Col>
 

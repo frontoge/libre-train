@@ -37,6 +37,10 @@ type ImageKind = keyof typeof IMAGE_FIELDS;
 // Partial set of image-key columns (null clears the key, falling back to the default).
 type ImageKeyData = { logo_key?: string | null; icon_key?: string | null };
 
+// Max lengths mirror the Branding VarChar columns.
+const MAX_TAGLINE_LEN = 150;
+const MAX_DESCRIPTION_LEN = 500;
+
 type BrandingRow = {
 	brand_name: string;
 	logo_key: string | null;
@@ -44,7 +48,15 @@ type BrandingRow = {
 	nav_display: string | null;
 	primary_color: string | null;
 	secondary_color: string | null;
+	auth_tagline: string | null;
+	auth_description: string | null;
 	updated_at: Date;
+};
+
+// Trims a copy field; empty/whitespace becomes null so the app falls back to its default.
+const normalizeCopy = (value?: string): string | null => {
+	const trimmed = value?.trim();
+	return trimmed ? trimmed : null;
 };
 
 // API-relative path; the client prefixes it with its API base. The `v` param busts the
@@ -57,6 +69,8 @@ const toBrandingResponse = (row: BrandingRow): BrandingResponse => ({
 	primary_color: row.primary_color ?? undefined,
 	secondary_color: row.secondary_color ?? undefined,
 	nav_display: (row.nav_display as NavDisplay | null) ?? DEFAULT_NAV_DISPLAY,
+	auth_tagline: row.auth_tagline ?? undefined,
+	auth_description: row.auth_description ?? undefined,
 	logoUrl: imageUrl('logo', row.logo_key, row.updated_at),
 	iconUrl: imageUrl('icon', row.icon_key, row.updated_at),
 });
@@ -66,6 +80,8 @@ const defaultBrandingResponse = (): BrandingResponse => ({
 	primary_color: undefined,
 	secondary_color: undefined,
 	nav_display: DEFAULT_NAV_DISPLAY,
+	auth_tagline: undefined,
+	auth_description: undefined,
 	logoUrl: undefined,
 	iconUrl: undefined,
 });
@@ -85,13 +101,20 @@ export const handleUpdateBranding = async (
 	req: Request<{}, {}, UpdateBrandingRequest>,
 	res: Response<ResponseWithError<BrandingResponse>>
 ) => {
-	const { brand_name, primary_color, secondary_color, nav_display } = req.body;
+	const { brand_name, primary_color, secondary_color, nav_display, auth_tagline, auth_description } = req.body;
 	if (!isValidColor(primary_color) || !isValidColor(secondary_color)) {
 		res.status(400).json({ hasError: true, errorMessage: 'Colors must be 6-digit hex values (e.g. #49aa19).' });
 		return;
 	}
 	if (!isValidNavDisplay(nav_display)) {
 		res.status(400).json({ hasError: true, errorMessage: `nav_display must be one of: ${NAV_DISPLAY_OPTIONS.join(', ')}.` });
+		return;
+	}
+	if ((auth_tagline?.length ?? 0) > MAX_TAGLINE_LEN || (auth_description?.length ?? 0) > MAX_DESCRIPTION_LEN) {
+		res.status(400).json({
+			hasError: true,
+			errorMessage: `Tagline must be ≤ ${MAX_TAGLINE_LEN} and description ≤ ${MAX_DESCRIPTION_LEN} characters.`,
+		});
 		return;
 	}
 	try {
@@ -103,12 +126,16 @@ export const handleUpdateBranding = async (
 				primary_color: primary_color ?? null,
 				secondary_color: secondary_color ?? null,
 				nav_display: nav_display ?? DEFAULT_NAV_DISPLAY,
+				auth_tagline: normalizeCopy(auth_tagline),
+				auth_description: normalizeCopy(auth_description),
 			},
 			update: {
 				brand_name: brand_name?.trim() ? brand_name.trim() : undefined,
 				primary_color: primary_color ?? null,
 				secondary_color: secondary_color ?? null,
 				nav_display: nav_display ?? undefined,
+				auth_tagline: normalizeCopy(auth_tagline),
+				auth_description: normalizeCopy(auth_description),
 			},
 		});
 		res.json(toBrandingResponse(row));

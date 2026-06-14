@@ -3,6 +3,7 @@ import { Content } from 'antd/es/layout/layout';
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { signupUser } from '../api/auth';
+import { AppContext, DEFAULT_AUTH_DESCRIPTION, DEFAULT_AUTH_TAGLINE, DEFAULT_BRAND_NAME } from '../app-context';
 import { useAuth } from '../hooks/useAuth';
 
 export function Signup() {
@@ -10,6 +11,13 @@ export function Signup() {
 	const location = useLocation();
 
 	const { setAuth } = useAuth();
+	const {
+		state: { branding },
+	} = React.useContext(AppContext);
+
+	const productName = branding.brand_name || DEFAULT_BRAND_NAME;
+	const tagline = branding.auth_tagline || DEFAULT_AUTH_TAGLINE;
+	const description = branding.auth_description || DEFAULT_AUTH_DESCRIPTION;
 
 	type FieldType = {
 		username?: string;
@@ -60,7 +68,7 @@ export function Signup() {
 					textAlign: 'center',
 				}}
 			>
-				LibreTrain
+				{productName}
 			</h1>
 			<Content
 				style={{
@@ -70,7 +78,9 @@ export function Signup() {
 					justifyContent: 'center',
 				}}
 			>
-				<h2>Create Account</h2>
+				<h2 style={{ marginBottom: 4 }}>Create Account</h2>
+				<p style={{ fontSize: 16, marginTop: 0, marginBottom: 4, textAlign: 'center', maxWidth: 480 }}>{tagline}</p>
+				<p style={{ marginTop: 0, marginBottom: 20, textAlign: 'center', maxWidth: 480, opacity: 0.75 }}>{description}</p>
 				<Form
 					name="signup"
 					labelCol={{ span: 8 }}

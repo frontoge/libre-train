@@ -4,7 +4,7 @@ import { Alert, Button, Col, ColorPicker, Divider, Grid, Input, Radio, Row, Spac
 import { useContext, useState, type CSSProperties } from 'react';
 import { FaBullseye, FaHouse, FaUser } from 'react-icons/fa6';
 import { clearIcon, clearLogo, updateBranding, uploadIcon, uploadLogo } from '../../api/branding';
-import { AppContext, DEFAULT_BRAND_NAME } from '../../app-context';
+import { AppContext, DEFAULT_AUTH_DESCRIPTION, DEFAULT_AUTH_TAGLINE, DEFAULT_BRAND_NAME } from '../../app-context';
 import icon from '../../assets/icon.svg';
 import logo from '../../assets/logo.svg';
 import PageLayout from '../../components/PageLayout';
@@ -34,6 +34,8 @@ export function Customization() {
 	const [primary, setPrimary] = useState(branding.primary_color || DEFAULT_BRANDING.primaryColor);
 	const [secondary, setSecondary] = useState(branding.secondary_color || DEFAULT_BRANDING.secondaryColor);
 	const [navDisplay, setNavDisplay] = useState<NavDisplay>(branding.nav_display ?? 'logo');
+	const [authTagline, setAuthTagline] = useState(branding.auth_tagline ?? '');
+	const [authDescription, setAuthDescription] = useState(branding.auth_description ?? '');
 	const [logoFile, setLogoFile] = useState<File | null>(null);
 	const [logoPreview, setLogoPreview] = useState<string | null>(null);
 	const [logoCleared, setLogoCleared] = useState(false);
@@ -54,6 +56,9 @@ export function Customization() {
 	const colorsAreDefault =
 		primary.toLowerCase() === DEFAULT_BRANDING.primaryColor.toLowerCase()
 		&& secondary.toLowerCase() === DEFAULT_BRANDING.secondaryColor.toLowerCase();
+	// Empty copy means "use the default" — the login/signup pages fall back to the defaults.
+	const taglineIsDefault = authTagline.trim() === '';
+	const descriptionIsDefault = authDescription.trim() === '';
 
 	const stageImage =
 		(setFile: (f: File | null) => void, setPreview: (p: string | null) => void, setCleared: (c: boolean) => void) =>
@@ -85,6 +90,8 @@ export function Customization() {
 		setPrimary(branding.primary_color || DEFAULT_BRANDING.primaryColor);
 		setSecondary(branding.secondary_color || DEFAULT_BRANDING.secondaryColor);
 		setNavDisplay(branding.nav_display ?? 'logo');
+		setAuthTagline(branding.auth_tagline ?? '');
+		setAuthDescription(branding.auth_description ?? '');
 		setLogoFile(null);
 		setLogoPreview(null);
 		setLogoCleared(false);
@@ -105,6 +112,8 @@ export function Customization() {
 				primary_color: primary,
 				secondary_color: secondary,
 				nav_display: navDisplay,
+				auth_tagline: authTagline,
+				auth_description: authDescription,
 			});
 			if (logoFile) {
 				await uploadLogo(logoFile);
@@ -342,6 +351,60 @@ export function Customization() {
 							<Typography.Paragraph type="secondary" style={{ fontSize: 12, marginTop: 12, marginBottom: 0 }}>
 								PNG, JPEG, WEBP, or SVG up to 2 MB each. Leave unset to use the defaults.
 							</Typography.Paragraph>
+
+							<Divider />
+
+							<Typography.Title level={5} style={{ marginTop: 0 }}>
+								Login &amp; signup screens
+							</Typography.Title>
+							<Typography.Paragraph type="secondary" style={{ fontSize: 12, marginTop: 0, marginBottom: 12 }}>
+								Marketing copy shown on the public login and signup pages. Leave a field blank to use the default.
+							</Typography.Paragraph>
+
+							<Space orientation="vertical" size={4} style={{ width: '100%' }}>
+								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+									<Typography.Text type="secondary">Tagline</Typography.Text>
+									<Button
+										type="link"
+										size="small"
+										onClick={() => setAuthTagline('')}
+										disabled={taglineIsDefault}
+										style={{ paddingInline: 0 }}
+									>
+										Reset to default
+									</Button>
+								</div>
+								<Input
+									value={authTagline}
+									maxLength={150}
+									showCount
+									onChange={(e) => setAuthTagline(e.target.value)}
+									placeholder={DEFAULT_AUTH_TAGLINE}
+								/>
+							</Space>
+
+							<Space orientation="vertical" size={4} style={{ width: '100%', marginTop: 12 }}>
+								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+									<Typography.Text type="secondary">Description</Typography.Text>
+									<Button
+										type="link"
+										size="small"
+										onClick={() => setAuthDescription('')}
+										disabled={descriptionIsDefault}
+										style={{ paddingInline: 0 }}
+									>
+										Reset to default
+									</Button>
+								</div>
+								<Input.TextArea
+									value={authDescription}
+									maxLength={500}
+									showCount
+									rows={3}
+									onChange={(e) => setAuthDescription(e.target.value)}
+									placeholder={DEFAULT_AUTH_DESCRIPTION}
+								/>
+							</Space>
 
 							<Divider />
 
