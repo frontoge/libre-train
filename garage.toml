@@ -1,0 +1,27 @@
+# Garage (S3-compatible object store) — single-node config for the coupled deployment.
+# Data/metadata live on the garage_data / garage_meta docker volumes (persisted).
+# NOTE: regenerate rpc_secret + admin_token for any real deployment: `openssl rand -hex 32`.
+
+metadata_dir = "/var/lib/garage/meta"
+data_dir = "/var/lib/garage/data"
+db_engine = "lmdb"
+
+replication_factor = 1
+
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "127.0.0.1:3901"
+rpc_secret = "1799bcc2d2d8e5a2cb9c2d51e2f1cf4b8b8c6a3f0d2e4f6a8c0e2d4f6a8b0c2d"
+
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "[::]:3900"
+root_domain = ".s3.garage.localhost"
+
+[s3_web]
+bind_addr = "[::]:3902"
+root_domain = ".web.garage.localhost"
+index = "index.html"
+
+[admin]
+api_bind_addr = "[::]:3903"
+admin_token = "garage-admin-token-change-me"

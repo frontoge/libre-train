@@ -83,6 +83,7 @@ const defaultClients: ClientContact[] = [
 const createState = (overrides?: Partial<AppState>): AppState => ({
 	clients: defaultClients,
 	contacts: [],
+	branding: { brand_name: 'Libre Train' },
 	assessmentTypes: [
 		{
 			id: 1,
@@ -137,6 +138,8 @@ const renderDashboard = (stateOverrides?: Partial<AppState>) => {
 					state,
 					setState: vi.fn(),
 					setAuth: vi.fn(),
+					colorMode: 'dark',
+					toggleColorMode: vi.fn(),
 				}}
 			>
 				<Dashboard />

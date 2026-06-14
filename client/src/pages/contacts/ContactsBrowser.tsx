@@ -1,17 +1,20 @@
 import type { ContactWithFlags, CreateContactRequest, UpdateContactRequest } from '@libre-train/shared';
-import { Avatar, Button, Col, Input, Modal, Popconfirm, Row, Space, Switch, Table, Tag, theme, Typography } from 'antd';
+import { Avatar, Button, Empty, Grid, Input, Modal, Popconfirm, Space, Table, Tag, theme, Tooltip, Typography } from 'antd';
 import type { TableProps } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useContext, useMemo, useState } from 'react';
-import { FaPlus, FaSearchengin, FaUserPlus } from 'react-icons/fa';
+import { FaPen, FaPhone, FaPlus, FaRegTrashAlt, FaSearch, FaUserPlus } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { createContact, deleteContact, updateContact } from '../../api/contacts';
 import { AppContext } from '../../app-context';
 import { ContactEditCreateForm } from '../../components/Contacts/ContactEditCreateForm';
 import PageLayout from '../../components/PageLayout';
+import { getYearsSinceDate } from '../../helpers/date-helpers';
 import { getInitials } from '../../helpers/label-formatters';
 import { useMessage } from '../../hooks/useMessage';
 import type { ContactEditCreateFormValues } from '../../types/types';
+
+type ContactFilter = 'all' | 'leads' | 'trainers' | 'clients';
 
 interface ContactTableRow {
 	key: string;
@@ -26,6 +29,14 @@ interface ContactTableRow {
 	isTrainer: boolean;
 	hasClient: boolean;
 }
+
+// Deterministic, pleasant avatar background so each contact reads as distinct at a glance.
+const AVATAR_COLORS = ['#1677ff', '#52c41a', '#fa8c16', '#eb2f96', '#722ed1', '#13c2c2', '#f5222d', '#2f54eb'];
+
+const colorForName = (name: string): string => {
+	const sum = [...name].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+	return AVATAR_COLORS[sum % AVATAR_COLORS.length];
+};
 
 const toFormValues = (contact: ContactWithFlags): ContactEditCreateFormValues => ({
 	firstName: contact.first_name,
@@ -45,6 +56,8 @@ const toRequestPayload = (values: ContactEditCreateFormValues): CreateContactReq
 
 export function ContactsBrowser() {
 	const { token } = theme.useToken();
+	const screens = Grid.useBreakpoint();
+	const isMobile = !screens.md;
 	const navigate = useNavigate();
 	const showMessage = useMessage();
 	const {
@@ -53,17 +66,27 @@ export function ContactsBrowser() {
 	} = useContext(AppContext);
 
 	const [searchInput, setSearchInput] = useState('');
-	const [hideTrainers, setHideTrainers] = useState(true);
-	const [hideWithClients, setHideWithClients] = useState(false);
+	const [filter, setFilter] = useState<ContactFilter>('all');
 	const [modalContact, setModalContact] = useState<ContactWithFlags | null>(null);
 	const [modalOpen, setModalOpen] = useState(false);
+
+	const counts = useMemo(
+		() => ({
+			all: contacts.length,
+			leads: contacts.filter((c) => !c.isTrainer && !c.hasClient).length,
+			trainers: contacts.filter((c) => c.isTrainer).length,
+			clients: contacts.filter((c) => c.hasClient).length,
+		}),
+		[contacts]
+	);
 
 	const tableData: ContactTableRow[] = useMemo(() => {
 		const term = searchInput.toLowerCase();
 		return contacts
 			.filter((c) => {
-				if (hideTrainers && c.isTrainer) return false;
-				if (hideWithClients && c.hasClient) return false;
+				if (filter === 'leads' && (c.isTrainer || c.hasClient)) return false;
+				if (filter === 'trainers' && !c.isTrainer) return false;
+				if (filter === 'clients' && !c.hasClient) return false;
 				if (!term) return true;
 				const fullName = `${c.first_name} ${c.last_name}`.toLowerCase();
 				return (
@@ -86,7 +109,7 @@ export function ContactsBrowser() {
 				hasClient: c.hasClient,
 			}))
 			.sort((a, b) => b.id - a.id);
-	}, [contacts, searchInput, hideTrainers, hideWithClients]);
+	}, [contacts, searchInput, filter]);
 
 	const openAddModal = () => {
 		setModalContact(null);
@@ -142,80 +165,121 @@ export function ContactsBrowser() {
 
 	const findContact = (id: number) => contacts.find((c) => c.id === id);
 
+	const statTiles: { key: ContactFilter; label: string; value: number; accent: string }[] = [
+		{ key: 'all', label: 'All contacts', value: counts.all, accent: token.colorPrimary },
+		{ key: 'leads', label: 'Leads', value: counts.leads, accent: token.colorWarning },
+		{ key: 'trainers', label: 'Trainers', value: counts.trainers, accent: '#722ed1' },
+		{ key: 'clients', label: 'Converted', value: counts.clients, accent: token.colorSuccess },
+	];
+
+	const statusTag = (record: ContactTableRow) => {
+		if (record.isTrainer) return <Tag color="purple">Trainer</Tag>;
+		if (record.hasClient) return <Tag color="success">Client</Tag>;
+		return <Tag color="gold">Lead</Tag>;
+	};
+
 	const columns: TableProps<ContactTableRow>['columns'] = [
 		{
-			title: 'Name',
+			title: 'Contact',
 			key: 'name',
-			width: 220,
+			width: 280,
 			render: (_, record) => (
-				<Space>
-					<Avatar size={32} src={record.avatar || undefined}>
+				<Space size={12}>
+					<Avatar
+						size={40}
+						src={record.avatar || undefined}
+						style={record.avatar ? undefined : { backgroundColor: colorForName(record.name), fontWeight: 600 }}
+					>
 						{record.avatar ? null : getInitials(record.firstName, record.lastName)}
 					</Avatar>
-					<div style={{ fontWeight: 500 }}>{record.name}</div>
+					<div style={{ minWidth: 0 }}>
+						<div style={{ fontWeight: 600, color: token.colorText }}>{record.name}</div>
+						<Typography.Text
+							type="secondary"
+							copyable={{ text: record.email, tooltips: ['Copy email', 'Copied'] }}
+							style={{ fontSize: 12 }}
+						>
+							{record.email}
+						</Typography.Text>
+					</div>
 				</Space>
 			),
-		},
-		{
-			title: 'Email',
-			dataIndex: 'email',
-			key: 'email',
-			width: 200,
-			ellipsis: true,
-			render: (email: string) => <Typography.Text copyable>{email}</Typography.Text>,
 		},
 		{
 			title: 'Phone',
 			dataIndex: 'phone',
 			key: 'phone',
-			width: 140,
-			ellipsis: true,
-			render: (phone?: string) => (phone ? <Typography.Text copyable>{phone}</Typography.Text> : '—'),
+			width: 170,
+			render: (phone?: string) =>
+				phone ? (
+					<Space size={6} style={{ color: token.colorTextSecondary }}>
+						<FaPhone size={11} style={{ color: token.colorTextTertiary }} />
+						<Typography.Text copyable={{ text: phone }}>{phone}</Typography.Text>
+					</Space>
+				) : (
+					<Typography.Text type="secondary">—</Typography.Text>
+				),
 		},
 		{
-			title: 'DOB',
+			title: 'Date of birth',
 			dataIndex: 'dob',
 			key: 'dob',
-			width: 120,
-			render: (dob?: string) => dob ?? '—',
+			width: 170,
+			render: (dob?: string) =>
+				dob ? (
+					<div>
+						<div>{dayjs(dob).format('MMM D, YYYY')}</div>
+						<Typography.Text type="secondary" style={{ fontSize: 12 }}>
+							{getYearsSinceDate(dob)} years old
+						</Typography.Text>
+					</div>
+				) : (
+					<Typography.Text type="secondary">—</Typography.Text>
+				),
 		},
 		{
 			title: 'Status',
 			key: 'status',
-			width: 160,
-			render: (_, record) => (
-				<Space size={4} wrap>
-					{record.isTrainer && <Tag color="purple">Trainer</Tag>}
-					{record.hasClient && <Tag color="green">Client</Tag>}
-					{!record.isTrainer && !record.hasClient && <Tag>Lead</Tag>}
-				</Space>
-			),
+			width: 130,
+			render: (_, record) => statusTag(record),
 		},
 		{
 			title: 'Actions',
 			key: 'actions',
-			width: 240,
+			width: 150,
+			align: 'right',
 			render: (_, record) => {
 				const contact = findContact(record.id);
 				const canCreateClient = !record.isTrainer && !record.hasClient;
 				return (
-					<Space size={4}>
+					<Space size={2}>
 						{canCreateClient && (
-							<Button type="link" icon={<FaUserPlus />} onClick={() => handleCreateClientFromContact(record.id)}>
-								Create Client
-							</Button>
+							<Tooltip title="Convert to client">
+								<Button
+									type="text"
+									icon={<FaUserPlus />}
+									onClick={() => handleCreateClientFromContact(record.id)}
+								/>
+							</Tooltip>
 						)}
-						<Button type="link" disabled={!contact} onClick={() => contact && openEditModal(contact)}>
-							Edit
-						</Button>
+						<Tooltip title="Edit">
+							<Button
+								type="text"
+								icon={<FaPen />}
+								disabled={!contact}
+								onClick={() => contact && openEditModal(contact)}
+							/>
+						</Tooltip>
 						<Popconfirm
 							title="Delete this contact?"
 							description="This cannot be undone."
+							okText="Delete"
+							okButtonProps={{ danger: true }}
 							onConfirm={() => handleDelete(record.id)}
 						>
-							<Button type="link" danger>
-								Delete
-							</Button>
+							<Tooltip title="Delete">
+								<Button type="text" danger icon={<FaRegTrashAlt />} />
+							</Tooltip>
 						</Popconfirm>
 					</Space>
 				);
@@ -223,70 +287,258 @@ export function ContactsBrowser() {
 		},
 	];
 
-	return (
-		<PageLayout title="Contacts">
-			<div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-				<div
-					style={{
-						backgroundColor: token.colorBgContainer,
-						padding: '1.5rem',
-						borderRadius: '8px',
-						border: `1px solid ${token.colorBorderSecondary}`,
-						boxShadow: `0 1px 2px ${token.colorBgElevated}`,
-					}}
-				>
-					<Row gutter={[16, 16]} align="middle" justify="space-between">
-						<Col xs={24} sm={12}>
-							<Space orientation="vertical" size={2}>
-								<Typography.Title level={3} style={{ margin: 0, color: token.colorTextHeading }}>
-									{tableData.length} {tableData.length === 1 ? 'Contact' : 'Contacts'}
-								</Typography.Title>
-								<Typography.Text type="secondary">
-									Browse, manage, and convert contacts into clients.
-								</Typography.Text>
-							</Space>
-						</Col>
-						<Col xs={24} sm={12} style={{ textAlign: 'right' }}>
-							<Button type="primary" icon={<FaPlus />} onClick={openAddModal} size="large">
-								Add Contact
-							</Button>
-						</Col>
-					</Row>
+	const emptyState = (
+		<Empty
+			image={Empty.PRESENTED_IMAGE_SIMPLE}
+			description={searchInput || filter !== 'all' ? 'No contacts match your filters' : 'No contacts yet'}
+		>
+			{!searchInput && filter === 'all' && (
+				<Button type="primary" icon={<FaPlus />} onClick={openAddModal}>
+					Add your first contact
+				</Button>
+			)}
+		</Empty>
+	);
+
+	const renderContactCard = (record: ContactTableRow) => {
+		const contact = findContact(record.id);
+		const canCreateClient = !record.isTrainer && !record.hasClient;
+		return (
+			<div
+				key={record.key}
+				style={{
+					border: `1px solid ${token.colorBorderSecondary}`,
+					borderRadius: token.borderRadiusLG,
+					padding: '0.875rem',
+					background: token.colorBgContainer,
+				}}
+			>
+				<div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+					<Avatar
+						size={44}
+						src={record.avatar || undefined}
+						style={record.avatar ? undefined : { backgroundColor: colorForName(record.name), fontWeight: 600 }}
+					>
+						{record.avatar ? null : getInitials(record.firstName, record.lastName)}
+					</Avatar>
+					<div style={{ flex: 1, minWidth: 0 }}>
+						<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+							<span style={{ fontWeight: 600, color: token.colorText, wordBreak: 'break-word' }}>
+								{record.name}
+							</span>
+							{statusTag(record)}
+						</div>
+						<Typography.Text
+							type="secondary"
+							copyable={{ text: record.email, tooltips: ['Copy email', 'Copied'] }}
+							style={{ fontSize: 13, wordBreak: 'break-all' }}
+						>
+							{record.email}
+						</Typography.Text>
+					</div>
 				</div>
 
-				<div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-					<Table<ContactTableRow>
-						columns={columns}
-						dataSource={tableData}
-						bordered
-						size="small"
-						style={{ width: '100%', flex: 1 }}
-						title={() => (
-							<div style={{ display: 'flex', width: '100%', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-								<Input
-									placeholder="Search contacts..."
-									prefix={<FaSearchengin style={{ marginRight: '8px', color: token.colorTextTertiary }} />}
-									value={searchInput}
-									onChange={(e) => setSearchInput(e.target.value)}
-									allowClear
-									style={{ flex: 1, minWidth: 200 }}
-								/>
-								<Space size="middle">
-									<Space size={6}>
-										<Switch checked={hideTrainers} onChange={setHideTrainers} size="small" />
-										<Typography.Text>Hide trainers</Typography.Text>
-									</Space>
-									<Space size={6}>
-										<Switch checked={hideWithClients} onChange={setHideWithClients} size="small" />
-										<Typography.Text>Hide contacts with clients</Typography.Text>
-									</Space>
-								</Space>
-							</div>
+				{(record.phone || record.dob) && (
+					<div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 12, fontSize: 13 }}>
+						{record.phone && (
+							<Space size={8} style={{ color: token.colorTextSecondary }}>
+								<FaPhone size={11} style={{ color: token.colorTextTertiary }} />
+								<Typography.Text copyable={{ text: record.phone }}>{record.phone}</Typography.Text>
+							</Space>
 						)}
-						pagination={{ pageSize: 12, showSizeChanger: false }}
-						scroll={{ x: 800 }}
-						locale={{ emptyText: searchInput ? 'No contacts match your search' : 'No contacts yet' }}
-					/>
+						{record.dob && (
+							<span style={{ color: token.colorTextSecondary }}>
+								{dayjs(record.dob).format('MMM D, YYYY')} · {getYearsSinceDate(record.dob)} years old
+							</span>
+						)}
+					</div>
+				)}
+
+				<div
+					style={{
+						display: 'flex',
+						justifyContent: 'flex-end',
+						gap: 4,
+						marginTop: 12,
+						paddingTop: 12,
+						borderTop: `1px solid ${token.colorBorderSecondary}`,
+					}}
+				>
+					{canCreateClient && (
+						<Button
+							size="small"
+							type="text"
+							icon={<FaUserPlus />}
+							onClick={() => handleCreateClientFromContact(record.id)}
+						>
+							Convert
+						</Button>
+					)}
+					<Button
+						size="small"
+						type="text"
+						icon={<FaPen />}
+						disabled={!contact}
+						onClick={() => contact && openEditModal(contact)}
+					>
+						Edit
+					</Button>
+					<Popconfirm
+						title="Delete this contact?"
+						description="This cannot be undone."
+						okText="Delete"
+						okButtonProps={{ danger: true }}
+						onConfirm={() => handleDelete(record.id)}
+					>
+						<Button size="small" type="text" danger icon={<FaRegTrashAlt />}>
+							Delete
+						</Button>
+					</Popconfirm>
+				</div>
+			</div>
+		);
+	};
+
+	return (
+		<PageLayout title="Contacts" contentStyle={{ padding: isMobile ? '1rem' : '1.5rem 2rem' }}>
+			<div style={{ height: isMobile ? 'auto' : '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+				{/* Header */}
+				<div
+					style={{
+						display: 'flex',
+						alignItems: 'flex-start',
+						justifyContent: 'space-between',
+						gap: '1rem',
+						flexWrap: 'wrap',
+					}}
+				>
+					<div style={{ flex: '1 1 auto', minWidth: 0 }}>
+						<Typography.Title level={3} style={{ margin: 0, color: token.colorTextHeading }}>
+							Contacts
+						</Typography.Title>
+						<Typography.Text type="secondary">Browse, manage, and convert contacts into clients.</Typography.Text>
+					</div>
+					<Button
+						type="primary"
+						icon={<FaPlus />}
+						onClick={openAddModal}
+						size="large"
+						block={isMobile}
+						style={isMobile ? undefined : { flex: '0 0 auto' }}
+					>
+						Add Contact
+					</Button>
+				</div>
+
+				{/* Clickable stat tiles double as quick filters */}
+				<div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+					{statTiles.map((tile) => {
+						const active = filter === tile.key;
+						return (
+							<button
+								key={tile.key}
+								type="button"
+								onClick={() => setFilter(tile.key)}
+								style={{
+									flex: isMobile ? '1 1 calc(50% - 0.375rem)' : '1 1 160px',
+									minWidth: 0,
+									textAlign: 'left',
+									cursor: 'pointer',
+									padding: isMobile ? '0.625rem 0.875rem' : '0.875rem 1.125rem',
+									borderRadius: token.borderRadiusLG,
+									border: `1px solid ${active ? tile.accent : token.colorBorderSecondary}`,
+									background: active ? `${tile.accent}14` : token.colorBgContainer,
+									boxShadow: active ? 'none' : `0 1px 2px ${token.colorBgElevated}`,
+									transition: 'all 0.15s ease',
+								}}
+							>
+								<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+									<span
+										style={{
+											width: 8,
+											height: 8,
+											borderRadius: '50%',
+											background: tile.accent,
+											flex: '0 0 auto',
+										}}
+									/>
+									<span
+										style={{
+											color: token.colorTextSecondary,
+											fontSize: 13,
+											whiteSpace: 'nowrap',
+											overflow: 'hidden',
+											textOverflow: 'ellipsis',
+										}}
+									>
+										{tile.label}
+									</span>
+								</div>
+								<div
+									style={{
+										fontSize: isMobile ? 22 : 26,
+										fontWeight: 700,
+										color: token.colorTextHeading,
+										marginTop: 4,
+									}}
+								>
+									{tile.value}
+								</div>
+							</button>
+						);
+					})}
+				</div>
+
+				{/* Table */}
+				<div
+					style={{
+						flex: isMobile ? '0 0 auto' : 1,
+						display: 'flex',
+						flexDirection: 'column',
+						background: token.colorBgContainer,
+						borderRadius: token.borderRadiusLG,
+						border: `1px solid ${token.colorBorderSecondary}`,
+						boxShadow: `0 1px 2px ${token.colorBgElevated}`,
+						overflow: isMobile ? 'visible' : 'hidden',
+					}}
+				>
+					<div style={{ padding: isMobile ? '0.75rem' : '1rem 1rem 0.75rem' }}>
+						<Input
+							placeholder="Search by name, email, or phone..."
+							prefix={<FaSearch style={{ marginRight: 8, color: token.colorTextTertiary }} />}
+							value={searchInput}
+							onChange={(e) => setSearchInput(e.target.value)}
+							allowClear
+							size="large"
+							style={{ width: '100%', maxWidth: isMobile ? undefined : 420 }}
+						/>
+					</div>
+					{isMobile ? (
+						<div style={{ flex: 1, padding: '0 0.75rem 0.75rem' }}>
+							{tableData.length === 0 ? (
+								<div style={{ padding: '2rem 0' }}>{emptyState}</div>
+							) : (
+								<div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+									{tableData.map(renderContactCard)}
+								</div>
+							)}
+						</div>
+					) : (
+						<Table<ContactTableRow>
+							columns={columns}
+							dataSource={tableData}
+							size="middle"
+							style={{ width: '100%', flex: 1 }}
+							pagination={{
+								pageSize: 12,
+								showSizeChanger: false,
+								hideOnSinglePage: true,
+								style: { padding: '0 1rem' },
+							}}
+							scroll={{ x: 800 }}
+							locale={{ emptyText: emptyState }}
+						/>
+					)}
 				</div>
 			</div>
 
@@ -297,6 +549,7 @@ export function ContactsBrowser() {
 				footer={null}
 				title={modalContact ? 'Edit Contact' : 'Add Contact'}
 				destroyOnHidden
+				style={{ maxWidth: 'calc(100vw - 2rem)' }}
 			>
 				<ContactEditCreateForm
 					onSubmit={handleModalSubmit}

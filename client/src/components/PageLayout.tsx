@@ -1,8 +1,10 @@
-import { HomeOutlined } from '@ant-design/icons';
-import { Breadcrumb, Layout, theme } from 'antd';
+import { HomeOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Breadcrumb, Dropdown, Layout, theme, type MenuProps } from 'antd';
 import { Content, Header } from 'antd/es/layout/layout';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
+import { FaMoon, FaSun } from 'react-icons/fa6';
 import { Link, useLocation } from 'react-router-dom';
+import { AppContext } from '../app-context';
 
 export type BreadcrumbItem = {
 	label: string;
@@ -58,6 +60,16 @@ function deriveBreadcrumbs(pathname: string): BreadcrumbItem[] {
 export default function PageLayout(props: PageLayoutProps) {
 	const { token } = theme.useToken();
 	const location = useLocation();
+	const { colorMode, toggleColorMode } = useContext(AppContext);
+
+	const userMenuItems: MenuProps['items'] = [
+		{
+			key: 'theme',
+			icon: colorMode === 'dark' ? <FaSun /> : <FaMoon />,
+			label: colorMode === 'dark' ? 'Light mode' : 'Dark mode',
+			onClick: toggleColorMode,
+		},
+	];
 
 	const trail = useMemo<BreadcrumbItem[]>(
 		() => props.breadcrumbs ?? deriveBreadcrumbs(location.pathname),
@@ -100,16 +112,18 @@ export default function PageLayout(props: PageLayoutProps) {
 
 	return (
 		<Layout style={layoutStyle}>
-			<Header style={{ flex: '0 0 auto' }}>
-				<h1
-					style={{
-						margin: 0,
-						padding: 0,
-						fontSize: '1.5rem',
-					}}
-				>
-					{props.title || 'Page Title'}
-				</h1>
+			<Header
+				style={{
+					flex: '0 0 auto',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
+				}}
+			>
+				<h1 style={{ margin: 0, padding: 0, fontSize: '1.5rem' }}>{props.title || 'Page Title'}</h1>
+				<Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
+					<Avatar icon={<UserOutlined />} style={{ cursor: 'pointer', backgroundColor: token.colorPrimary }} />
+				</Dropdown>
 			</Header>
 			<div
 				style={{

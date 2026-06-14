@@ -11,7 +11,7 @@ An open-source CRM for personal training. Bun workspace monorepo with four packa
 - `shared/` — Types, route constants, and utilities consumed by both client and server (`@libre-train/shared`)
 - `db/` — Prisma schema, migrations, and generated Prisma/Zod clients (`@libre-train/db`)
 
-`database/` (note: not the `db/` workspace) contains raw SQL definitions — `tables/`, `views/`, `procedures/`, and seed `scripts/`. Many API handlers rely on stored procedures defined here, so schema changes often require coordinating Prisma migrations in `db/prisma/migrations` with SQL under `database/`.
+The Prisma migrations under `db/prisma/migrations` are the single source of truth for the database schema (tables, views, and seed data). All data access goes through the Prisma client — there are no hand-maintained SQL files or stored procedures.
 
 ## Common commands
 
@@ -19,6 +19,7 @@ Run from the repo root unless noted.
 
 ```bash
 bun install                  # install all workspaces
+bun run env:use containers   # point each workspace's .env at a named profile (.env.<profile>)
 bun run db:generate          # generate Prisma + Zod clients into db/generated/ (required before build)
 bun run build                # builds shared first, then client + server sequentially
 bun run start:client         # vite dev server for the client
@@ -45,9 +46,27 @@ bun run --filter @libre-train/db db:migrate:reset     # reset dev database
 
 ## Required environment
 
+Each workspace reads a `.env` next to its package; each ships an `.env.example` template. The active `.env` files are managed by named profiles and a switcher — `bun run env:use <profile>` symlinks each `<ws>/.env` to its `.env.<profile>` (e.g. `bun run env:use containers` for the local Docker stack). Profile names must avoid `local`/`development`/`production`/`test` (Bun and Vite auto-load `.env.<those>`). See `LOCAL-DEV.md` for the full local setup, including `docker-compose.local.yaml` (local MariaDB + Garage; the counterpart to the deployment `docker-compose.yaml`, which builds/runs the server image).
+
 - `db/.env` — `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (checked by `db/prisma.config.ts`; also used by the server via `@prisma/adapter-mariadb`)
-- `server/.env` — the DB vars above, plus `JWT_SECRET`, `REFRESH_TOKEN_SECRET`, `FRONTEND_URL` (CORS origin). Server exits on startup if the JWT secrets are missing.
-- `client/.env` — `VITE_API_URL` (base for fetches; `/api` is appended by `getAppConfiguration`), `VITE_ENV` (`local` | `dev` | `prod`).
+- `server/.env` — the DB vars above, plus `JWT_SECRET`, `REFRESH_TOKEN_SECRET`, `FRONTEND_URL` (CORS origin). Server exits on startup if the JWT secrets are missing. Optionally `GARAGE_ENDPOINT`, `GARAGE_REGION`, `GARAGE_ACCESS_KEY`, `GARAGE_SECRET_KEY`, `GARAGE_BUCKET` for object storage — if absent the server still boots, but branding logo upload/serving returns 503.
+- `client/.env` — `VITE_API_URL` (base for fetches; `/api` is appended by `getAppConfiguration`), `VITE_ENV` (`local` | `dev` | `prod`), `VITE_BASE_URL` (router basename).
+
+### Object storage (Garage)
+
+Branding logos are stored in a [Garage](https://garagehq.deuxfleurs.fr/) (S3-compatible) bucket, present in both `docker-compose.yaml` (deployment) and `docker-compose.local.yaml` (local dev) with persisted `garage_meta` / `garage_data` volumes. The server reaches it via `@aws-sdk/client-s3` (`server/storage/garage-storage.ts`, path-style). Logos are **served by proxying** through the public `GET /api/branding/logo` route — only the object key is stored in the DB, so the bucket stays internal. One-time bootstrap (for local dev, add `-f docker-compose.local.yaml` to each command):
+
+```bash
+docker compose up -d garage
+docker compose exec garage /garage status                                   # copy the node ID
+docker compose exec garage /garage layout assign -z dc1 -c 1G <node-id>
+docker compose exec garage /garage layout apply --version 1
+docker compose exec garage /garage bucket create libre-train-logos
+docker compose exec garage /garage key create libre-train-app               # copy Key ID + Secret
+docker compose exec garage /garage bucket allow --read --write libre-train-logos --key libre-train-app
+```
+
+Put the Key ID / Secret into `GARAGE_ACCESS_KEY` / `GARAGE_SECRET_KEY` in `server/.env`. Regenerate `rpc_secret` / `admin_token` in `garage.toml` for non-local deployments (`openssl rand -hex 32`).
 
 Local auth bypass: when `VITE_ENV=local` and `getAppConfiguration().disableAuth` is true, the client pins itself to user id 10 and skips login. `disableAuth` is currently hardcoded to `false` in `client/src/config/app.config.ts` — flip it locally if needed, but never commit that change.
 
@@ -58,11 +77,12 @@ Local auth bypass: when `VITE_ENV=local` and `getAppConfiguration().disableAuth`
 1. Client calls go through `client/src/helpers/fetch-helpers.ts` / `api.ts`, targeting paths from `@libre-train/shared` `Routes`.
 2. Express mounts everything under `/api` (`server/index.ts` → `server/api/router.ts`). All endpoints are registered in `router.ts` using the same `Routes` constants, so the client and server agree on paths by construction — when adding an endpoint, add it to `shared/routes.ts` first, then both sides import it.
 3. Handlers live in `server/api/handlers/*-handlers.ts`, grouped by domain (auth, client, cycle, diet, assessment, exercise, contact, workout-routine). They use the shared `prisma` instance from `server/database/mysql-database.ts`, which wraps `PrismaClient` with the MariaDB adapter.
-4. Many handlers call MySQL stored procedures (see `database/procedures/`) via `prisma.$queryRaw` rather than model methods — check both when tracing behavior.
+4. Handlers query through the Prisma client model methods (`prisma.<model>.find/create/update/...`); there are no raw SQL queries or stored-procedure calls.
 
 ### Data model
 
-- Canonical schema: `db/prisma/schema.prisma` (MySQL provider, views preview feature enabled). The `database/tables/` and `database/views/` SQL files mirror this and are used for initial setup / reference.
+- Canonical schema: `db/prisma/schema.prisma` (MySQL provider, views preview feature enabled). Migrations in `db/prisma/migrations` create the tables and views from it.
+- **Do not create migration files.** When changing the schema, edit `db/prisma/schema.prisma` and run `bun run db:generate` to refresh the generated Prisma + Zod clients (no DB needed) so code typechecks — then leave migration creation to the maintainer, who runs the Prisma CLI (`bun run --filter @libre-train/db db:migrate`). Never hand-author files under `db/prisma/migrations/`.
 - `db/prisma/zod-generator.config.json` drives `prisma-zod-generator`, outputting Zod schemas to `db/generated/zod`. These are re-exported via `@libre-train/db/zod`.
 - `shared/models.ts` wraps each Zod schema with `DataModel<T>` — a transform that stringifies `Date` fields (to match JSON-over-HTTP) and converts `null` to `undefined`. Use `DataModel<typeof FooSchema>` for any type that crosses the API boundary rather than the raw Prisma type.
 

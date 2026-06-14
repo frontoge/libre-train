@@ -1,5 +1,6 @@
 export * from './assessment';
 export * from './auth';
+export * from './branding';
 export * from './client';
 export * from './contacts';
 export * from './diet';

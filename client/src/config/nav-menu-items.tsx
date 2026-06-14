@@ -1,6 +1,6 @@
 import { HomeFilled } from '@ant-design/icons';
-import { FaAddressBook, FaBullseye, FaHandshake, FaListAlt, FaPencilAlt } from 'react-icons/fa';
-import { FaCalendarXmark, FaGear, FaMagnifyingGlass, FaSquarePlus } from 'react-icons/fa6';
+import { FaAddressBook, FaBullseye, FaListAlt, FaPencilAlt } from 'react-icons/fa';
+import { FaCalendarXmark, FaPalette, FaSquarePlus } from 'react-icons/fa6';
 import { GiWeightLiftingUp } from 'react-icons/gi';
 import { ImMap } from 'react-icons/im';
 import { IoMdPerson, IoMdPersonAdd } from 'react-icons/io';
@@ -9,6 +9,7 @@ import { RiLogoutBoxRFill } from 'react-icons/ri';
 import { SiMealie } from 'react-icons/si';
 import { type NavMenuItem } from '../types/types';
 
+// Structure: business-function groups (no icon) → collapsible submenus / leaf items (icons).
 export const items: NavMenuItem[] = [
 	{
 		key: 'dashboard',
@@ -17,113 +18,123 @@ export const items: NavMenuItem[] = [
 		urlPath: '/',
 	},
 	{
-		type: 'divider',
-	},
-	{
-		key: 'clientsMenu',
+		key: 'clientsGroup',
+		type: 'group',
 		label: 'Clients',
-		icon: <IoMdPerson />,
 		children: [
 			{
-				key: 'client_overview',
-				label: 'Dashboard',
-				icon: <MdSpaceDashboard />,
-				urlPath: '/clients/',
+				key: 'clientsMenu',
+				label: 'Clients',
+				icon: <IoMdPerson />,
+				children: [
+					{
+						key: 'client_overview',
+						label: 'Dashboard',
+						icon: <MdSpaceDashboard />,
+						urlPath: '/clients/',
+					},
+					{
+						key: 'client_new',
+						label: 'New Client',
+						icon: <IoMdPersonAdd />,
+						urlPath: '/clients/create',
+					},
+					{
+						key: 'client_browse',
+						label: 'Browse Clients',
+						icon: <FaListAlt />,
+						urlPath: '/clients/browse',
+					},
+				],
 			},
 			{
-				key: 'client_new',
-				label: 'New Client',
-				icon: <IoMdPersonAdd />,
-				urlPath: '/clients/create',
+				key: 'assessmentsMenu',
+				label: 'Assessments',
+				icon: <MdAssessment />,
+				children: [
+					{
+						key: 'assessment_new',
+						label: 'New',
+						icon: <FaSquarePlus />,
+						urlPath: '/assessments/create',
+					},
+					{
+						key: 'assessment_manage',
+						label: 'History',
+						icon: <FaListAlt />,
+						urlPath: '/assessments/',
+					},
+				],
 			},
 			{
-				key: 'client_browse',
-				label: 'Browse Clients',
-				icon: <FaListAlt />,
-				urlPath: '/clients/browse',
+				key: 'goals',
+				label: 'Goals',
+				icon: <FaBullseye />,
+				urlPath: '/goals',
 			},
 		],
 	},
 	{
-		key: 'assessmentsMenu',
-		label: 'Assessments',
-		icon: <MdAssessment />,
+		key: 'trainingGroup',
+		type: 'group',
+		label: 'Training',
 		children: [
 			{
-				key: 'assessment_new',
-				label: 'New',
-				icon: <FaSquarePlus />,
-				urlPath: '/assessments/create',
+				key: 'trainingMenu',
+				label: 'Training Plans',
+				icon: <ImMap />,
+				children: [
+					{
+						key: 'training_plan_new',
+						label: 'New Plan',
+						icon: <FaSquarePlus />,
+						urlPath: '/training/create',
+					},
+					{
+						key: 'training_plan_manage',
+						label: 'Browse Plans',
+						icon: <FaListAlt />,
+						urlPath: '/training/',
+					},
+					{
+						key: 'training_plan_snapshot',
+						label: "Today's Plan",
+						icon: <FaCalendarXmark />,
+						urlPath: '/training/view',
+					},
+				],
 			},
 			{
-				key: 'assessment_manage',
-				label: 'History',
-				icon: <FaListAlt />,
-				urlPath: '/assessments/',
+				key: 'exercise_manage',
+				label: 'Exercises',
+				icon: <GiWeightLiftingUp />,
+				urlPath: '/exercises/',
 			},
 		],
 	},
 	{
-		key: 'goals',
-		label: 'Goals',
-		icon: <FaBullseye />,
-		urlPath: '/goals',
-	},
-	{
-		key: 'trainingMenu',
-		label: 'Training Plans',
-		icon: <ImMap />,
-		children: [
-			{
-				key: 'training_plan_new',
-				label: 'New Plan',
-				icon: <FaSquarePlus />,
-				urlPath: '/training/create',
-			},
-			{
-				key: 'training_plan_manage',
-				label: 'Browse Plans',
-				icon: <FaListAlt />,
-				urlPath: '/training/',
-			},
-			{
-				key: 'training_plan_snapshot',
-				label: "Today's Plan",
-				icon: <FaCalendarXmark />,
-				urlPath: '/training/view',
-			},
-		],
-	},
-	{
-		key: 'dietMenu',
-		label: 'Diet',
-		icon: <SiMealie />,
+		key: 'nutritionGroup',
+		type: 'group',
+		label: 'Nutrition',
 		children: [
 			{
 				key: 'diet_plan_browse',
-				label: 'Browse Plans',
-				icon: <FaListAlt />,
+				label: 'Diet Plans',
+				icon: <SiMealie />,
 				urlPath: '/diet/plans',
 			},
-		],
-	},
-	{
-		key: 'logging',
-		label: 'Logging',
-		icon: <FaPencilAlt />,
-		children: [
 			{
 				key: 'log_diet',
-				label: 'New Diet Log',
-				icon: <SiMealie />,
+				label: 'Diet Log',
+				icon: <FaPencilAlt />,
 				urlPath: '/diet/log',
 			},
 		],
 	},
 	{
-		key: 'salesMenu',
+		key: 'salesGroup',
+		type: 'group',
 		label: 'Sales',
-		icon: <FaHandshake />,
 		children: [
 			{
 				key: 'contacts_browse',
@@ -134,23 +145,16 @@ export const items: NavMenuItem[] = [
 		],
 	},
 	{
-		key: 'exercisesMenu',
-		label: 'Exercises',
-		icon: <GiWeightLiftingUp />,
+		key: 'settingsGroup',
+		type: 'group',
+		label: 'Settings',
 		children: [
 			{
-				key: 'exercise_manage',
-				label: 'Search',
-				icon: <FaMagnifyingGlass />,
-				urlPath: '/exercises/',
+				key: 'settings_customization',
+				label: 'Customization',
+				icon: <FaPalette />,
+				urlPath: '/settings/customization',
 			},
-		],
-	},
-	{
-		key: 'settings',
-		label: 'Settings',
-		icon: <FaGear />,
-		children: [
 			{
 				key: 'logout',
 				label: 'Logout',
@@ -161,16 +165,39 @@ export const items: NavMenuItem[] = [
 	},
 ];
 
-export const getNavItemByKey = (key: string): NavMenuItem | undefined => {
-	for (const item of items) {
-		if (item.key === key) {
-			return item;
+// Recursive lookup so deeply-nested leaves (group → submenu → item) resolve their urlPath.
+export const getNavItemByKey = (key: string, list: NavMenuItem[] = items): NavMenuItem | undefined => {
+	for (const item of list) {
+		if (!item) continue;
+		if ('key' in item && item.key === key) {
+			return item as NavMenuItem;
 		}
 		if (item.children) {
-			const childItem = item.children.find((child) => child?.key === key);
-			if (childItem && 'key' in childItem) {
-				return childItem as NavMenuItem;
-			}
+			const found = getNavItemByKey(key, item.children);
+			if (found) return found;
 		}
 	}
+	return undefined;
+};
+
+// Key of the collapsible submenu (NOT a group) that contains the given leaf key, if any.
+// Used to auto-expand the active submenu.
+export const getParentSubmenuKey = (
+	targetKey: string,
+	list: NavMenuItem[] = items,
+	ancestorSubmenuKey?: string
+): string | undefined => {
+	for (const item of list) {
+		if (!item) continue;
+		if ('key' in item && item.key === targetKey) {
+			return ancestorSubmenuKey;
+		}
+		if (item.children) {
+			const isSubmenu = item.type !== 'group';
+			const nextAncestor = isSubmenu && 'key' in item ? String(item.key) : ancestorSubmenuKey;
+			const found = getParentSubmenuKey(targetKey, item.children, nextAncestor);
+			if (found) return found;
+		}
+	}
+	return undefined;
 };

@@ -3,7 +3,8 @@ body,
 #root {
 	margin: 0;
 	height: 100%;
-	background: #141414;
+	/* Driven by the active antd theme (see BackgroundSync in App.tsx); falls back to dark. */
+	background: var(--app-bg, #141414);
 }
 
 * {

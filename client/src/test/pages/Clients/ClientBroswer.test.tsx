@@ -56,6 +56,7 @@ const createState = (clients: ClientContact[]): AppState => ({
 	clients,
 	contacts: [],
 	assessmentTypes: [],
+	branding: { brand_name: 'Libre Train' },
 	showMessage: () => {},
 	auth: {
 		authToken: undefined,
@@ -71,6 +72,8 @@ const renderClientBrowser = (clients: ClientContact[] = defaultClients) => {
 					state: createState(clients),
 					setState: vi.fn(),
 					setAuth: vi.fn(),
+					colorMode: 'dark',
+					toggleColorMode: vi.fn(),
 				}}
 			>
 				<ClientBrowser />
