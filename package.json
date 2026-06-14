@@ -15,6 +15,7 @@
 		"build:clean": "bun run clean && bun run build",
 		"start:client": "bun run --filter @libre-train/client dev",
 		"start:server": "bun run --filter @libre-train/server dev",
+		"env:use": "bun scripts/use-env.ts",
 		"format": "prettier --write \"**/*.{js,ts,tsx,json,css}\"",
 		"format:check": "prettier --check \"**/*.{js,ts,tsx,json,css}\"",
 		"lint": "bun run --sequential --if-present --no-exit-on-error --filter '!@libre-train/db' lint",

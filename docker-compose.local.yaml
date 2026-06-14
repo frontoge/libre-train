@@ -1,0 +1,48 @@
+# Local development dependencies: a MariaDB database and a Garage object store.
+#
+# This is the counterpart to docker-compose.yaml — that file *builds and runs the server*
+# for deployments, whereas this file runs ONLY the backing services so you can run the
+# server and client on your host (bun run start:server / start:client) against them.
+#
+#   docker compose -f docker-compose.local.yaml up -d
+#
+# Migrations are NOT run here — apply them from the host with an env that points at these
+# containers (see LOCAL-DEV.md, "Switching env profiles").
+
+services:
+    db:
+        image: mariadb:11
+        restart: unless-stopped
+        # Bound to localhost so the database is reachable by host-run dev servers
+        # without being exposed on the network.
+        ports:
+            - '127.0.0.1:3306:3306'
+        environment:
+            MARIADB_DATABASE: libre_train
+            MARIADB_USER: libre_train
+            MARIADB_PASSWORD: libre_train
+            MARIADB_ROOT_PASSWORD: root
+        volumes:
+            - db_data:/var/lib/mysql
+        healthcheck:
+            test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    garage:
+        image: dxflrs/garage:v1.0.1
+        restart: unless-stopped
+        # S3 API bound to localhost so host-run dev servers can reach it without
+        # exposing the object store publicly.
+        ports:
+            - '127.0.0.1:3900:3900'
+        volumes:
+            - ./garage.toml:/etc/garage.toml:ro
+            - garage_meta:/var/lib/garage/meta
+            - garage_data:/var/lib/garage/data
+
+volumes:
+    db_data:
+    garage_meta:
+    garage_data:
