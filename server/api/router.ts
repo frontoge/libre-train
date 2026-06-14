@@ -11,7 +11,16 @@ import {
 	handleUpdateAssessmentLog,
 } from './handlers/assessment-handlers';
 import { handleAuthLogin, handleAuthLogout, handleAuthRefresh, handleAuthSignup } from './handlers/auth-handlers';
-import { handleGetBranding, handleGetLogo, handleUpdateBranding, handleUploadLogo } from './handlers/branding-handlers';
+import {
+	handleClearIcon,
+	handleClearLogo,
+	handleGetBranding,
+	handleGetIcon,
+	handleGetLogo,
+	handleUpdateBranding,
+	handleUploadIcon,
+	handleUploadLogo,
+} from './handlers/branding-handlers';
 import {
 	handleCreateClient,
 	handleDailyUpdate,
@@ -88,6 +97,10 @@ router.get(Routes.Branding, handleGetBranding);
 router.put(Routes.Branding, handleUpdateBranding);
 router.get(`${Routes.Branding}/logo`, handleGetLogo);
 router.post(`${Routes.Branding}/logo`, upload.single('file'), handleUploadLogo);
+router.delete(`${Routes.Branding}/logo`, handleClearLogo);
+router.get(`${Routes.Branding}/icon`, handleGetIcon);
+router.post(`${Routes.Branding}/icon`, upload.single('file'), handleUploadIcon);
+router.delete(`${Routes.Branding}/icon`, handleClearIcon);
 
 // Client routes
 router.post(Routes.Clients, handleCreateClient);

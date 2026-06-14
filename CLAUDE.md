@@ -82,6 +82,7 @@ Local auth bypass: when `VITE_ENV=local` and `getAppConfiguration().disableAuth`
 ### Data model
 
 - Canonical schema: `db/prisma/schema.prisma` (MySQL provider, views preview feature enabled). Migrations in `db/prisma/migrations` create the tables and views from it.
+- **Do not create migration files.** When changing the schema, edit `db/prisma/schema.prisma` and run `bun run db:generate` to refresh the generated Prisma + Zod clients (no DB needed) so code typechecks — then leave migration creation to the maintainer, who runs the Prisma CLI (`bun run --filter @libre-train/db db:migrate`). Never hand-author files under `db/prisma/migrations/`.
 - `db/prisma/zod-generator.config.json` drives `prisma-zod-generator`, outputting Zod schemas to `db/generated/zod`. These are re-exported via `@libre-train/db/zod`.
 - `shared/models.ts` wraps each Zod schema with `DataModel<T>` — a transform that stringifies `Date` fields (to match JSON-over-HTTP) and converts `null` to `undefined`. Use `DataModel<typeof FooSchema>` for any type that crosses the API boundary rather than the raw Prisma type.
 
