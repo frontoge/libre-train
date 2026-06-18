@@ -17,7 +17,7 @@ if (!process.env.GARAGE_ENDPOINT || !process.env.GARAGE_ACCESS_KEY || !process.e
 }
 
 const app = express();
-const port = 3000;
+const port = Number(process.env.SERVER_PORT) || 3000;
 
 app.use(
 	cors({

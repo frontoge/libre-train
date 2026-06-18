@@ -5,7 +5,7 @@ services:
             dockerfile: server/Dockerfile
         restart: unless-stopped
         ports:
-            - '3000:3000'
+            - '${SERVER_PORT:-3000}:${SERVER_PORT:-3000}'
         env_file:
             - ./server/.env
         environment:
@@ -20,7 +20,7 @@ services:
         # S3 API is bound to localhost on the host so host-run dev servers can reach it,
         # without exposing the object store publicly.
         ports:
-            - '127.0.0.1:3900:3900'
+            - '127.0.0.1:${GARAGE_PORT:-3900}:3900'
         volumes:
             - ./garage.toml:/etc/garage.toml:ro
             - garage_meta:/var/lib/garage/meta
