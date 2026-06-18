@@ -82,6 +82,7 @@ jobs:
         run: |
           cat > server/.env << EOF
           NODE_ENV=${{ vars.ENVIRONMENT }}
+          SERVER_PORT=${{ vars.SERVER_PORT }}
           DB_HOST=${{ vars.DB_HOST }}
           DB_PORT=${{ vars.DB_PORT }}
           DB_USER=${{ vars.DB_USER }}
@@ -90,6 +91,11 @@ jobs:
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}
           FRONTEND_URL=https://${{ vars.FRONTEND_DOMAIN }}/${{ vars.FRONTEND_APP_NAME }}
+          EOF
+
+          cat > .env << EOF
+          SERVER_PORT=${{ vars.SERVER_PORT }}
+          GARAGE_PORT=${{ vars.GARAGE_PORT }}
           EOF
 
           docker compose down --remove-orphans
