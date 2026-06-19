@@ -1,5 +1,5 @@
 import { HomeFilled } from '@ant-design/icons';
-import { FaAddressBook, FaBullseye, FaListAlt, FaPencilAlt } from 'react-icons/fa';
+import { FaAddressBook, FaBullseye, FaListAlt, FaPencilAlt, FaShieldAlt, FaUsersCog } from 'react-icons/fa';
 import { FaCalendarXmark, FaPalette, FaSquarePlus } from 'react-icons/fa6';
 import { GiWeightLiftingUp } from 'react-icons/gi';
 import { ImMap } from 'react-icons/im';
@@ -149,6 +149,18 @@ export const items: NavMenuItem[] = [
 		type: 'group',
 		label: 'Settings',
 		children: [
+			{
+				key: 'user_management',
+				label: 'User Management',
+				icon: <FaUsersCog />,
+				urlPath: '/settings/users',
+			},
+			{
+				key: 'permission_groups',
+				label: 'Permissions',
+				icon: <FaShieldAlt />,
+				urlPath: '/settings/permissions',
+			},
 			{
 				key: 'settings_customization',
 				label: 'Customization',

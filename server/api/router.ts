@@ -78,6 +78,7 @@ import {
 	handleGetClientGoals,
 	handleUpdateClientGoal,
 } from './handlers/goal-handlers';
+import { handleGetUsers } from './handlers/user-handlers';
 import {
 	handleCreateWorkoutRoutine,
 	handleDeleteWorkoutRoutine,
@@ -122,6 +123,9 @@ router.post(Routes.AuthSignup, handleAuthSignup);
 router.post(Routes.AuthLogin, handleAuthLogin);
 router.post(Routes.AuthRefresh, handleAuthRefresh);
 router.get(Routes.AuthLogout, handleAuthLogout);
+
+// User routes (read-only for now)
+router.get(Routes.Users, handleGetUsers);
 
 // Contact routes
 router.get(Routes.Contacts, handleGetContacts);
