@@ -78,7 +78,13 @@ import {
 	handleGetClientGoals,
 	handleUpdateClientGoal,
 } from './handlers/goal-handlers';
-import { handleGetUsers } from './handlers/user-handlers';
+import {
+	handleCreatePermissionGroup,
+	handleDeletePermissionGroup,
+	handleGetPermissionGroups,
+	handleUpdatePermissionGroup,
+} from './handlers/permission-group-handlers';
+import { handleGetUsers, handleUpdateUserGroups } from './handlers/user-handlers';
 import {
 	handleCreateWorkoutRoutine,
 	handleDeleteWorkoutRoutine,
@@ -124,8 +130,15 @@ router.post(Routes.AuthLogin, handleAuthLogin);
 router.post(Routes.AuthRefresh, handleAuthRefresh);
 router.get(Routes.AuthLogout, handleAuthLogout);
 
-// User routes (read-only for now)
+// User routes
 router.get(Routes.Users, handleGetUsers);
+router.put(`${Routes.Users}/:id/groups`, handleUpdateUserGroups);
+
+// Permission group routes
+router.get(Routes.PermissionGroups, handleGetPermissionGroups);
+router.post(Routes.PermissionGroups, handleCreatePermissionGroup);
+router.put(`${Routes.PermissionGroups}/:id`, handleUpdatePermissionGroup);
+router.delete(`${Routes.PermissionGroups}/:id`, handleDeletePermissionGroup);
 
 // Contact routes
 router.get(Routes.Contacts, handleGetContacts);

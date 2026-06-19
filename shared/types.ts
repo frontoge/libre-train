@@ -12,6 +12,7 @@ import type {
 	Macrocycle,
 	Mesocycle,
 	Microcycle,
+	PermissionGroup,
 	User,
 } from './models';
 
@@ -215,14 +216,44 @@ export type ContactWithFlags = Contact & {
 	hasClient: boolean;
 };
 
+// A user's permission group as summarized on the user-management list (identity + display
+// fields only — not the full permission set).
+export type UserGroupSummary = Pick<PermissionGroup, 'id' | 'name' | 'color' | 'is_default'>;
+
+// A permission group as exposed by the permission-groups API: the group plus the set of
+// permission keys it grants and how many users belong to it.
+export type PermissionGroupWithPermissions = PermissionGroup & {
+	permissionKeys: string[];
+	memberCount: number;
+};
+
+// Create/update payloads for permission groups. is_system is never client-settable.
+export type CreatePermissionGroupRequest = {
+	name: string;
+	description?: string;
+	color?: string;
+	is_default?: boolean;
+	permissionKeys: string[];
+};
+
+export type UpdatePermissionGroupRequest = Partial<CreatePermissionGroupRequest>;
+
+// Replace the full set of permission groups a user belongs to. Must contain at least one
+// group (every user belongs to one or more groups).
+export type UpdateUserGroupsRequest = {
+	groupIds: number[];
+};
+
 // A system user (login account) as exposed by the management API: the account fields
-// joined with the linked Contact's identity. The password hash is never serialized.
+// joined with the linked Contact's identity and the permission groups they belong to. The
+// password hash is never serialized.
 export type UserWithContact = Omit<User, 'pass'> & {
 	first_name: string;
 	last_name: string;
 	email: string;
 	phone?: string;
 	img?: string;
+	groups: UserGroupSummary[];
 };
 
 // What the expanded nav header renders: the full logo, the brand name text, or both.

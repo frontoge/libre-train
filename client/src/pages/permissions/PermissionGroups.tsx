@@ -1,19 +1,36 @@
-import { Button, Drawer, Empty, Form, Grid, Input, Popconfirm, Space, Table, Tag, theme, Tooltip, Tree, Typography } from 'antd';
+import type { PermissionGroupWithPermissions } from '@libre-train/shared';
+import {
+	Button,
+	Drawer,
+	Empty,
+	Form,
+	Grid,
+	Input,
+	Popconfirm,
+	Space,
+	Spin,
+	Table,
+	Tag,
+	theme,
+	Tooltip,
+	Tree,
+	Typography,
+} from 'antd';
 import type { TableProps } from 'antd/es/table';
 import type { DataNode } from 'antd/es/tree';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FaLock, FaPen, FaPlus, FaRegTrashAlt, FaSearch, FaShieldAlt } from 'react-icons/fa';
+import {
+	createPermissionGroup,
+	deletePermissionGroup,
+	listPermissionGroups,
+	updatePermissionGroup,
+} from '../../api/permission-groups';
 import PageLayout from '../../components/PageLayout';
 import { useMessage } from '../../hooks/useMessage';
-import {
-	ALL_PERMISSION_IDS,
-	GROUP_COLORS,
-	PERMISSION_CATALOG,
-	SEED_GROUPS,
-	TOTAL_PERMISSIONS,
-	type PermissionGroup,
-} from './permission-data';
+import { ALL_PERMISSION_IDS, GROUP_COLORS, PERMISSION_CATALOG, TOTAL_PERMISSIONS } from './permission-data';
 
+type Group = PermissionGroupWithPermissions;
 type DrawerMode = 'view' | 'edit' | 'create';
 
 type GroupFormValues = {
@@ -29,16 +46,34 @@ export function PermissionGroups() {
 	const isMobile = !screens.md;
 	const showMessage = useMessage();
 
-	const [groups, setGroups] = useState<PermissionGroup[]>(SEED_GROUPS);
+	const [groups, setGroups] = useState<Group[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [saving, setSaving] = useState(false);
 	const [searchInput, setSearchInput] = useState('');
 
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [drawerMode, setDrawerMode] = useState<DrawerMode>('view');
-	const [activeGroup, setActiveGroup] = useState<PermissionGroup | null>(null);
+	const [activeGroup, setActiveGroup] = useState<Group | null>(null);
 	const [checkedPermissionIds, setCheckedPermissionIds] = useState<string[]>([]);
 	const [form] = Form.useForm<GroupFormValues>();
 
 	const readOnly = drawerMode === 'view';
+
+	const refresh = async () => {
+		setLoading(true);
+		try {
+			setGroups(await listPermissionGroups());
+		} catch (error) {
+			console.error('Error fetching permission groups:', error);
+			showMessage('error', 'Failed to load permission groups.');
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		void refresh();
+	}, []);
 
 	const treeData: DataNode[] = useMemo(
 		() =>
@@ -63,7 +98,7 @@ export function PermissionGroups() {
 	const filteredGroups = useMemo(() => {
 		const term = searchInput.trim().toLowerCase();
 		if (!term) return groups;
-		return groups.filter((g) => g.name.toLowerCase().includes(term) || g.description.toLowerCase().includes(term));
+		return groups.filter((g) => g.name.toLowerCase().includes(term) || (g.description || '').toLowerCase().includes(term));
 	}, [groups, searchInput]);
 
 	const openCreate = () => {
@@ -74,18 +109,18 @@ export function PermissionGroups() {
 		setDrawerOpen(true);
 	};
 
-	const openView = (group: PermissionGroup) => {
+	const openView = (group: Group) => {
 		setDrawerMode('view');
 		setActiveGroup(group);
-		setCheckedPermissionIds(group.permissionIds);
+		setCheckedPermissionIds(group.permissionKeys);
 		form.setFieldsValue({ name: group.name, description: group.description });
 		setDrawerOpen(true);
 	};
 
-	const openEdit = (group: PermissionGroup) => {
+	const openEdit = (group: Group) => {
 		setDrawerMode('edit');
 		setActiveGroup(group);
-		setCheckedPermissionIds(group.permissionIds);
+		setCheckedPermissionIds(group.permissionKeys);
 		form.setFieldsValue({ name: group.name, description: group.description });
 		setDrawerOpen(true);
 	};
@@ -97,54 +132,63 @@ export function PermissionGroups() {
 	};
 
 	const handleSave = async () => {
+		let values: GroupFormValues;
 		try {
-			const values = await form.validateFields();
-			if (!checkedPermissionIds.length) {
-				showMessage('warning', 'Assign at least one permission to the group.');
-				return;
-			}
+			values = await form.validateFields();
+		} catch {
+			return; // validation errors are surfaced inline by the form
+		}
+		if (!checkedPermissionIds.length) {
+			showMessage('warning', 'Assign at least one permission to the group.');
+			return;
+		}
 
+		const name = values.name!.trim();
+		const description = values.description?.trim() || undefined;
+		setSaving(true);
+		try {
 			if (drawerMode === 'create') {
-				const newGroup: PermissionGroup = {
-					id: `grp-${Date.now()}`,
-					name: values.name!.trim(),
-					description: values.description?.trim() ?? '',
+				await createPermissionGroup({
+					name,
+					description,
 					color: GROUP_COLORS[groups.length % GROUP_COLORS.length],
-					permissionIds: checkedPermissionIds,
-					memberCount: 0,
-				};
-				setGroups((prev) => [...prev, newGroup]);
-				showMessage('success', `Created "${newGroup.name}".`);
+					permissionKeys: checkedPermissionIds,
+				});
+				showMessage('success', `Created "${name}".`);
 			} else if (activeGroup) {
-				setGroups((prev) =>
-					prev.map((g) =>
-						g.id === activeGroup.id
-							? {
-									...g,
-									name: values.name!.trim(),
-									description: values.description?.trim() ?? '',
-									permissionIds: checkedPermissionIds,
-								}
-							: g
-					)
-				);
-				showMessage('success', `Updated "${values.name!.trim()}".`);
+				await updatePermissionGroup(activeGroup.id, {
+					name,
+					description,
+					color: activeGroup.color,
+					permissionKeys: checkedPermissionIds,
+				});
+				showMessage('success', `Updated "${name}".`);
 			}
 			closeDrawer();
-		} catch {
-			// validation errors are surfaced inline by the form
+			await refresh();
+		} catch (error) {
+			console.error('Error saving permission group:', error);
+			showMessage('error', error instanceof Error ? error.message : 'Failed to save permission group.');
+		} finally {
+			setSaving(false);
 		}
 	};
 
-	const handleDelete = (group: PermissionGroup) => {
-		setGroups((prev) => prev.filter((g) => g.id !== group.id));
-		showMessage('success', `Deleted "${group.name}".`);
+	const handleDelete = async (group: Group) => {
+		try {
+			await deletePermissionGroup(group.id);
+			showMessage('success', `Deleted "${group.name}".`);
+			await refresh();
+		} catch (error) {
+			console.error('Error deleting permission group:', error);
+			showMessage('error', error instanceof Error ? error.message : 'Failed to delete permission group.');
+		}
 	};
 
 	const selectAll = () => setCheckedPermissionIds([...ALL_PERMISSION_IDS]);
 	const clearAll = () => setCheckedPermissionIds([]);
 
-	const columns: TableProps<PermissionGroup>['columns'] = [
+	const columns: TableProps<Group>['columns'] = [
 		{
 			title: 'Group',
 			key: 'group',
@@ -159,8 +203,8 @@ export function PermissionGroups() {
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-							background: `${group.color}1f`,
-							color: group.color,
+							background: `${group.color || token.colorPrimary}1f`,
+							color: group.color || token.colorPrimary,
 							flex: '0 0 auto',
 						}}
 					>
@@ -169,13 +213,14 @@ export function PermissionGroups() {
 					<div style={{ minWidth: 0 }}>
 						<Space size={6}>
 							<span style={{ fontWeight: 600, color: token.colorText }}>{group.name}</span>
-							{group.isSystem && (
+							{group.is_system && (
 								<Tooltip title="System group — cannot be deleted">
 									<Tag icon={<FaLock size={9} style={{ marginInlineEnd: 4 }} />} color="default">
 										System
 									</Tag>
 								</Tooltip>
 							)}
+							{group.is_default && <Tag color="blue">Default</Tag>}
 						</Space>
 						<div style={{ fontSize: 12, color: token.colorTextSecondary }}>{group.description}</div>
 					</div>
@@ -186,13 +231,15 @@ export function PermissionGroups() {
 			title: 'Permissions',
 			key: 'permissions',
 			width: 180,
-			sorter: (a, b) => a.permissionIds.length - b.permissionIds.length,
+			sorter: (a, b) => a.permissionKeys.length - b.permissionKeys.length,
 			render: (_, group) =>
-				group.permissionIds.length >= TOTAL_PERMISSIONS ? (
+				group.permissionKeys.length >= TOTAL_PERMISSIONS ? (
 					<Tag color="success">Full access</Tag>
+				) : group.permissionKeys.length === 0 ? (
+					<Typography.Text type="secondary">No access</Typography.Text>
 				) : (
 					<Typography.Text type="secondary">
-						{group.permissionIds.length} of {TOTAL_PERMISSIONS}
+						{group.permissionKeys.length} of {TOTAL_PERMISSIONS}
 					</Typography.Text>
 				),
 		},
@@ -223,10 +270,10 @@ export function PermissionGroups() {
 						okText="Delete"
 						okButtonProps={{ danger: true }}
 						onConfirm={() => handleDelete(group)}
-						disabled={group.isSystem}
+						disabled={group.is_system}
 					>
-						<Tooltip title={group.isSystem ? 'System groups cannot be deleted' : 'Delete'}>
-							<Button type="text" danger icon={<FaRegTrashAlt />} disabled={group.isSystem} />
+						<Tooltip title={group.is_system ? 'System groups cannot be deleted' : 'Delete'}>
+							<Button type="text" danger icon={<FaRegTrashAlt />} disabled={group.is_system} />
 						</Tooltip>
 					</Popconfirm>
 				</Space>
@@ -245,7 +292,7 @@ export function PermissionGroups() {
 		</Empty>
 	);
 
-	const renderGroupCard = (group: PermissionGroup) => (
+	const renderGroupCard = (group: Group) => (
 		<div
 			key={group.id}
 			style={{
@@ -264,25 +311,26 @@ export function PermissionGroups() {
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
-						background: `${group.color}1f`,
-						color: group.color,
+						background: `${group.color || token.colorPrimary}1f`,
+						color: group.color || token.colorPrimary,
 						flex: '0 0 auto',
 					}}
 				>
 					<FaShieldAlt />
 				</div>
 				<div style={{ flex: 1, minWidth: 0 }}>
-					<Space size={6}>
+					<Space size={6} wrap>
 						<span style={{ fontWeight: 600, color: token.colorText }}>{group.name}</span>
-						{group.isSystem && <Tag color="default">System</Tag>}
+						{group.is_system && <Tag color="default">System</Tag>}
+						{group.is_default && <Tag color="blue">Default</Tag>}
 					</Space>
 					<div style={{ fontSize: 13, color: token.colorTextSecondary, marginTop: 2 }}>{group.description}</div>
 					<div style={{ marginTop: 8, display: 'flex', gap: 16 }}>
-						{group.permissionIds.length >= TOTAL_PERMISSIONS ? (
+						{group.permissionKeys.length >= TOTAL_PERMISSIONS ? (
 							<Tag color="success">Full access</Tag>
 						) : (
 							<Typography.Text type="secondary" style={{ fontSize: 12 }}>
-								{group.permissionIds.length}/{TOTAL_PERMISSIONS} permissions
+								{group.permissionKeys.length}/{TOTAL_PERMISSIONS} permissions
 							</Typography.Text>
 						)}
 						<Typography.Text type="secondary" style={{ fontSize: 12 }}>
@@ -312,9 +360,9 @@ export function PermissionGroups() {
 					okText="Delete"
 					okButtonProps={{ danger: true }}
 					onConfirm={() => handleDelete(group)}
-					disabled={group.isSystem}
+					disabled={group.is_system}
 				>
-					<Button size="small" type="text" danger icon={<FaRegTrashAlt />} disabled={group.isSystem}>
+					<Button size="small" type="text" danger icon={<FaRegTrashAlt />} disabled={group.is_system}>
 						Delete
 					</Button>
 				</Popconfirm>
@@ -395,7 +443,11 @@ export function PermissionGroups() {
 						</Typography.Text>
 					</div>
 
-					{isMobile ? (
+					{loading ? (
+						<div style={{ display: 'flex', justifyContent: 'center', padding: '3rem 0' }}>
+							<Spin size="large" />
+						</div>
+					) : isMobile ? (
 						<div style={{ flex: 1, padding: '0.25rem 0.75rem 0.75rem' }}>
 							{filteredGroups.length === 0 ? (
 								<div style={{ padding: '2rem 0' }}>{emptyState}</div>
@@ -406,7 +458,7 @@ export function PermissionGroups() {
 							)}
 						</div>
 					) : (
-						<Table<PermissionGroup>
+						<Table<Group>
 							rowKey="id"
 							columns={columns}
 							dataSource={filteredGroups}
@@ -433,11 +485,11 @@ export function PermissionGroups() {
 				title={drawerTitle}
 				destroyOnHidden
 				extra={
-					readOnly && activeGroup && !activeGroup.isSystem ? (
+					readOnly && activeGroup && !activeGroup.is_system ? (
 						<Button type="primary" icon={<FaPen />} onClick={() => setDrawerMode('edit')}>
 							Edit
 						</Button>
-					) : readOnly && activeGroup?.isSystem ? (
+					) : readOnly && activeGroup?.is_system ? (
 						<Tag icon={<FaLock size={9} style={{ marginInlineEnd: 4 }} />}>System group</Tag>
 					) : undefined
 				}
@@ -449,7 +501,7 @@ export function PermissionGroups() {
 					) : (
 						<div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
 							<Button onClick={closeDrawer}>Cancel</Button>
-							<Button type="primary" onClick={handleSave}>
+							<Button type="primary" loading={saving} onClick={handleSave}>
 								{drawerMode === 'create' ? 'Create group' : 'Save changes'}
 							</Button>
 						</div>

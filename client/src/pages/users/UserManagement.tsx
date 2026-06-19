@@ -1,4 +1,4 @@
-import type { UserWithContact } from '@libre-train/shared';
+import type { PermissionGroupWithPermissions, UserGroupSummary, UserWithContact } from '@libre-train/shared';
 import {
 	Avatar,
 	Button,
@@ -11,6 +11,7 @@ import {
 	Modal,
 	Popconfirm,
 	Segmented,
+	Select,
 	Space,
 	Spin,
 	Table,
@@ -22,8 +23,9 @@ import {
 import type { TableProps } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
-import { FaEnvelope, FaPen, FaPhone, FaPlus, FaRegTrashAlt, FaSearch, FaUserShield } from 'react-icons/fa';
-import { listUsers } from '../../api/users';
+import { FaEnvelope, FaLayerGroup, FaPen, FaPhone, FaPlus, FaRegTrashAlt, FaSearch, FaUserShield } from 'react-icons/fa';
+import { listPermissionGroups } from '../../api/permission-groups';
+import { listUsers, updateUserGroups } from '../../api/users';
 import PageLayout from '../../components/PageLayout';
 import { getInitials } from '../../helpers/label-formatters';
 import { useMessage } from '../../hooks/useMessage';
@@ -90,13 +92,31 @@ export function UserManagement() {
 	const [modalOpen, setModalOpen] = useState(false);
 	const [form] = Form.useForm<UserFormValues>();
 
+	// Permission groups available for assignment + the "manage groups" modal state.
+	const [allGroups, setAllGroups] = useState<PermissionGroupWithPermissions[]>([]);
+	const [groupModalUser, setGroupModalUser] = useState<UserWithContact | null>(null);
+	const [selectedGroupIds, setSelectedGroupIds] = useState<number[]>([]);
+	const [savingGroups, setSavingGroups] = useState(false);
+
+	const reloadUsers = async () => {
+		try {
+			setUsers(await listUsers());
+		} catch (error) {
+			console.error('Error reloading users:', error);
+			showMessage('error', 'Failed to reload users.');
+		}
+	};
+
 	useEffect(() => {
 		let active = true;
 		const load = async () => {
 			setLoading(true);
 			try {
-				const data = await listUsers();
-				if (active) setUsers(data);
+				const [userData, groupData] = await Promise.all([listUsers(), listPermissionGroups()]);
+				if (active) {
+					setUsers(userData);
+					setAllGroups(groupData);
+				}
 			} catch (error) {
 				console.error('Error fetching users:', error);
 				if (active) showMessage('error', 'Failed to load users.');
@@ -125,6 +145,7 @@ export function UserManagement() {
 					|| u.username.toLowerCase().includes(term)
 					|| u.email.toLowerCase().includes(term)
 					|| (u.phone || '').toLowerCase().includes(term)
+					|| u.groups.some((g) => g.name.toLowerCase().includes(term))
 				);
 			});
 	}, [users, searchInput, joinedFilter]);
@@ -164,6 +185,36 @@ export function UserManagement() {
 		closeModal();
 	};
 
+	const openGroupModal = (user: UserWithContact) => {
+		setGroupModalUser(user);
+		setSelectedGroupIds(user.groups.map((g) => g.id));
+	};
+
+	const closeGroupModal = () => {
+		setGroupModalUser(null);
+		setSelectedGroupIds([]);
+	};
+
+	const handleSaveGroups = async () => {
+		if (!groupModalUser) return;
+		if (selectedGroupIds.length === 0) {
+			showMessage('warning', 'A user must belong to at least one group.');
+			return;
+		}
+		setSavingGroups(true);
+		try {
+			await updateUserGroups(groupModalUser.id, selectedGroupIds);
+			showMessage('success', `Updated groups for ${fullName(groupModalUser) || groupModalUser.username}.`);
+			closeGroupModal();
+			await reloadUsers();
+		} catch (error) {
+			console.error('Error updating user groups:', error);
+			showMessage('error', error instanceof Error ? error.message : 'Failed to update groups.');
+		} finally {
+			setSavingGroups(false);
+		}
+	};
+
 	const handleDelete = (user: UserWithContact) => {
 		showMessage('info', `Deleting users isn't available yet.`);
 		void user;
@@ -194,6 +245,19 @@ export function UserManagement() {
 			</div>
 		</Space>
 	);
+
+	const renderGroups = (groups: UserGroupSummary[]) =>
+		groups.length ? (
+			<Space size={[4, 4]} wrap>
+				{groups.map((group) => (
+					<Tag key={group.id} color={group.color || undefined} style={{ marginInlineEnd: 0 }}>
+						{group.name}
+					</Tag>
+				))}
+			</Space>
+		) : (
+			<Typography.Text type="secondary">—</Typography.Text>
+		);
 
 	const columns: TableProps<UserWithContact>['columns'] = [
 		{
@@ -237,6 +301,13 @@ export function UserManagement() {
 				),
 		},
 		{
+			title: 'Groups',
+			key: 'groups',
+			width: 240,
+			sorter: (a, b) => a.groups.length - b.groups.length,
+			render: (_, user) => renderGroups(user.groups),
+		},
+		{
 			title: 'Joined',
 			dataIndex: 'created_at',
 			key: 'created_at',
@@ -258,12 +329,15 @@ export function UserManagement() {
 		{
 			title: 'Actions',
 			key: 'actions',
-			width: 130,
+			width: 160,
 			align: 'right',
 			render: (_, user) => (
 				<Space size={2}>
 					<Tooltip title="View details">
 						<Button type="text" icon={<FaUserShield />} onClick={() => setDrawerUser(user)} />
+					</Tooltip>
+					<Tooltip title="Manage groups">
+						<Button type="text" icon={<FaLayerGroup />} onClick={() => openGroupModal(user)} />
 					</Tooltip>
 					<Tooltip title="Edit">
 						<Button type="text" icon={<FaPen />} onClick={() => openEditModal(user)} />
@@ -320,6 +394,7 @@ export function UserManagement() {
 							{user.email}
 						</Typography.Text>
 					</div>
+					<div style={{ marginTop: 8 }}>{renderGroups(user.groups)}</div>
 				</div>
 			</div>
 			<div
@@ -334,6 +409,9 @@ export function UserManagement() {
 			>
 				<Button size="small" type="text" icon={<FaUserShield />} onClick={() => setDrawerUser(user)}>
 					View
+				</Button>
+				<Button size="small" type="text" icon={<FaLayerGroup />} onClick={() => openGroupModal(user)}>
+					Groups
 				</Button>
 				<Button size="small" type="text" icon={<FaPen />} onClick={() => openEditModal(user)}>
 					Edit
@@ -497,7 +575,7 @@ export function UserManagement() {
 								hideOnSinglePage: true,
 								style: { padding: '0 1rem' },
 							}}
-							scroll={{ x: 1000 }}
+							scroll={{ x: 1240 }}
 							locale={{ emptyText: emptyState }}
 						/>
 					)}
@@ -545,6 +623,7 @@ export function UserManagement() {
 								<Typography.Text copyable={{ text: drawerUser.email }}>{drawerUser.email}</Typography.Text>
 							</Descriptions.Item>
 							<Descriptions.Item label="Phone">{drawerUser.phone || '—'}</Descriptions.Item>
+							<Descriptions.Item label="Permission groups">{renderGroups(drawerUser.groups)}</Descriptions.Item>
 							<Descriptions.Item label="Linked contact">#{drawerUser.contactId}</Descriptions.Item>
 							<Descriptions.Item label="Joined">
 								{drawerUser.created_at ? dayjs(drawerUser.created_at).format('MMM D, YYYY') : '—'}
@@ -554,21 +633,75 @@ export function UserManagement() {
 							</Descriptions.Item>
 						</Descriptions>
 
-						<Button
-							type="primary"
-							icon={<FaPen />}
-							block
-							onClick={() => {
-								const user = drawerUser;
-								setDrawerUser(null);
-								openEditModal(user);
-							}}
-						>
-							Edit user
-						</Button>
+						<Space style={{ width: '100%' }} orientation="vertical" size={8}>
+							<Button
+								type="primary"
+								icon={<FaLayerGroup />}
+								block
+								onClick={() => {
+									const user = drawerUser;
+									setDrawerUser(null);
+									openGroupModal(user);
+								}}
+							>
+								Manage groups
+							</Button>
+							<Button
+								icon={<FaPen />}
+								block
+								onClick={() => {
+									const user = drawerUser;
+									setDrawerUser(null);
+									openEditModal(user);
+								}}
+							>
+								Edit profile
+							</Button>
+						</Space>
 					</div>
 				)}
 			</Drawer>
+
+			{/* Manage groups modal (wired to the API) */}
+			<Modal
+				centered
+				open={!!groupModalUser}
+				onCancel={closeGroupModal}
+				onOk={handleSaveGroups}
+				okText="Save groups"
+				okButtonProps={{ loading: savingGroups, disabled: selectedGroupIds.length === 0 }}
+				title={
+					groupModalUser ? `Manage groups — ${fullName(groupModalUser) || groupModalUser.username}` : 'Manage groups'
+				}
+				destroyOnHidden
+				style={{ maxWidth: 'calc(100vw - 2rem)' }}
+			>
+				<Typography.Paragraph type="secondary" style={{ marginTop: 4 }}>
+					Assign one or more permission groups. A user must belong to at least one group.
+				</Typography.Paragraph>
+				<Select
+					mode="multiple"
+					style={{ width: '100%' }}
+					placeholder="Select permission groups"
+					value={selectedGroupIds}
+					onChange={setSelectedGroupIds}
+					showSearch={{ optionFilterProp: 'label' }}
+					options={allGroups.map((group) => ({ label: group.name, value: group.id }))}
+					tagRender={({ label, value, closable, onClose }) => {
+						const group = allGroups.find((g) => g.id === value);
+						return (
+							<Tag
+								color={group?.color || undefined}
+								closable={closable}
+								onClose={onClose}
+								style={{ marginInlineEnd: 4 }}
+							>
+								{label}
+							</Tag>
+						);
+					}}
+				/>
+			</Modal>
 
 			{/* Create / edit modal (UI only — not wired to the API yet) */}
 			<Modal
