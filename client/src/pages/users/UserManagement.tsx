@@ -25,7 +25,7 @@ import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 import { FaEnvelope, FaLayerGroup, FaPen, FaPhone, FaPlus, FaRegTrashAlt, FaSearch, FaUserShield } from 'react-icons/fa';
 import { listPermissionGroups } from '../../api/permission-groups';
-import { listUsers, updateUserGroups } from '../../api/users';
+import { createUser, listUsers, updateUserGroups } from '../../api/users';
 import PageLayout from '../../components/PageLayout';
 import { getInitials } from '../../helpers/label-formatters';
 import { useMessage } from '../../hooks/useMessage';
@@ -179,10 +179,37 @@ export function UserManagement() {
 		form.resetFields();
 	};
 
-	// CRUD is intentionally not wired up yet — surface intent without mutating data.
-	const handleModalSubmit = () => {
-		showMessage('info', `Saving users isn't available yet.`);
-		closeModal();
+	const [savingUser, setSavingUser] = useState(false);
+
+	const handleModalSubmit = async (values: UserFormValues) => {
+		// Editing existing users isn't wired up yet — only creation mutates data.
+		if (modalUser) {
+			showMessage('info', `Editing users isn't available yet.`);
+			closeModal();
+			return;
+		}
+
+		setSavingUser(true);
+		try {
+			// New users are created with this as a temporary password; they're forced to set a
+			// permanent one on first sign-in (must_change_password on the server).
+			await createUser({
+				firstName: values.firstName?.trim() ?? '',
+				lastName: values.lastName?.trim() ?? '',
+				email: values.email?.trim() ?? '',
+				phone: values.phone?.trim() || undefined,
+				username: values.username?.trim() ?? '',
+				password: values.password ?? '',
+			});
+			showMessage('success', 'User created. They will set their own password on first sign-in.');
+			closeModal();
+			await reloadUsers();
+		} catch (error) {
+			console.error('Error creating user:', error);
+			showMessage('error', error instanceof Error ? error.message : 'Failed to create user.');
+		} finally {
+			setSavingUser(false);
+		}
 	};
 
 	const openGroupModal = (user: UserWithContact) => {
@@ -229,21 +256,12 @@ export function UserManagement() {
 	};
 
 	const renderUserCell = (user: UserWithContact) => (
-		<Space size={12}>
-			<Avatar
-				size={40}
-				src={user.img || undefined}
-				style={user.img ? undefined : { backgroundColor: colorForKey(user.username || user.email), fontWeight: 600 }}
-			>
-				{user.img ? null : getInitials(user.first_name, user.last_name)}
-			</Avatar>
-			<div style={{ minWidth: 0 }}>
-				<div style={{ fontWeight: 600, color: token.colorText }}>{fullName(user) || user.username}</div>
-				<Typography.Text type="secondary" style={{ fontSize: 12 }}>
-					@{user.username}
-				</Typography.Text>
-			</div>
-		</Space>
+		<div style={{ minWidth: 0 }}>
+			<div style={{ fontWeight: 600, color: token.colorText }}>{fullName(user) || user.username}</div>
+			<Typography.Text type="secondary" style={{ fontSize: 12 }}>
+				@{user.username}
+			</Typography.Text>
+		</div>
 	);
 
 	const renderGroups = (groups: UserGroupSummary[]) =>
@@ -274,9 +292,10 @@ export function UserManagement() {
 			width: 240,
 			sorter: (a, b) => a.email.localeCompare(b.email),
 			render: (email: string) => (
-				<Space size={6} style={{ color: token.colorTextSecondary }}>
+				<Space size={6} style={{ color: token.colorTextSecondary }} onClick={(e) => e.stopPropagation()}>
 					<FaEnvelope size={11} style={{ color: token.colorTextTertiary }} />
-					<Typography.Text copyable={{ text: email }}>{email}</Typography.Text>
+					<Typography.Text copyable={{ text: email }} />
+					<Typography.Text style={{ whiteSpace: 'nowrap' }}>{email}</Typography.Text>
 				</Space>
 			),
 		},
@@ -329,18 +348,12 @@ export function UserManagement() {
 		{
 			title: 'Actions',
 			key: 'actions',
-			width: 160,
+			width: 96,
 			align: 'right',
 			render: (_, user) => (
-				<Space size={2}>
+				<Space size={2} onClick={(e) => e.stopPropagation()}>
 					<Tooltip title="View details">
 						<Button type="text" icon={<FaUserShield />} onClick={() => setDrawerUser(user)} />
-					</Tooltip>
-					<Tooltip title="Manage groups">
-						<Button type="text" icon={<FaLayerGroup />} onClick={() => openGroupModal(user)} />
-					</Tooltip>
-					<Tooltip title="Edit">
-						<Button type="text" icon={<FaPen />} onClick={() => openEditModal(user)} />
 					</Tooltip>
 					<Popconfirm
 						title="Delete this user?"
@@ -575,7 +588,10 @@ export function UserManagement() {
 								hideOnSinglePage: true,
 								style: { padding: '0 1rem' },
 							}}
-							scroll={{ x: 1240 }}
+							onRow={(user) => ({
+								onClick: () => setDrawerUser(user),
+								style: { cursor: 'pointer' },
+							})}
 							locale={{ emptyText: emptyState }}
 						/>
 					)}
@@ -710,6 +726,8 @@ export function UserManagement() {
 				onCancel={closeModal}
 				onOk={() => form.submit()}
 				okText={modalUser ? 'Save changes' : 'Create user'}
+				okButtonProps={{ loading: savingUser }}
+				confirmLoading={savingUser}
 				title={modalUser ? 'Edit User' : 'Add User'}
 				destroyOnHidden
 				style={{ maxWidth: 'calc(100vw - 2rem)' }}
@@ -760,7 +778,13 @@ export function UserManagement() {
 						<Form.Item
 							name="password"
 							label="Temporary password"
-							rules={[{ required: true, message: 'Password is required' }]}
+							extra="The user will be required to set their own password on first sign-in."
+							rules={[
+								{ required: true, message: 'Password is required' },
+								{ min: 8, message: 'Password must be at least 8 characters long' },
+								{ pattern: /[A-Z]/, message: 'Password must contain at least one uppercase letter' },
+								{ pattern: /[0-9]/, message: 'Password must contain at least one number' },
+							]}
 						>
 							<Input.Password placeholder="Set an initial password" />
 						</Form.Item>

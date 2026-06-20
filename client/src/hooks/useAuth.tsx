@@ -57,7 +57,7 @@ export function useAuth() {
 	const refreshAuthentication = useCallback(async () => {
 		try {
 			const data = await refreshToken();
-			setAuth({ authToken: data.accessToken, user: data.user });
+			setAuth({ authToken: data.accessToken, user: data.user, mustChangePassword: data.mustChangePassword });
 			return true;
 		} catch (error) {
 			console.error('Error refreshing authentication:', error);

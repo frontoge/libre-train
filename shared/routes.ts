@@ -6,6 +6,7 @@ export const Routes = {
 	AuthSignup: '/auth/signup',
 	AuthRefresh: '/auth/refresh',
 	AuthLogout: '/auth/logout',
+	AuthSetPassword: '/auth/set-password',
 	Branding: '/branding',
 	Clients: '/clients',
 	ClientContact: '/clientcontact',

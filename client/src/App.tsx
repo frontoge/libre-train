@@ -15,6 +15,7 @@ import { GoalsOverview } from './pages/goals/GoalsOverview';
 import { RouterLayout } from './pages/Layout';
 import { Login } from './pages/Login';
 import { NoPage } from './pages/NoPage';
+import { SetPassword } from './pages/SetPassword';
 import { Signup } from './pages/Signup';
 import { TrainingRouter } from './pages/training/TrainingRouter';
 import './styles/app.css';
@@ -280,6 +281,7 @@ function App() {
 						</Route>
 						<Route path="/signup" element={<Signup />} />
 						<Route path="/login" element={<Login />} />
+						<Route path="/set-password" element={<SetPassword />} />
 						<Route path="/logout" element={<Logout />} />
 						<Route path="*" element={<NoPage />} />
 					</Routes>

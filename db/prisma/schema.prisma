@@ -341,6 +341,9 @@ model User {
   id         Int        @id @default(autoincrement()) @db.UnsignedInt
   username   String     @db.VarChar(32)
   pass       String     @db.VarChar(255)
+  // True until the user replaces the temporary password they were created with. While set,
+  // the client gates them onto the set-password screen before the rest of the app loads.
+  must_change_password Boolean @default(false)
   created_at DateTime   @default(now()) @db.Timestamp(0)
   updated_at DateTime   @default(now()) @db.Timestamp(0)
   contactId  Int        @db.UnsignedInt

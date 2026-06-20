@@ -10,7 +10,13 @@ import {
 	handleGetAssessmentTypes,
 	handleUpdateAssessmentLog,
 } from './handlers/assessment-handlers';
-import { handleAuthLogin, handleAuthLogout, handleAuthRefresh, handleAuthSignup } from './handlers/auth-handlers';
+import {
+	handleAuthLogin,
+	handleAuthLogout,
+	handleAuthRefresh,
+	handleAuthSignup,
+	handleSetPassword,
+} from './handlers/auth-handlers';
 import {
 	handleClearIcon,
 	handleClearLogo,
@@ -84,7 +90,7 @@ import {
 	handleGetPermissionGroups,
 	handleUpdatePermissionGroup,
 } from './handlers/permission-group-handlers';
-import { handleGetUsers, handleUpdateUserGroups } from './handlers/user-handlers';
+import { handleCreateUser, handleGetUsers, handleUpdateUserGroups } from './handlers/user-handlers';
 import {
 	handleCreateWorkoutRoutine,
 	handleDeleteWorkoutRoutine,
@@ -129,9 +135,11 @@ router.post(Routes.AuthSignup, handleAuthSignup);
 router.post(Routes.AuthLogin, handleAuthLogin);
 router.post(Routes.AuthRefresh, handleAuthRefresh);
 router.get(Routes.AuthLogout, handleAuthLogout);
+router.post(Routes.AuthSetPassword, handleSetPassword);
 
 // User routes
 router.get(Routes.Users, handleGetUsers);
+router.post(Routes.Users, handleCreateUser);
 router.put(`${Routes.Users}/:id/groups`, handleUpdateUserGroups);
 
 // Permission group routes

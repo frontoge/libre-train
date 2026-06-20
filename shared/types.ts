@@ -244,6 +244,30 @@ export type UpdateUserGroupsRequest = {
 	groupIds: number[];
 };
 
+// Admin-side payload for creating a login account. The password is a temporary one the new
+// user must replace on first sign-in (the created user is flagged must_change_password).
+export type CreateUserRequest = {
+	firstName: string;
+	lastName: string;
+	email: string;
+	phone?: string;
+	username: string;
+	password: string;
+};
+
+// Payload for a signed-in user replacing their temporary password with a permanent one.
+export type SetPasswordRequest = {
+	password: string;
+};
+
+// Shape returned by the auth endpoints (login / signup / refresh / set-password). The access
+// token is held in memory client-side; mustChangePassword drives the set-password gate.
+export type AuthResponse = {
+	accessToken: string;
+	user: number;
+	mustChangePassword: boolean;
+};
+
 // A system user (login account) as exposed by the management API: the account fields
 // joined with the linked Contact's identity and the permission groups they belong to. The
 // password hash is never serialized.

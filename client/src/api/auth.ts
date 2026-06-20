@@ -1,3 +1,4 @@
+import type { AuthResponse, SetPasswordRequest } from '@libre-train/shared';
 import { Routes } from '@libre-train/shared';
 import { apiFetch } from '../helpers/fetch-helpers';
 
@@ -6,10 +7,7 @@ export type LoginRequest = {
 	password: string;
 };
 
-export type AuthResponse = {
-	accessToken: string;
-	user: number;
-};
+export type { AuthResponse };
 
 export async function loginUser(body: LoginRequest): Promise<AuthResponse> {
 	return apiFetch<AuthResponse, LoginRequest>(Routes.AuthLogin, {
@@ -42,5 +40,16 @@ export async function logoutUser(): Promise<void> {
 		method: 'GET',
 		credentials: 'include',
 		errorMessage: 'Logout failed',
+	});
+}
+
+// Replace the temporary password for the signed-in user. Authenticated by the in-memory
+// access token, which is sent as a Bearer header.
+export async function setPassword(password: string, authToken: string): Promise<void> {
+	await apiFetch<void, SetPasswordRequest>(Routes.AuthSetPassword, {
+		method: 'POST',
+		body: { password },
+		authToken,
+		errorMessage: 'Failed to set password',
 	});
 }
