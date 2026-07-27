@@ -9,6 +9,8 @@ export type ApiRequestOptions<TBody = unknown> = {
 	credentials?: RequestCredentials;
 	errorMessage?: string;
 	errorKeys?: ReadonlyArray<string>;
+	/** Bearer access token to send in the Authorization header (for token-authenticated endpoints). */
+	authToken?: string;
 };
 
 const DEFAULT_ERROR_KEYS = ['message', 'errorMessage', 'error'] as const;
@@ -54,6 +56,7 @@ export async function apiFetch<TResponse, TBody = unknown>(
 		credentials,
 		errorMessage = `Request failed: ${method} ${path}`,
 		errorKeys = DEFAULT_ERROR_KEYS,
+		authToken,
 	} = options;
 
 	const baseUrl = `${getAppConfiguration().apiUrl}${path}`;
@@ -61,7 +64,10 @@ export async function apiFetch<TResponse, TBody = unknown>(
 
 	const init: RequestInit = {
 		method,
-		headers: { 'Content-Type': 'application/json' },
+		headers: {
+			'Content-Type': 'application/json',
+			...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+		},
 	};
 	if (body !== undefined) init.body = JSON.stringify(body);
 	if (credentials) init.credentials = credentials;

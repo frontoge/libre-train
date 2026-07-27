@@ -341,12 +341,16 @@ model User {
   id         Int        @id @default(autoincrement()) @db.UnsignedInt
   username   String     @db.VarChar(32)
   pass       String     @db.VarChar(255)
+  // True until the user replaces the temporary password they were created with. While set,
+  // the client gates them onto the set-password screen before the rest of the app loads.
+  must_change_password Boolean @default(false)
   created_at DateTime   @default(now()) @db.Timestamp(0)
   updated_at DateTime   @default(now()) @db.Timestamp(0)
   contactId  Int        @db.UnsignedInt
   Client     Client[]
   DietPlan   DietPlan[]
   Contact    Contact    @relation(fields: [contactId], references: [id], onDelete: Cascade, map: "User_contact_FK")
+  UserPermissionGroup UserPermissionGroup[]
 
   @@index([contactId], map: "User_contact_FK")
 }
@@ -369,6 +373,58 @@ model WorkoutRoutineCategory {
   id                   Int                    @id @default(autoincrement()) @db.UnsignedInt
   category_name        String                 @db.VarChar(255)
   PlannedExerciseGroup PlannedExerciseGroup[]
+}
+
+// Catalog of individual capabilities. Code-defined: seeded by migration and mirrored by a
+// TS enum in shared. Admins compose permission groups from these; devs add new keys.
+model Permission {
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  key         String   @unique(map: "Permission_key") @db.VarChar(64)
+  label       String   @db.VarChar(100)
+  description String?  @db.VarChar(255)
+  category    String   @db.VarChar(50)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamp(0)
+  PermissionGroupPermission PermissionGroupPermission[]
+}
+
+// A reusable role. One OR MORE groups may be flagged is_default; every new user is assigned
+// all current default groups (guaranteeing each user has at least one group).
+model PermissionGroup {
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  name        String   @unique(map: "PermissionGroup_name") @db.VarChar(50)
+  description String?  @db.VarChar(255)
+  color       String?  @db.VarChar(7)
+  is_system   Boolean  @default(false)
+  is_default  Boolean  @default(false)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamp(0)
+  PermissionGroupPermission PermissionGroupPermission[]
+  UserPermissionGroup       UserPermissionGroup[]
+}
+
+// Group ↔ Permission: which permissions a group grants.
+model PermissionGroupPermission {
+  permissionGroupId Int @db.UnsignedInt
+  permissionId      Int @db.UnsignedInt
+  PermissionGroup PermissionGroup @relation(fields: [permissionGroupId], references: [id], onDelete: Cascade, map: "PermissionGroupPermission_group_FK")
+  Permission      Permission      @relation(fields: [permissionId], references: [id], onDelete: Cascade, map: "PermissionGroupPermission_permission_FK")
+
+  @@id([permissionGroupId, permissionId])
+  @@index([permissionId], map: "PermissionGroupPermission_permission_FK")
+}
+
+// User ↔ Group: a user can hold many groups. Restrict deletion of a group still assigned to
+// users (reassign first); deleting a user cascades their memberships.
+model UserPermissionGroup {
+  userId            Int      @db.UnsignedInt
+  permissionGroupId Int      @db.UnsignedInt
+  created_at        DateTime @default(now()) @db.Timestamp(0)
+  User            User            @relation(fields: [userId], references: [id], onDelete: Cascade, map: "UserPermissionGroup_user_FK")
+  PermissionGroup PermissionGroup @relation(fields: [permissionGroupId], references: [id], onDelete: Restrict, map: "UserPermissionGroup_group_FK")
+
+  @@id([userId, permissionGroupId])
+  @@index([permissionGroupId], map: "UserPermissionGroup_group_FK")
 }
 
 view WorkoutRoutineExercises {
@@ -422,4 +478,11 @@ view ClientDietPlan {
   notes          String? @db.VarChar(512)
   dietPlanId     Int?    @default(0) @db.UnsignedInt
   clientId       Int     @default(0) @db.UnsignedInt
+}
+
+// Flattened, de-duplicated permission keys per user across all of their groups. Backed by a
+// SELECT DISTINCT over UserPermissionGroup → PermissionGroupPermission → Permission.
+view UserEffectivePermission {
+  userId        Int    @db.UnsignedInt
+  permissionKey String @db.VarChar(64)
 }

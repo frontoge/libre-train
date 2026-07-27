@@ -14,8 +14,10 @@ import {
 	MacrocycleSchema,
 	MesocycleSchema,
 	MicrocycleSchema,
+	PermissionGroupSchema,
 	PlannedExerciseGroupSchema,
 	PlannedExerciseSchema,
+	UserSchema,
 	WorkoutRoutineSchema,
 } from '@libre-train/db/zod';
 import z from 'zod';
@@ -50,6 +52,10 @@ export type AssessmentType = DataModel<typeof AssessmentTypeSchema>;
 export type AssessmentClientLog = DataModel<typeof AssessmentClientLogSchema>;
 
 export type Branding = DataModel<typeof BrandingSchema>;
+
+export type User = DataModel<typeof UserSchema>;
+
+export type PermissionGroup = DataModel<typeof PermissionGroupSchema>;
 
 export enum AssessmentGroup {
 	Posture = 1,

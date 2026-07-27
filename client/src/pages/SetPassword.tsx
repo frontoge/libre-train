@@ -1,93 +1,77 @@
 /// <reference types="vite/client" />
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { LockOutlined } from '@ant-design/icons';
 import { Alert, Button, Card, Col, Divider, Form, Input, Layout, Row, Space, theme, Typography, type FormProps } from 'antd';
 import React from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { loginUser } from '../api/auth';
-import { AppContext, DEFAULT_AUTH_DESCRIPTION, DEFAULT_AUTH_TAGLINE, DEFAULT_BRAND_NAME } from '../app-context';
+import { useNavigate } from 'react-router-dom';
+import { setPassword as setPasswordRequest } from '../api/auth';
+import { AppContext, DEFAULT_AUTH_TAGLINE, DEFAULT_BRAND_NAME } from '../app-context';
 import logo from '../assets/logo.svg';
 import { useAuth } from '../hooks/useAuth';
 
-// Non-configurable copy/links on the login screen (brand name, tagline, description, and logo
-// come from branding configured on the customization page).
+// Copy specific to the first-sign-in set-password screen. Layout mirrors the login screen so
+// the two read as the same product surface.
 const STATIC = {
-	helpText: 'Need access? Contact your admin or support team.',
-	links: [
-		{ label: 'Docs', href: '#' },
-		{ label: 'Support', href: '#' },
-		{ label: 'Status', href: '#' },
-	],
+	helpText: 'Trouble setting your password? Contact your admin or support team.',
 } as const;
 
-const FORGOT_PASSWORD_URL = '#';
-
-export function Login() {
+export function SetPassword() {
 	const { token } = theme.useToken();
 	const navigate = useNavigate();
-	const [searchParams] = useSearchParams();
-	const { refreshAuthentication, auth, setAuth } = useAuth();
+	const { auth, setAuth, refreshAuthentication } = useAuth();
 	const {
 		state: { branding },
 	} = React.useContext(AppContext);
 
 	const productName = branding.brand_name || DEFAULT_BRAND_NAME;
 	const tagline = branding.auth_tagline || DEFAULT_AUTH_TAGLINE;
-	const description = branding.auth_description || DEFAULT_AUTH_DESCRIPTION;
 	const logoSrc = branding.logoUrl ?? logo;
+
 	const hasAttemptedRefresh = React.useRef(false);
 	const [isSubmitting, setIsSubmitting] = React.useState(false);
-	const [loginError, setLoginError] = React.useState<string | null>(null);
+	const [error, setError] = React.useState<string | null>(null);
 
 	React.useEffect(() => {
-		if (auth.user !== undefined) {
-			// Signed in with a temporary password — force the set-password screen before anything else.
-			if (auth.mustChangePassword) {
-				navigate('/set-password', { replace: true });
+		// Nobody is signed in here: try the refresh cookie once, then fall back to login.
+		if (auth.user === undefined) {
+			if (hasAttemptedRefresh.current) {
+				navigate('/login', { replace: true });
 				return;
 			}
-			// User is already authenticated, redirect to home
-			const redirect = searchParams.get('redirect');
-			navigate(redirect ?? '/', { replace: true });
+			hasAttemptedRefresh.current = true;
+			void refreshAuthentication();
 			return;
 		}
-
-		if (hasAttemptedRefresh.current) {
-			return;
+		// Signed in but no temp password outstanding — nothing to do here.
+		if (!auth.mustChangePassword) {
+			navigate('/', { replace: true });
 		}
-
-		hasAttemptedRefresh.current = true;
-
-		// Try to refresh authentication using refresh token
-		void refreshAuthentication();
-	}, [auth.user, auth.mustChangePassword, navigate, refreshAuthentication, searchParams]);
+	}, [auth.user, auth.mustChangePassword, navigate, refreshAuthentication]);
 
 	type FieldType = {
-		username?: string;
 		password?: string;
+		confirmPassword?: string;
 	};
 
 	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+		if (!auth.authToken) {
+			setError('Your session has expired. Please sign in again.');
+			return;
+		}
 		setIsSubmitting(true);
-		setLoginError(null);
+		setError(null);
 
 		try {
-			const { accessToken, user, mustChangePassword } = await loginUser({
-				username: values.username ?? '',
-				password: values.password ?? '',
-			});
-			setAuth({ authToken: accessToken, user, mustChangePassword });
+			await setPasswordRequest(values.password ?? '', auth.authToken);
+			setAuth({ ...auth, mustChangePassword: false });
+			navigate('/', { replace: true });
 		} catch (e: any) {
-			setLoginError(e?.message ?? 'Unable to sign in. Please verify your credentials and try again.');
+			setError(e?.message ?? 'Unable to set your password. Please try again.');
 		} finally {
 			setIsSubmitting(false);
 		}
 	};
 
-	const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-		setLoginError('Please complete the required fields.');
-	};
-
-	if (auth.user !== undefined) {
+	if (auth.user === undefined || !auth.mustChangePassword) {
 		return null;
 	}
 
@@ -129,7 +113,7 @@ export function Login() {
 				<Row justify="center" align="middle" style={{ minHeight: 'calc(100vh - 48px)' }}>
 					<Col xs={24} sm={22} md={20} lg={18} xl={16}>
 						<Card
-							bordered={false}
+							variant="borderless"
 							style={{
 								borderRadius: 24,
 								background: token.colorBgContainer,
@@ -139,7 +123,7 @@ export function Login() {
 						>
 							<Row gutter={[48, 32]}>
 								<Col xs={24} md={11}>
-									<Space direction="vertical" size={20} style={{ width: '100%' }}>
+									<Space orientation="vertical" size={20} style={{ width: '100%' }}>
 										<div
 											style={{
 												height: 72,
@@ -156,7 +140,7 @@ export function Login() {
 											/>
 										</div>
 
-										<Space direction="vertical" size={8}>
+										<Space orientation="vertical" size={8}>
 											<Typography.Text style={{ color: token.colorPrimary, fontWeight: 600 }}>
 												Welcome to
 											</Typography.Text>
@@ -169,82 +153,81 @@ export function Login() {
 										</Space>
 
 										<Typography.Paragraph style={{ marginBottom: 0, color: token.colorTextDescription }}>
-											{description}
+											You signed in with a temporary password. Choose a permanent password to finish setting
+											up your account.
 										</Typography.Paragraph>
 
 										<Divider style={{ margin: '4px 0' }} />
-
-										<Space size={[8, 8]} wrap>
-											{STATIC.links.map((item) => (
-												<Button
-													key={item.label}
-													type="link"
-													href={item.href}
-													style={{ paddingInline: 0 }}
-												>
-													{item.label}
-												</Button>
-											))}
-										</Space>
 
 										<Typography.Text type="secondary">{STATIC.helpText}</Typography.Text>
 									</Space>
 								</Col>
 
 								<Col xs={24} md={13}>
-									<Space direction="vertical" size={16} style={{ width: '100%' }}>
+									<Space orientation="vertical" size={16} style={{ width: '100%' }}>
 										<Typography.Title level={3} style={{ margin: 0, color: token.colorTextHeading }}>
-											Sign in
+											Set a new password
 										</Typography.Title>
 										<Typography.Text type="secondary">
-											Use your account credentials to access your training workspace.
+											Your new password replaces the temporary one you were given.
 										</Typography.Text>
 
-										{loginError && <Alert message={loginError} type="error" showIcon />}
+										{error && <Alert title={error} type="error" showIcon />}
 
 										<Form
-											name="login"
+											name="set-password"
 											layout="vertical"
 											size="large"
 											onFinish={onFinish}
-											onFinishFailed={onFinishFailed}
 											autoComplete="off"
 											requiredMark={false}
 										>
 											<Form.Item<FieldType>
-												name="username"
-												label="Username"
-												rules={[{ required: true, message: 'Please input a username' }]}
+												name="password"
+												label="New password"
+												rules={[
+													{ required: true, message: 'Please choose a password' },
+													{ min: 8, message: 'Password must be at least 8 characters long' },
+													{
+														pattern: /[A-Z]/,
+														message: 'Password must contain at least one uppercase letter',
+													},
+													{ pattern: /[0-9]/, message: 'Password must contain at least one number' },
+												]}
+												hasFeedback
 											>
-												<Input prefix={<UserOutlined />} placeholder="Enter your username" />
+												<Input.Password prefix={<LockOutlined />} placeholder="Enter a new password" />
 											</Form.Item>
 
 											<Form.Item<FieldType>
-												name="password"
-												label="Password"
-												rules={[{ required: true, message: 'Please input your password' }]}
+												name="confirmPassword"
+												label="Confirm password"
+												dependencies={['password']}
+												hasFeedback
+												rules={[
+													{ required: true, message: 'Please confirm your password' },
+													({ getFieldValue }) => ({
+														validator(_, value) {
+															if (!value || getFieldValue('password') === value) {
+																return Promise.resolve();
+															}
+															return Promise.reject(new Error('The passwords do not match'));
+														},
+													}),
+												]}
 											>
-												<Input.Password prefix={<LockOutlined />} placeholder="Enter your password" />
+												<Input.Password
+													prefix={<LockOutlined />}
+													placeholder="Re-enter your new password"
+												/>
 											</Form.Item>
 
-											<Form.Item style={{ marginBottom: 8 }}>
+											<Form.Item style={{ marginBottom: 0 }}>
 												<Button type="primary" htmlType="submit" block loading={isSubmitting}>
-													Log in
-												</Button>
-											</Form.Item>
-
-											<Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
-												<Button type="link" href={FORGOT_PASSWORD_URL} style={{ paddingInline: 0 }}>
-													Forgot password?
+													Save password
 												</Button>
 											</Form.Item>
 										</Form>
-
-										{/* Show this after SSO is set up
-										<Divider style={{ margin: '4px 0' }}>Secure Sign-In</Divider>
-										<Typography.Text type="secondary" style={{ fontSize: 13 }}>
-											Session security and account policies are configurable from server settings.
-										</Typography.Text> */}
 									</Space>
 								</Col>
 							</Row>
