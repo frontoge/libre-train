@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 import apiRouter from './api/router';
+import { syncPermissionCatalog } from './database/sync-permission-catalog';
 
 console.log('Starting server...');
 
@@ -43,6 +44,21 @@ app.get(/(.*)/, (req: Request, res: Response) => {
 		error: 'Not Found',
 	});
 });
+
+// Keep the DB permission catalog in sync with shared/permissions.ts. Non-fatal: if the DB is
+// unreachable the server still boots (as it does today) and the next restart retries.
+syncPermissionCatalog()
+	.then(({ added, grantedToAdministrator }) => {
+		if (added.length > 0) {
+			console.log(
+				`Permission catalog: added ${added.join(', ')}`
+					+ (grantedToAdministrator ? ' (granted to Administrator)' : ' (Administrator group not found; not granted)')
+			);
+		}
+	})
+	.catch((error) => {
+		console.error('Failed to sync the permission catalog:', error);
+	});
 
 app.listen(port, '0.0.0.0', () => {
 	console.log(`Server is running on port ${port}`);

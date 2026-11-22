@@ -22,6 +22,11 @@ export type AppState = {
 		duration?: number
 	) => void;
 	auth: Auth;
+	// Effective permission keys for the signed-in user (union across their groups). Drives
+	// page/activity gating. `permissionsLoaded` distinguishes "no permissions" from "not yet
+	// fetched" so gates can wait instead of flashing a denial.
+	permissions: string[];
+	permissionsLoaded: boolean;
 };
 
 export type StateRefreshers = {
@@ -30,6 +35,7 @@ export type StateRefreshers = {
 	refreshContacts: () => void;
 	refreshAssessmentTypes: () => void;
 	refreshBranding: () => void;
+	refreshPermissions: () => void;
 };
 
 export type ColorMode = 'light' | 'dark';
@@ -54,6 +60,8 @@ const initialContext: AppContext = {
 			authToken: '',
 			user: import.meta.env.VITE_ENV === 'local' && getAppConfiguration().disableAuth ? 10 : undefined,
 		},
+		permissions: [],
+		permissionsLoaded: false,
 	},
 	setState: () => {},
 	setAuth: () => {},

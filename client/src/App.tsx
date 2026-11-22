@@ -1,10 +1,12 @@
 /// <reference types="vite/client" />
+import { ALL_PERMISSION_KEYS } from '@libre-train/shared';
 import { ConfigProvider, message, theme } from 'antd';
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { AppContext, DEFAULT_BRAND_NAME, type AppState, type ColorMode } from './app-context';
 import type { Auth } from './auth/authorization';
 import { RequireAuth } from './auth/RequireAuth';
+import { RequirePermission } from './auth/RequirePermission';
 import { getAppConfiguration } from './config/app.config';
 import { AssessmentRouter } from './pages/assessments/AssessmentRouter';
 import { ClientRouter } from './pages/clients/ClientRouter';
@@ -23,6 +25,7 @@ import { getBranding as apiGetBranding } from './api/branding';
 import { fetchClientContacts as apiFetchClientContacts } from './api/client';
 import { listContacts as apiListContacts } from './api/contacts';
 import { fetchAssessmentTypes as apiFetchAssessmentTypes, fetchExercises as apiFetchExercises } from './api/exercise';
+import { getMyPermissions as apiGetMyPermissions } from './api/users';
 import { buildTheme, DEFAULT_BRANDING } from './config/themes';
 import { ClientCycleRoutineView } from './pages/clients/ClientCycleRoutineView';
 import { DietRouter } from './pages/diet/DietRouter';
@@ -79,6 +82,8 @@ function App() {
 			authToken: undefined,
 			user: env === 'local' && getAppConfiguration().disableAuth ? 10 : undefined,
 		},
+		permissions: [],
+		permissionsLoaded: false,
 	});
 
 	const setAuth = (auth: Auth) => {
@@ -96,6 +101,10 @@ function App() {
 		setAppState((prevState) => ({
 			...prevState,
 			auth,
+			// A different user (or a sign-out) must not inherit the previous user's permissions.
+			// Mark them unloaded so gates wait for the new fetch instead of using stale keys. A
+			// token refresh for the same user keeps them, avoiding a spinner flash.
+			...(prevState.auth.user !== auth.user ? { permissions: [], permissionsLoaded: false } : {}),
 		}));
 	};
 
@@ -147,12 +156,36 @@ function App() {
 		}
 	};
 
+	const fetchPermissions = async () => {
+		// Local auth bypass grants everything so dev work isn't blocked by the gate.
+		if (env === 'local' && getAppConfiguration().disableAuth) {
+			setAppState((prev) => ({ ...prev, permissions: ALL_PERMISSION_KEYS, permissionsLoaded: true }));
+			return;
+		}
+		const { authToken, user } = appState.auth;
+		if (!authToken) {
+			setAppState((prev) => ({ ...prev, permissions: [], permissionsLoaded: true }));
+			return;
+		}
+		// Ignore a response that lands after the user has changed (sign-out / switch account).
+		const applyIfSameUser = (permissions: string[]) =>
+			setAppState((prev) => (prev.auth.user === user ? { ...prev, permissions, permissionsLoaded: true } : prev));
+		try {
+			applyIfSameUser(await apiGetMyPermissions(authToken));
+		} catch (error) {
+			console.error('Error fetching permissions:', error);
+			// Fail closed (no permissions) but mark loaded so gates resolve to a clean denial.
+			applyIfSameUser([]);
+		}
+	};
+
 	const stateRefreshers = {
 		refreshExerciseData: fetchExercises,
 		refreshClients: fetchClients,
 		refreshContacts: fetchContacts,
 		refreshAssessmentTypes: fetchAssessmentTypes,
 		refreshBranding: fetchBranding,
+		refreshPermissions: fetchPermissions,
 	};
 
 	useEffect(() => {
@@ -161,6 +194,7 @@ function App() {
 			fetchClients();
 			fetchContacts();
 			fetchAssessmentTypes();
+			fetchPermissions();
 		}
 	}, [appState.auth]);
 
@@ -217,65 +251,67 @@ function App() {
 							<Route
 								path="clients/*"
 								element={
-									<RequireAuth>
+									<RequirePermission permission="clients.view">
 										<ClientRouter />
-									</RequireAuth>
+									</RequirePermission>
 								}
 							/>
 							<Route
 								path="exercises/*"
 								element={
-									<RequireAuth>
+									<RequirePermission permission="exercises.view">
 										<ExerciseRouter />
-									</RequireAuth>
+									</RequirePermission>
 								}
 							/>
 							<Route
 								path="goals"
 								element={
-									<RequireAuth>
+									<RequirePermission permission="clients.view">
 										<GoalsOverview />
-									</RequireAuth>
+									</RequirePermission>
 								}
 							/>
 							<Route
 								path="training/*"
 								element={
-									<RequireAuth>
+									<RequirePermission permission="training.view">
 										<TrainingRouter />
-									</RequireAuth>
+									</RequirePermission>
 								}
 							/>
 							<Route
 								path="assessments/*"
 								element={
-									<RequireAuth>
+									<RequirePermission permission="assessments.view">
 										<AssessmentRouter />
-									</RequireAuth>
+									</RequirePermission>
 								}
 							/>
 							<Route
 								path="diet/*"
 								element={
-									<RequireAuth>
+									<RequirePermission permission="nutrition.view">
 										<DietRouter />
-									</RequireAuth>
+									</RequirePermission>
 								}
 							/>
 							<Route
 								path="contacts"
 								element={
-									<RequireAuth>
+									<RequirePermission permission="contacts.view">
 										<ContactsBrowser />
-									</RequireAuth>
+									</RequirePermission>
 								}
 							/>
 							<Route
 								path="settings/*"
 								element={
-									<RequireAuth>
+									<RequirePermission
+										permission={['settings.branding', 'settings.users', 'settings.permissions']}
+									>
 										<SettingsRouter />
-									</RequireAuth>
+									</RequirePermission>
 								}
 							/>
 						</Route>

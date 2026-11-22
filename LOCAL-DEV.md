@@ -35,7 +35,9 @@ docker compose -f docker-compose.local.yaml up -d
 This starts:
 
 - **MariaDB** on `127.0.0.1:3306` with database/user/password all `libre_train` (root
-  password `root`). Data persists in the `db_data` volume.
+  password `root`). Data persists in the `db_data` volume. On first start (empty volume)
+  it runs `db/scripts/01-grant-shadow-db.sql`, which gives `libre_train` the rights
+  Prisma needs to create its shadow database (see step 4).
 - **Garage** (S3-compatible) on `127.0.0.1:3900`, for branding logo storage.
 
 ## 3. Configure environment variables
@@ -106,6 +108,30 @@ SQL to load by hand.
 
 To reset the dev database from scratch later, use
 `bun run --filter @libre-train/db db:migrate:reset`.
+
+### Troubleshooting: `P3014` "could not create the shadow database"
+
+`db:migrate` (`prisma migrate dev`) creates and drops a temporary **shadow database** to
+validate migrations, so the DB user needs permission to create databases. `db:deploy`
+doesn't use a shadow database, so it isn't affected.
+
+The local compose stack grants this automatically through `db/scripts/`, but only when
+the `db_data` volume is **first created**. MariaDB skips init scripts on an existing
+volume. If your volume predates that script, or you're pointing at your own
+MariaDB/MySQL, grant it once by hand:
+
+```bash
+docker compose -f docker-compose.local.yaml exec db \
+  mariadb -uroot -proot -e "GRANT ALL PRIVILEGES ON *.* TO 'libre_train'@'%'; FLUSH PRIVILEGES;"
+```
+
+The grant is stored in the `db_data` volume, so it survives restarts. Deleting the volume
+(`docker compose -f docker-compose.local.yaml down -v`) resets the database, and the
+init script runs again on the next `up`.
+
+> Only do this for a local, throwaway database. For a shared or remote database, give
+> Prisma a separate shadow database instead of server-wide rights: see
+> [Prisma's shadow database docs](https://www.prisma.io/docs/orm/prisma-migrate/understanding-prisma-migrate/shadow-database).
 
 ## 5. Enable logo storage (optional)
 

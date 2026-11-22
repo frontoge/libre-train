@@ -260,6 +260,13 @@ export type SetPasswordRequest = {
 	password: string;
 };
 
+// The set of permission keys the signed-in user effectively holds (union across all of their
+// permission groups), as resolved by the UserEffectivePermission view. Drives client-side
+// page/activity gating.
+export type EffectivePermissionsResponse = {
+	permissions: string[];
+};
+
 // Shape returned by the auth endpoints (login / signup / refresh / set-password). The access
 // token is held in memory client-side; mustChangePassword drives the set-password gate.
 export type AuthResponse = {

@@ -32,18 +32,21 @@ export const items: NavMenuItem[] = [
 						label: 'Dashboard',
 						icon: <MdSpaceDashboard />,
 						urlPath: '/clients/',
+						requiredPermission: 'clients.view',
 					},
 					{
 						key: 'client_new',
 						label: 'New Client',
 						icon: <IoMdPersonAdd />,
 						urlPath: '/clients/create',
+						requiredPermission: 'clients.create',
 					},
 					{
 						key: 'client_browse',
 						label: 'Browse Clients',
 						icon: <FaListAlt />,
 						urlPath: '/clients/browse',
+						requiredPermission: 'clients.view',
 					},
 				],
 			},
@@ -57,12 +60,14 @@ export const items: NavMenuItem[] = [
 						label: 'New',
 						icon: <FaSquarePlus />,
 						urlPath: '/assessments/create',
+						requiredPermission: 'assessments.manage',
 					},
 					{
 						key: 'assessment_manage',
 						label: 'History',
 						icon: <FaListAlt />,
 						urlPath: '/assessments/',
+						requiredPermission: 'assessments.view',
 					},
 				],
 			},
@@ -71,6 +76,7 @@ export const items: NavMenuItem[] = [
 				label: 'Goals',
 				icon: <FaBullseye />,
 				urlPath: '/goals',
+				requiredPermission: 'clients.view',
 			},
 		],
 	},
@@ -89,18 +95,21 @@ export const items: NavMenuItem[] = [
 						label: 'New Plan',
 						icon: <FaSquarePlus />,
 						urlPath: '/training/create',
+						requiredPermission: 'training.create',
 					},
 					{
 						key: 'training_plan_manage',
 						label: 'Browse Plans',
 						icon: <FaListAlt />,
 						urlPath: '/training/',
+						requiredPermission: 'training.view',
 					},
 					{
 						key: 'training_plan_snapshot',
 						label: "Today's Plan",
 						icon: <FaCalendarXmark />,
 						urlPath: '/training/view',
+						requiredPermission: 'training.view',
 					},
 				],
 			},
@@ -109,6 +118,7 @@ export const items: NavMenuItem[] = [
 				label: 'Exercises',
 				icon: <GiWeightLiftingUp />,
 				urlPath: '/exercises/',
+				requiredPermission: 'exercises.view',
 			},
 		],
 	},
@@ -122,12 +132,14 @@ export const items: NavMenuItem[] = [
 				label: 'Diet Plans',
 				icon: <SiMealie />,
 				urlPath: '/diet/plans',
+				requiredPermission: 'nutrition.view',
 			},
 			{
 				key: 'log_diet',
 				label: 'Diet Log',
 				icon: <FaPencilAlt />,
 				urlPath: '/diet/log',
+				requiredPermission: 'nutrition.manage',
 			},
 		],
 	},
@@ -141,6 +153,7 @@ export const items: NavMenuItem[] = [
 				label: 'Contacts',
 				icon: <FaAddressBook />,
 				urlPath: '/contacts',
+				requiredPermission: 'contacts.view',
 			},
 		],
 	},
@@ -154,18 +167,21 @@ export const items: NavMenuItem[] = [
 				label: 'User Management',
 				icon: <FaUsersCog />,
 				urlPath: '/settings/users',
+				requiredPermission: 'settings.users',
 			},
 			{
 				key: 'permission_groups',
 				label: 'Permissions',
 				icon: <FaShieldAlt />,
 				urlPath: '/settings/permissions',
+				requiredPermission: 'settings.permissions',
 			},
 			{
 				key: 'settings_customization',
 				label: 'Customization',
 				icon: <FaPalette />,
 				urlPath: '/settings/customization',
+				requiredPermission: 'settings.branding',
 			},
 			{
 				key: 'logout',
@@ -176,6 +192,31 @@ export const items: NavMenuItem[] = [
 		],
 	},
 ];
+
+// Filter the menu tree down to what the user may access. A leaf is dropped when its
+// requiredPermission isn't met; a container (group/submenu) is dropped when it fails its own
+// requirement or none of its children survive. Items with no requirement and no children
+// (Home, Logout) are always kept. New permissions integrate by tagging items above — no change
+// here.
+export const filterNavItems = (
+	list: NavMenuItem[],
+	isAllowed: (requirement: string | string[] | undefined) => boolean
+): NavMenuItem[] => {
+	const result: NavMenuItem[] = [];
+	for (const item of list) {
+		if (!item) continue;
+		if (!isAllowed(item.requiredPermission)) continue;
+		if (item.children) {
+			const children = filterNavItems(item.children, isAllowed);
+			if (children.length > 0) {
+				result.push({ ...item, children } as NavMenuItem);
+			}
+			continue;
+		}
+		result.push(item);
+	}
+	return result;
+};
 
 // Recursive lookup so deeply-nested leaves (group → submenu → item) resolve their urlPath.
 export const getNavItemByKey = (key: string, list: NavMenuItem[] = items): NavMenuItem | undefined => {

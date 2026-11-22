@@ -90,7 +90,13 @@ import {
 	handleGetPermissionGroups,
 	handleUpdatePermissionGroup,
 } from './handlers/permission-group-handlers';
-import { handleCreateUser, handleGetUsers, handleUpdateUserGroups } from './handlers/user-handlers';
+import {
+	handleCreateUser,
+	handleGetMyPermissions,
+	handleGetUsers,
+	handleResetUserPassword,
+	handleUpdateUserGroups,
+} from './handlers/user-handlers';
 import {
 	handleCreateWorkoutRoutine,
 	handleDeleteWorkoutRoutine,
@@ -139,8 +145,10 @@ router.post(Routes.AuthSetPassword, handleSetPassword);
 
 // User routes
 router.get(Routes.Users, handleGetUsers);
+router.get(Routes.UserPermissions, handleGetMyPermissions);
 router.post(Routes.Users, handleCreateUser);
 router.put(`${Routes.Users}/:id/groups`, handleUpdateUserGroups);
+router.post(`${Routes.Users}/:id/reset-password`, handleResetUserPassword);
 
 // Permission group routes
 router.get(Routes.PermissionGroups, handleGetPermissionGroups);

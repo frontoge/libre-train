@@ -1,7 +1,9 @@
 // Canonical, code-defined permission catalog. This is the single source of truth for the
-// individual capabilities in the system: the DB `Permission` table is seeded from it, the
-// settings UI renders groups against it, and server-side checks reference the keys.
-// Devs add new permissions here (and re-seed); admins compose groups from them.
+// individual capabilities in the system: the server syncs it into the DB `Permission` table on
+// startup (server/database/sync-permission-catalog.ts), the settings UI renders groups against
+// it, and server-side checks reference the keys. Devs add new permissions here, with no
+// migration needed: new keys are inserted and granted to Administrator on the next server
+// start. Admins compose groups from them.
 
 export type PermissionDef = {
 	key: string;
@@ -77,9 +79,18 @@ export const PERMISSION_CATALOG: PermissionCategoryDef[] = [
 			{ key: 'settings.branding', label: 'Manage branding', description: 'Customize colors, logo, and copy.' },
 			{ key: 'settings.users', label: 'Manage users', description: 'Create and manage user accounts.' },
 			{ key: 'settings.permissions', label: 'Manage permissions', description: 'Configure permission groups.' },
+			{
+				key: 'users.reset_password',
+				label: 'Reset user passwords',
+				description: 'Set a temporary password for another user, forcing them to choose a new one on next sign-in.',
+			},
 		],
 	},
 ];
+
+// Permission key for resetting another user's password — referenced by the server-side
+// authorization check and the client's reset action so the two never drift.
+export const PERMISSION_RESET_USER_PASSWORD = 'users.reset_password';
 
 export const ALL_PERMISSION_KEYS: string[] = PERMISSION_CATALOG.flatMap((c) => c.permissions.map((p) => p.key));
 
