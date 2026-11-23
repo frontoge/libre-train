@@ -1,6 +1,6 @@
 import { HomeOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Breadcrumb, Dropdown, Layout, theme, type MenuProps } from 'antd';
-import { Content, Header } from 'antd/es/layout/layout';
+import { Content } from 'antd/es/layout/layout';
 import { useContext, useMemo } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa6';
 import { Link, useLocation } from 'react-router-dom';
@@ -12,7 +12,6 @@ export type BreadcrumbItem = {
 };
 
 type PageLayoutProps = {
-	title?: string;
 	children?: React.ReactNode;
 	/** Override the auto-derived breadcrumb trail. The Home crumb is always prepended. */
 	breadcrumbs?: BreadcrumbItem[];
@@ -115,26 +114,25 @@ export default function PageLayout(props: PageLayoutProps) {
 
 	return (
 		<Layout style={layoutStyle}>
-			<Header
+			{/* Breadcrumbs on the left, user menu pinned to the right. The breadcrumbs name the
+			    current page, so there's no separate title bar. */}
+			<div
 				style={{
 					flex: '0 0 auto',
 					display: 'flex',
 					alignItems: 'center',
-					justifyContent: 'space-between',
-				}}
-			>
-				<h1 style={{ margin: 0, padding: 0, fontSize: '1.5rem' }}>{props.title || 'Page Title'}</h1>
-				<Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
-					<Avatar icon={<UserOutlined />} style={{ cursor: 'pointer', backgroundColor: token.colorPrimary }} />
-				</Dropdown>
-			</Header>
-			<div
-				style={{
-					flex: '0 0 auto',
+					gap: '1rem',
 					padding: '0.75rem 2rem 0',
 				}}
 			>
-				<Breadcrumb items={crumbItems} />
+				<Breadcrumb items={crumbItems} style={{ flex: '1 1 auto', minWidth: 0 }} />
+				<Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
+					<Avatar
+						icon={<UserOutlined />}
+						aria-label="User menu"
+						style={{ flex: '0 0 auto', cursor: 'pointer', backgroundColor: token.colorPrimary }}
+					/>
+				</Dropdown>
 			</div>
 			<Content style={contentStyle}>{props.children}</Content>
 		</Layout>

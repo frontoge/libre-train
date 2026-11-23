@@ -27,7 +27,8 @@
 		"lint:fix": "eslint . --fix",
 		"test": "vitest",
 		"test:run": "vitest run",
-		"test:coverage": "vitest run --coverage"
+		"test:coverage": "vitest run --coverage",
+		"seed:dev": "bun run scripts/seed-dev-admin.ts"
 	},
 	"peerDependencies": {
 		"typescript": "^5.8.3"

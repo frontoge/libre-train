@@ -499,7 +499,7 @@ export function UserManagement() {
 	const hasSelection = selectedRowKeys.length > 0;
 
 	return (
-		<PageLayout title="User Management" contentStyle={{ padding: isMobile ? '1rem' : '1.5rem 2rem' }}>
+		<PageLayout contentStyle={{ padding: isMobile ? '1rem' : '1.5rem 2rem' }}>
 			<div style={{ height: isMobile ? 'auto' : '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 				{/* Header */}
 				<div

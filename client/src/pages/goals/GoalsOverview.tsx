@@ -81,14 +81,14 @@ export function GoalsOverview() {
 
 	if (trainerId === undefined) {
 		return (
-			<PageLayout title="Goals">
+			<PageLayout>
 				<Result status="403" title="Not signed in" />
 			</PageLayout>
 		);
 	}
 
 	return (
-		<PageLayout title="Goals">
+		<PageLayout>
 			<div
 				style={{
 					maxWidth: '1280px',

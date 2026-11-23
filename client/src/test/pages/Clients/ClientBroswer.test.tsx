@@ -89,10 +89,9 @@ describe('ClientBrowser', () => {
 		mockNavigate.mockReset();
 	});
 
-	it('renders page title and total client count', () => {
+	it('renders the total client count', () => {
 		renderClientBrowser();
 
-		expect(screen.getByRole('heading', { name: 'Client Browser' })).toBeInTheDocument();
 		expect(screen.getByRole('heading', { name: /2 Clients/i })).toBeInTheDocument();
 	});
 

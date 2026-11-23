@@ -127,7 +127,7 @@ export function ClientBrowser() {
 	];
 
 	return (
-		<PageLayout title="Client Browser">
+		<PageLayout>
 			<div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 				{/* Info Card */}
 				<div

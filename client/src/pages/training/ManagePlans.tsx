@@ -13,7 +13,6 @@ export function ManagePlans() {
 
 	return (
 		<PageLayout
-			title="Browse Plans"
 			contentStyle={{
 				display: 'flex',
 				flexDirection: 'column',

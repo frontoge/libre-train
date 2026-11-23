@@ -5,7 +5,6 @@ import { Panel } from '../../components/Panel';
 export function CreateAssessment() {
 	return (
 		<PageLayout
-			title="New Assessment"
 			contentStyle={{
 				padding: '2rem 3rem',
 				display: 'flex',

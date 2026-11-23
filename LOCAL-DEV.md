@@ -109,6 +109,25 @@ SQL to load by hand.
 To reset the dev database from scratch later, use
 `bun run --filter @libre-train/db db:migrate:reset`.
 
+### Create a local admin login
+
+Migrations don't create any users. To get an account you can sign in with, seed a local
+admin:
+
+```bash
+bun run seed:dev
+```
+
+This creates the user **`dev`** with password **`Password1`** in the Administrator group,
+so it can open every page. Override the defaults with `SEED_ADMIN_USERNAME`,
+`SEED_ADMIN_PASSWORD` and `SEED_ADMIN_EMAIL`. Re-running is safe: it resets that user's
+password and makes sure they're still an Administrator, which also helps if you forget the
+password.
+
+The script reads `server/.env` and **refuses to run unless `DB_HOST` is `localhost`,
+`127.0.0.1` or `::1`**, so it can't seed a shared or deployed database. Run it again after
+`db:migrate:reset`, since that wipes all users.
+
 ### Troubleshooting: `P3014` "could not create the shadow database"
 
 `db:migrate` (`prisma migrate dev`) creates and drops a temporary **shadow database** to

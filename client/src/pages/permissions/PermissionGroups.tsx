@@ -379,7 +379,7 @@ export function PermissionGroups() {
 		drawerMode === 'create' ? 'New permission group' : drawerMode === 'edit' ? 'Edit group' : activeGroup?.name;
 
 	return (
-		<PageLayout title="Permission Groups" contentStyle={{ padding: isMobile ? '1rem' : '1.5rem 2rem' }}>
+		<PageLayout contentStyle={{ padding: isMobile ? '1rem' : '1.5rem 2rem' }}>
 			<div style={{ height: isMobile ? 'auto' : '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 				{/* Header */}
 				<div

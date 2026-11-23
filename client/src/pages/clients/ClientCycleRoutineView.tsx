@@ -78,7 +78,6 @@ export function ClientCycleRoutineView() {
 
 	return (
 		<PageLayout
-			title={microcycle?.cycle_name ? `Microcycle: ${microcycle.cycle_name}` : 'Microcycle Routines'}
 			style={{
 				height: '100%',
 				width: '100%',
@@ -90,6 +89,9 @@ export function ClientCycleRoutineView() {
 			}}
 		>
 			<div className="client-cycle-view-wrapper">
+				<Typography.Title level={3} style={{ margin: 0 }}>
+					{microcycle?.cycle_name ? `Microcycle: ${microcycle.cycle_name}` : 'Microcycle Routines'}
+				</Typography.Title>
 				<Panel className="client-cycle-meta-panel">
 					<div className="client-cycle-meta-row">
 						<Typography.Text type="secondary">Date Range</Typography.Text>

@@ -68,7 +68,6 @@ export function NewPlan() {
 
 	return (
 		<PageLayout
-			title="New Training Plan"
 			contentStyle={{
 				display: 'flex',
 				flexDirection: 'column',

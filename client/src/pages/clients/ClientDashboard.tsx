@@ -58,11 +58,7 @@ export function ClientDashboard() {
 
 	return (
 		<ClientDashboardContext value={{ dashboardState, setDashboardState }}>
-			<PageLayout
-				title="Client Dashboard"
-				breadcrumbs={breadcrumbs}
-				contentStyle={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}
-			>
+			<PageLayout breadcrumbs={breadcrumbs} contentStyle={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
 				<div
 					id="client-dash-left"
 					style={{
