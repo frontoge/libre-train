@@ -203,7 +203,7 @@ export function Customization() {
 	);
 
 	return (
-		<PageLayout title="Customization" contentStyle={{ padding: isMobile ? '1rem' : '1.5rem 2rem' }}>
+		<PageLayout contentStyle={{ padding: isMobile ? '1rem' : '1.5rem 2rem' }}>
 			<div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 				<div>
 					<Typography.Title level={3} style={{ margin: 0, color: token.colorTextHeading }}>

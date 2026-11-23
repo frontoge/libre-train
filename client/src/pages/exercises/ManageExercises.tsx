@@ -5,7 +5,6 @@ import { Panel } from '../../components/Panel';
 export default function ManageExercises() {
 	return (
 		<PageLayout
-			title="Browse Exercises"
 			contentStyle={{
 				display: 'flex',
 				flexDirection: 'row',

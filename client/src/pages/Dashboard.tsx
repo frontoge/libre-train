@@ -113,7 +113,7 @@ export function Dashboard() {
 	}, []);
 
 	return (
-		<PageLayout title="Trainer Dashboard">
+		<PageLayout>
 			<Space orientation="vertical" size={20} style={{ width: '100%' }}>
 				<DashboardHeader
 					taskProgressPercent={taskProgressPercent}

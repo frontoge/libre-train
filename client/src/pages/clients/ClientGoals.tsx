@@ -72,7 +72,7 @@ export function ClientGoals() {
 
 	if (clientId === undefined || Number.isNaN(clientId)) {
 		return (
-			<PageLayout title="Client Goals">
+			<PageLayout>
 				<Result status="404" title="No client selected" subTitle="Pick a client from the client list." />
 			</PageLayout>
 		);
@@ -109,7 +109,7 @@ export function ClientGoals() {
 	);
 
 	return (
-		<PageLayout title={clientName ? `Goals — ${clientName}` : 'Client Goals'} breadcrumbs={breadcrumbs}>
+		<PageLayout breadcrumbs={breadcrumbs}>
 			<div
 				style={{
 					maxWidth: '1280px',

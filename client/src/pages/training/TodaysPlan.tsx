@@ -3,7 +3,6 @@ import PageLayout from '../../components/PageLayout';
 export function TodaysPlan() {
 	return (
 		<PageLayout
-			title="Training Plan Snapshot"
 			contentStyle={{
 				display: 'flex',
 				flexDirection: 'column',

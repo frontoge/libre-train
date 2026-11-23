@@ -165,7 +165,7 @@ describe('Dashboard', () => {
 
 		renderDashboard();
 
-		expect(screen.getByRole('heading', { name: 'Trainer Dashboard' })).toBeInTheDocument();
+		expect(screen.getByLabelText('User menu')).toBeInTheDocument();
 		expect(screen.getByText('Your Coaching Command Center')).toBeInTheDocument();
 		expect(screen.getByText('Recently Added Clients')).toBeInTheDocument();
 		expect(screen.getByText("Today's Appointments")).toBeInTheDocument();

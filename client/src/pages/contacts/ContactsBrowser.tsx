@@ -411,7 +411,7 @@ export function ContactsBrowser() {
 	};
 
 	return (
-		<PageLayout title="Contacts" contentStyle={{ padding: isMobile ? '1rem' : '1.5rem 2rem' }}>
+		<PageLayout contentStyle={{ padding: isMobile ? '1rem' : '1.5rem 2rem' }}>
 			<div style={{ height: isMobile ? 'auto' : '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 				{/* Header */}
 				<div

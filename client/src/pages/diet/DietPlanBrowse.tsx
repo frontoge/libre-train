@@ -4,7 +4,7 @@ import { Panel } from '../../components/Panel';
 
 export function DietPlanBrowse() {
 	return (
-		<PageLayout title="View Client Diet Plans">
+		<PageLayout>
 			<Panel
 				style={{
 					width: '100%',

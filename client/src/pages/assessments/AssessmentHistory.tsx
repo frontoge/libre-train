@@ -41,7 +41,6 @@ export function AssessmentHistory() {
 
 	return (
 		<PageLayout
-			title="Assessment History"
 			contentStyle={{
 				padding: '2rem 3rem',
 				display: 'flex',
