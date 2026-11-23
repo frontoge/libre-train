@@ -22,12 +22,15 @@ import {
 } from 'antd';
 import type { TableProps } from 'antd/es/table';
 import dayjs from 'dayjs';
-import { useEffect, useMemo, useState } from 'react';
-import { FaEnvelope, FaLayerGroup, FaPen, FaPhone, FaPlus, FaRegTrashAlt, FaSearch, FaUserShield } from 'react-icons/fa';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { FaEnvelope, FaKey, FaLayerGroup, FaPen, FaPhone, FaPlus, FaRegTrashAlt, FaSearch, FaUserShield } from 'react-icons/fa';
 import { listPermissionGroups } from '../../api/permission-groups';
-import { createUser, listUsers, updateUserGroups } from '../../api/users';
+import { createUser, listUsers, resetUserPassword, updateUserGroups } from '../../api/users';
+import { AppContext } from '../../app-context';
+import { Can } from '../../components/Common/Can';
 import PageLayout from '../../components/PageLayout';
 import { getInitials } from '../../helpers/label-formatters';
+import { useAuth } from '../../hooks/useAuth';
 import { useMessage } from '../../hooks/useMessage';
 
 // Deterministic, pleasant avatar background so each user reads as distinct at a glance.
@@ -212,6 +215,43 @@ export function UserManagement() {
 		}
 	};
 
+	// Reset-password flow (gated by the users.reset_password permission). The admin sets a
+	// temporary password; the target is forced to choose a new one on next sign-in.
+	const { auth } = useAuth();
+	const { stateRefreshers } = useContext(AppContext);
+	const [resetUser, setResetUser] = useState<UserWithContact | null>(null);
+	const [resetForm] = Form.useForm<{ password?: string }>();
+	const [resettingPassword, setResettingPassword] = useState(false);
+
+	const openResetModal = (user: UserWithContact) => {
+		setResetUser(user);
+		resetForm.resetFields();
+	};
+
+	const closeResetModal = () => {
+		setResetUser(null);
+		resetForm.resetFields();
+	};
+
+	const handleResetSubmit = async (values: { password?: string }) => {
+		if (!resetUser) return;
+		if (!auth.authToken) {
+			showMessage('error', 'Your session has expired. Please sign in again.');
+			return;
+		}
+		setResettingPassword(true);
+		try {
+			await resetUserPassword(resetUser.id, values.password ?? '', auth.authToken);
+			showMessage('success', `Password reset for ${fullName(resetUser) || resetUser.username}.`);
+			closeResetModal();
+		} catch (error) {
+			console.error('Error resetting password:', error);
+			showMessage('error', error instanceof Error ? error.message : 'Failed to reset password.');
+		} finally {
+			setResettingPassword(false);
+		}
+	};
+
 	const openGroupModal = (user: UserWithContact) => {
 		setGroupModalUser(user);
 		setSelectedGroupIds(user.groups.map((g) => g.id));
@@ -233,6 +273,8 @@ export function UserManagement() {
 			await updateUserGroups(groupModalUser.id, selectedGroupIds);
 			showMessage('success', `Updated groups for ${fullName(groupModalUser) || groupModalUser.username}.`);
 			closeGroupModal();
+			// The edited user may be the signed-in admin; re-fetch so their own access updates now.
+			stateRefreshers?.refreshPermissions();
 			await reloadUsers();
 		} catch (error) {
 			console.error('Error updating user groups:', error);
@@ -348,13 +390,18 @@ export function UserManagement() {
 		{
 			title: 'Actions',
 			key: 'actions',
-			width: 96,
+			width: 130,
 			align: 'right',
 			render: (_, user) => (
 				<Space size={2} onClick={(e) => e.stopPropagation()}>
 					<Tooltip title="View details">
 						<Button type="text" icon={<FaUserShield />} onClick={() => setDrawerUser(user)} />
 					</Tooltip>
+					<Can permission="users.reset_password">
+						<Tooltip title="Reset password">
+							<Button type="text" icon={<FaKey />} onClick={() => openResetModal(user)} />
+						</Tooltip>
+					</Can>
 					<Popconfirm
 						title="Delete this user?"
 						description="This cannot be undone."
@@ -429,6 +476,11 @@ export function UserManagement() {
 				<Button size="small" type="text" icon={<FaPen />} onClick={() => openEditModal(user)}>
 					Edit
 				</Button>
+				<Can permission="users.reset_password">
+					<Button size="small" type="text" icon={<FaKey />} onClick={() => openResetModal(user)}>
+						Reset
+					</Button>
+				</Can>
 				<Popconfirm
 					title="Delete this user?"
 					description="This cannot be undone."
@@ -789,6 +841,38 @@ export function UserManagement() {
 							<Input.Password placeholder="Set an initial password" />
 						</Form.Item>
 					)}
+				</Form>
+			</Modal>
+
+			{/* Reset password modal (gated by users.reset_password) */}
+			<Modal
+				centered
+				open={!!resetUser}
+				onCancel={closeResetModal}
+				onOk={() => resetForm.submit()}
+				okText="Reset password"
+				okButtonProps={{ loading: resettingPassword }}
+				confirmLoading={resettingPassword}
+				title={resetUser ? `Reset password — ${fullName(resetUser) || resetUser.username}` : 'Reset password'}
+				destroyOnHidden
+				style={{ maxWidth: 'calc(100vw - 2rem)' }}
+			>
+				<Typography.Paragraph type="secondary" style={{ marginTop: 4 }}>
+					Set a temporary password for this user. They will be required to choose a new one the next time they sign in.
+				</Typography.Paragraph>
+				<Form form={resetForm} layout="vertical" requiredMark="optional" onFinish={handleResetSubmit}>
+					<Form.Item
+						name="password"
+						label="Temporary password"
+						rules={[
+							{ required: true, message: 'Password is required' },
+							{ min: 8, message: 'Password must be at least 8 characters long' },
+							{ pattern: /[A-Z]/, message: 'Password must contain at least one uppercase letter' },
+							{ pattern: /[0-9]/, message: 'Password must contain at least one number' },
+						]}
+					>
+						<Input.Password placeholder="Set a temporary password" />
+					</Form.Item>
 				</Form>
 			</Modal>
 		</PageLayout>

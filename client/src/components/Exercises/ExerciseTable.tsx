@@ -8,6 +8,7 @@ import { AppContext } from '../../app-context';
 import { applyExerciseTableFilters } from '../../helpers/filter-helpers';
 import { ExerciseTypeLabels, MovementPatternLabels, MuscleGroupLabels } from '../../helpers/label-formatters';
 import { useMessage } from '../../hooks/useMessage';
+import { Can } from '../Common/Can';
 import { CreateEditExerciseModal } from './CreateEditExerciseModal';
 import { ExerciseSearch, type ExerciseSearchParams } from './ExerciseSearch';
 import { MuscleGroupTag } from './MuscleGroupTag';
@@ -108,10 +109,12 @@ export function ExerciseTable() {
 					) : (
 						<span style={{ color: '#bfbfbf', cursor: 'not-allowed' }}>Video</span>
 					)}
-					<Button onClick={() => handleOpenEditModal(record.id)}>Edit</Button>
-					<Button onClick={() => handleDelete(record.id)} type="primary">
-						Delete
-					</Button>
+					<Can permission="exercises.manage">
+						<Button onClick={() => handleOpenEditModal(record.id)}>Edit</Button>
+						<Button onClick={() => handleDelete(record.id)} type="primary">
+							Delete
+						</Button>
+					</Can>
 				</Space>
 			),
 			width: 80,
@@ -136,15 +139,17 @@ export function ExerciseTable() {
 				}}
 				onSearchChange={setFilterParams}
 			/>
-			<Button
-				color="default"
-				variant="filled"
-				icon={<IoAddCircle />}
-				iconPlacement="end"
-				onClick={() => handleOpenNewExercise()}
-			>
-				Create New
-			</Button>
+			<Can permission="exercises.manage">
+				<Button
+					color="default"
+					variant="filled"
+					icon={<IoAddCircle />}
+					iconPlacement="end"
+					onClick={() => handleOpenNewExercise()}
+				>
+					Create New
+				</Button>
+			</Can>
 		</div>
 	);
 

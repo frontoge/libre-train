@@ -132,24 +132,32 @@ export const handleAuthRefresh = async (req: Request, res: Response) => {
 	}
 };
 
+// Resolve the calling user's id from the Bearer access token. Returns null when the token is
+// missing or invalid. This is the one place the app verifies an access token for a data
+// request, so any token-authenticated handler should funnel through it.
+export function getAuthenticatedUserId(req: Request): number | null {
+	const authHeader = req.headers.authorization;
+	const accessToken = authHeader?.startsWith('Bearer ') ? authHeader.slice('Bearer '.length) : undefined;
+	if (!accessToken) {
+		return null;
+	}
+	try {
+		const payload = jwt.verify(accessToken, process.env.JWT_SECRET!);
+		// eslint-disable-next-line
+		const userId = Number(payload.sub);
+		return Number.isInteger(userId) ? userId : null;
+	} catch {
+		return null;
+	}
+}
+
 // A signed-in user replacing the temporary password they were created with. Authenticated by
 // the access token (Bearer) rather than a body-supplied id, and only usable while the user is
 // actually flagged must_change_password — once cleared, the endpoint no longer applies.
 export const handleSetPassword = async (req: Request<{}, {}, { password?: string }>, res: Response) => {
-	const authHeader = req.headers.authorization;
-	const accessToken = authHeader?.startsWith('Bearer ') ? authHeader.slice('Bearer '.length) : undefined;
-
-	if (!accessToken) {
+	const userId = getAuthenticatedUserId(req);
+	if (userId === null) {
 		return res.status(401).json({ message: 'Authentication required' });
-	}
-
-	let userId: number;
-	try {
-		const payload = jwt.verify(accessToken, process.env.JWT_SECRET!);
-		// eslint-disable-next-line
-		userId = Number(payload.sub);
-	} catch {
-		return res.status(401).json({ message: 'Invalid or expired session' });
 	}
 
 	const passwordError = validatePasswordStrength(req.body.password);

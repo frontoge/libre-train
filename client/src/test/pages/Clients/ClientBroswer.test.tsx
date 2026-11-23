@@ -62,6 +62,8 @@ const createState = (clients: ClientContact[]): AppState => ({
 		authToken: undefined,
 		user: 1,
 	},
+	permissions: [],
+	permissionsLoaded: true,
 });
 
 const renderClientBrowser = (clients: ClientContact[] = defaultClients) => {

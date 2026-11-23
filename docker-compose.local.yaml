@@ -24,6 +24,9 @@ services:
             MARIADB_ROOT_PASSWORD: root
         volumes:
             - db_data:/var/lib/mysql
+            # Runs once on an empty db_data volume: lets the app user create Prisma's
+            # shadow database so `db:migrate` works (see LOCAL-DEV.md, step 4).
+            - ./db/scripts:/docker-entrypoint-initdb.d:ro
         healthcheck:
             test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
             interval: 10s

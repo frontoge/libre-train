@@ -8,6 +8,10 @@ export type MenuItem = Required<MenuProps>['items'][number];
 export type NavMenuItem = MenuItem & {
 	urlPath?: string;
 	children?: NavMenuItem[];
+	// Permission(s) required to see this item. A string[] is satisfied by holding ANY listed
+	// key. Omitted means always visible (e.g. Home, Logout). Containers (groups/submenus) are
+	// hidden automatically when none of their children survive filtering.
+	requiredPermission?: string | string[];
 };
 
 export type ClientListMenuItem = MenuItem;

@@ -19,6 +19,7 @@ export const Routes = {
 	Mesocycle: '/cycle/meso',
 	Microcycle: '/cycle/micro',
 	Users: '/users',
+	UserPermissions: '/users/me/permissions',
 	PermissionGroups: '/permission-groups',
 	WorkoutRoutine: '/workout-routine',
 	DietPlan: '/diet/plan',

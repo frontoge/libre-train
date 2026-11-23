@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import { RequirePermission } from '../../auth/RequirePermission';
 import { NoPage } from '../NoPage';
 import { CreateDietLog } from './CreateDietLog';
 import { DietPlanBrowse } from './DietPlanBrowse';
@@ -16,7 +17,14 @@ export const DietRouter = () => {
 	return (
 		<Routes>
 			<Route path="plans/*" element={<DietPlanRouter />} />
-			<Route path="log" element={<CreateDietLog />} />
+			<Route
+				path="log"
+				element={
+					<RequirePermission permission="nutrition.manage">
+						<CreateDietLog />
+					</RequirePermission>
+				}
+			/>
 			<Route path="*" element={<NoPage />} />
 		</Routes>
 	);

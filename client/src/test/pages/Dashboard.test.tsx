@@ -125,6 +125,8 @@ const createState = (overrides?: Partial<AppState>): AppState => ({
 		authToken: undefined,
 		user: 1,
 	},
+	permissions: [],
+	permissionsLoaded: true,
 	...overrides,
 });
 

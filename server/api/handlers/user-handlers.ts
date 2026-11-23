@@ -1,9 +1,24 @@
-import { CreateUserRequest, UpdateUserGroupsRequest, UserWithContact } from '@libre-train/shared';
+import {
+	CreateUserRequest,
+	EffectivePermissionsResponse,
+	PERMISSION_RESET_USER_PASSWORD,
+	UpdateUserGroupsRequest,
+	UserWithContact,
+} from '@libre-train/shared';
 import { Request, Response } from 'express';
 import dayjs from '../../config/dayjs';
 import { prisma } from '../../database/mysql-database';
 import { MessageResponse } from '../../types/utilities';
-import { hashPassword, validatePasswordStrength } from './auth-handlers';
+import { getAuthenticatedUserId, hashPassword, validatePasswordStrength } from './auth-handlers';
+
+// True when the given user holds the permission key, per the UserEffectivePermission view.
+async function userHasPermission(userId: number, permissionKey: string): Promise<boolean> {
+	const match = await prisma.userEffectivePermission.findFirst({
+		where: { userId, permissionKey },
+		select: { userId: true },
+	});
+	return match !== null;
+}
 
 // Shared selection + mapping so created users serialize identically to the list endpoint.
 const userWithContactSelect = {
@@ -75,6 +90,28 @@ export const handleGetUsers = async (_req: Request, res: Response<UserWithContac
 		}
 		console.error('Unexpected error fetching users:', error);
 		res.status(500).json({ message: 'An unexpected error occurred.' });
+	}
+};
+
+// The effective permissions of the signed-in user — the union of every permission key granted
+// by the groups they belong to, resolved by the UserEffectivePermission DB view. The client
+// uses this to gate navigation, routes, and in-page actions.
+export const handleGetMyPermissions = async (req: Request, res: Response<EffectivePermissionsResponse | MessageResponse>) => {
+	const userId = getAuthenticatedUserId(req);
+	if (userId === null) {
+		res.status(401).json({ message: 'Authentication required' });
+		return;
+	}
+
+	try {
+		const rows = await prisma.userEffectivePermission.findMany({
+			where: { userId },
+			select: { permissionKey: true },
+		});
+		res.status(200).json({ permissions: rows.map((row) => row.permissionKey) });
+	} catch (error) {
+		console.error('Error fetching user permissions:', error);
+		res.status(500).json({ message: 'An error occurred while fetching permissions.' });
 	}
 };
 
@@ -201,5 +238,56 @@ export const handleCreateUser = async (
 	} catch (error) {
 		console.error('Error creating user:', error);
 		res.status(500).json({ message: 'An error occurred while creating the user.' });
+	}
+};
+
+// An admin (anyone holding users.reset_password) sets a temporary password for another user.
+// The target is flagged must_change_password, so they're forced onto the set-password screen
+// on next sign-in. Authorization is enforced server-side here — the only data route to do so —
+// because resetting credentials is sensitive enough not to trust the client alone.
+export const handleResetUserPassword = async (
+	req: Request<{ id: string }, {}, { password?: string }>,
+	res: Response<MessageResponse>
+) => {
+	const callerId = getAuthenticatedUserId(req);
+	if (callerId === null) {
+		res.status(401).json({ message: 'Authentication required' });
+		return;
+	}
+
+	if (!(await userHasPermission(callerId, PERMISSION_RESET_USER_PASSWORD))) {
+		res.status(403).json({ message: 'You do not have permission to reset user passwords.' });
+		return;
+	}
+
+	const targetId = parseInt(req.params.id, 10);
+	if (!Number.isInteger(targetId)) {
+		res.status(400).json({ message: 'Invalid user id.' });
+		return;
+	}
+
+	const passwordError = validatePasswordStrength(req.body.password);
+	if (passwordError) {
+		res.status(400).json({ message: passwordError });
+		return;
+	}
+
+	try {
+		const target = await prisma.user.findUnique({ where: { id: targetId }, select: { id: true } });
+		if (!target) {
+			res.status(404).json({ message: 'User not found.' });
+			return;
+		}
+
+		const passwordHash = await hashPassword(req.body.password!);
+		await prisma.user.update({
+			where: { id: targetId },
+			data: { pass: passwordHash, must_change_password: true },
+		});
+
+		res.status(200).json({ message: 'Password reset. The user must set a new password on next sign-in.' });
+	} catch (error) {
+		console.error('Error resetting user password:', error);
+		res.status(500).json({ message: 'An error occurred while resetting the password.' });
 	}
 };

@@ -7,6 +7,7 @@ import { FaPen, FaPhone, FaPlus, FaRegTrashAlt, FaSearch, FaUserPlus } from 'rea
 import { useNavigate } from 'react-router-dom';
 import { createContact, deleteContact, updateContact } from '../../api/contacts';
 import { AppContext } from '../../app-context';
+import { Can } from '../../components/Common/Can';
 import { ContactEditCreateForm } from '../../components/Contacts/ContactEditCreateForm';
 import PageLayout from '../../components/PageLayout';
 import { getYearsSinceDate } from '../../helpers/date-helpers';
@@ -254,33 +255,37 @@ export function ContactsBrowser() {
 				return (
 					<Space size={2}>
 						{canCreateClient && (
-							<Tooltip title="Convert to client">
+							<Can permission="clients.create">
+								<Tooltip title="Convert to client">
+									<Button
+										type="text"
+										icon={<FaUserPlus />}
+										onClick={() => handleCreateClientFromContact(record.id)}
+									/>
+								</Tooltip>
+							</Can>
+						)}
+						<Can permission="contacts.manage">
+							<Tooltip title="Edit">
 								<Button
 									type="text"
-									icon={<FaUserPlus />}
-									onClick={() => handleCreateClientFromContact(record.id)}
+									icon={<FaPen />}
+									disabled={!contact}
+									onClick={() => contact && openEditModal(contact)}
 								/>
 							</Tooltip>
-						)}
-						<Tooltip title="Edit">
-							<Button
-								type="text"
-								icon={<FaPen />}
-								disabled={!contact}
-								onClick={() => contact && openEditModal(contact)}
-							/>
-						</Tooltip>
-						<Popconfirm
-							title="Delete this contact?"
-							description="This cannot be undone."
-							okText="Delete"
-							okButtonProps={{ danger: true }}
-							onConfirm={() => handleDelete(record.id)}
-						>
-							<Tooltip title="Delete">
-								<Button type="text" danger icon={<FaRegTrashAlt />} />
-							</Tooltip>
-						</Popconfirm>
+							<Popconfirm
+								title="Delete this contact?"
+								description="This cannot be undone."
+								okText="Delete"
+								okButtonProps={{ danger: true }}
+								onConfirm={() => handleDelete(record.id)}
+							>
+								<Tooltip title="Delete">
+									<Button type="text" danger icon={<FaRegTrashAlt />} />
+								</Tooltip>
+							</Popconfirm>
+						</Can>
 					</Space>
 				);
 			},
@@ -293,9 +298,11 @@ export function ContactsBrowser() {
 			description={searchInput || filter !== 'all' ? 'No contacts match your filters' : 'No contacts yet'}
 		>
 			{!searchInput && filter === 'all' && (
-				<Button type="primary" icon={<FaPlus />} onClick={openAddModal}>
-					Add your first contact
-				</Button>
+				<Can permission="contacts.manage">
+					<Button type="primary" icon={<FaPlus />} onClick={openAddModal}>
+						Add your first contact
+					</Button>
+				</Can>
 			)}
 		</Empty>
 	);
@@ -365,35 +372,39 @@ export function ContactsBrowser() {
 					}}
 				>
 					{canCreateClient && (
+						<Can permission="clients.create">
+							<Button
+								size="small"
+								type="text"
+								icon={<FaUserPlus />}
+								onClick={() => handleCreateClientFromContact(record.id)}
+							>
+								Convert
+							</Button>
+						</Can>
+					)}
+					<Can permission="contacts.manage">
 						<Button
 							size="small"
 							type="text"
-							icon={<FaUserPlus />}
-							onClick={() => handleCreateClientFromContact(record.id)}
+							icon={<FaPen />}
+							disabled={!contact}
+							onClick={() => contact && openEditModal(contact)}
 						>
-							Convert
+							Edit
 						</Button>
-					)}
-					<Button
-						size="small"
-						type="text"
-						icon={<FaPen />}
-						disabled={!contact}
-						onClick={() => contact && openEditModal(contact)}
-					>
-						Edit
-					</Button>
-					<Popconfirm
-						title="Delete this contact?"
-						description="This cannot be undone."
-						okText="Delete"
-						okButtonProps={{ danger: true }}
-						onConfirm={() => handleDelete(record.id)}
-					>
-						<Button size="small" type="text" danger icon={<FaRegTrashAlt />}>
-							Delete
-						</Button>
-					</Popconfirm>
+						<Popconfirm
+							title="Delete this contact?"
+							description="This cannot be undone."
+							okText="Delete"
+							okButtonProps={{ danger: true }}
+							onConfirm={() => handleDelete(record.id)}
+						>
+							<Button size="small" type="text" danger icon={<FaRegTrashAlt />}>
+								Delete
+							</Button>
+						</Popconfirm>
+					</Can>
 				</div>
 			</div>
 		);
@@ -418,16 +429,18 @@ export function ContactsBrowser() {
 						</Typography.Title>
 						<Typography.Text type="secondary">Browse, manage, and convert contacts into clients.</Typography.Text>
 					</div>
-					<Button
-						type="primary"
-						icon={<FaPlus />}
-						onClick={openAddModal}
-						size="large"
-						block={isMobile}
-						style={isMobile ? undefined : { flex: '0 0 auto' }}
-					>
-						Add Contact
-					</Button>
+					<Can permission="contacts.manage">
+						<Button
+							type="primary"
+							icon={<FaPlus />}
+							onClick={openAddModal}
+							size="large"
+							block={isMobile}
+							style={isMobile ? undefined : { flex: '0 0 auto' }}
+						>
+							Add Contact
+						</Button>
+					</Can>
 				</div>
 
 				{/* Clickable stat tiles double as quick filters */}

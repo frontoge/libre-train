@@ -1,8 +1,9 @@
 import { Menu } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getParentSubmenuKey, items } from '../../config/nav-menu-items';
+import { filterNavItems, getParentSubmenuKey, items } from '../../config/nav-menu-items';
 import { getNavigationUrl } from '../../helpers/navigation-helpers';
+import { usePermissions } from '../../hooks/usePermissions';
 
 type NavEntry = {
 	key: string;
@@ -52,6 +53,10 @@ const flattenNavItems = (menuItems: typeof items): NavEntry[] => {
 export function NavMenu() {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { isAllowed } = usePermissions();
+
+	// Only render menu entries the user is allowed to reach.
+	const visibleItems = useMemo(() => filterNavItems(items, isAllowed), [isAllowed]);
 
 	const selectedKeys = useMemo(() => {
 		const currentPath = trimBasePath(location.pathname, import.meta.env.VITE_BASE_URL ?? '/');
@@ -106,7 +111,7 @@ export function NavMenu() {
 				borderInlineEnd: 'none',
 			}}
 			onClick={onClick}
-			items={items}
+			items={visibleItems}
 		/>
 	);
 }

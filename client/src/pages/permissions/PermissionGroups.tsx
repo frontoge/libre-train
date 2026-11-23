@@ -18,7 +18,7 @@ import {
 } from 'antd';
 import type { TableProps } from 'antd/es/table';
 import type { DataNode } from 'antd/es/tree';
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { FaLock, FaPen, FaPlus, FaRegTrashAlt, FaSearch, FaShieldAlt } from 'react-icons/fa';
 import {
 	createPermissionGroup,
@@ -26,6 +26,7 @@ import {
 	listPermissionGroups,
 	updatePermissionGroup,
 } from '../../api/permission-groups';
+import { AppContext } from '../../app-context';
 import PageLayout from '../../components/PageLayout';
 import { useMessage } from '../../hooks/useMessage';
 import { ALL_PERMISSION_IDS, GROUP_COLORS, PERMISSION_CATALOG, TOTAL_PERMISSIONS } from './permission-data';
@@ -45,6 +46,7 @@ export function PermissionGroups() {
 	const screens = Grid.useBreakpoint();
 	const isMobile = !screens.md;
 	const showMessage = useMessage();
+	const { stateRefreshers } = useContext(AppContext);
 
 	const [groups, setGroups] = useState<Group[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -165,6 +167,8 @@ export function PermissionGroups() {
 				showMessage('success', `Updated "${name}".`);
 			}
 			closeDrawer();
+			// Editing a group the signed-in user belongs to changes their own access.
+			stateRefreshers?.refreshPermissions();
 			await refresh();
 		} catch (error) {
 			console.error('Error saving permission group:', error);
@@ -178,6 +182,7 @@ export function PermissionGroups() {
 		try {
 			await deletePermissionGroup(group.id);
 			showMessage('success', `Deleted "${group.name}".`);
+			stateRefreshers?.refreshPermissions();
 			await refresh();
 		} catch (error) {
 			console.error('Error deleting permission group:', error);
